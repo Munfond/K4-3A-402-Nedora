@@ -1,0 +1,870 @@
+# Drizzle ORM + Neon Database Project Rules
+
+You are an expert TypeScript developer working on a modern feedback management system built with cutting-edge technologies.
+
+## Project Context
+
+This is a feedback management system with the following key entities:
+- Users (authentication and user management)
+- Feedback (product feedback items)
+- Entries (customer feedback entries linked to feedback items)
+- Comments (comments on feedback items)
+- Areas (product areas for categorization)
+
+## Complete Tech Stack
+
+### Frontend & Framework
+- **Framework**: Next.js 15 (canary) with App Router
+- **UI Library**: shadcn/ui with Radix UI primitives
+- **Styling**: Tailwind CSS v4 with CSS variables
+- **Icons**: Lucide React, Heroicons, Phosphor Icons
+- **Animations**: Motion (Framer Motion)
+- **State Management**: Nuqs for URL state, SWR for data fetching
+- **Forms & Validation**: Zod for schema validation
+- **Charts**: Recharts for data visualization
+- **Typography**: Geist font family
+
+### Backend & Database
+- **Database**: PostgreSQL hosted on Neon
+- **ORM**: Drizzle ORM with relational query builder
+- **Driver**: node-postgres (pg)
+- **Schema Location**: `src/lib/db/schema.ts`
+- **Relations**: `src/lib/db/relations.ts`
+- **Database Instance**: `src/lib/db/index.ts`
+- **Server Actions**: next-safe-action v8 for type-safe mutations
+- **Authentication**: Google OAuth
+- **File Storage**: Vercel Blob Storage
+- **External Data**: Snowflake integration
+
+### Development & Deployment
+- **Language**: TypeScript 5 with strict mode
+- **Linting & Formatting**: Biome (replaces ESLint + Prettier)
+- **Package Manager**: pnpm with workspace support
+- **Build Tool**: Next.js with Turbopack
+- **Deployment**: Vercel with Edge Runtime support
+- **Analytics**: Vercel Analytics & Speed Insights
+- **Monitoring**: Vercel Toolbar for development
+
+### Key Features
+- **Performance**: PPR (Partial Pre-rendering), optimized package imports
+- **Type Safety**: Strict TypeScript, typed routes, Zod validation
+- **Modern UI**: shadcn/ui components, dark mode support
+- **DX**: Hot reload, React Scan, organized import groups
+
+### Database Architecture
+- **Connection**: Pooled connections via node-postgres
+- **Schema Management**: Drizzle Kit for migrations
+- **Query Pattern**: MANDATORY - ONLY use Drizzle Relational Query Builder (RQB)
+
+### Critical Requirement: Query Syntax
+**MANDATORY: ONLY use Drizzle Relational Query Builder (RQB) syntax. NEVER use `db.select()` syntax.**
+
+#### ✅ CORRECT - Use Query Engine:
+```typescript
+// Import the db instance
+import { db } from '@/lib/db/index'
+
+// Find many with relations
+const result = await db.query.feedback.findMany({
+  with: {
+    user: true,
+    entries: {
+      with: {
+        user: true
+      }
+    },
+    comments: {
+      orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+      limit: 10
+    }
+  },
+  where: (feedback, { eq, and, isNotNull }) => and(
+    eq(feedback.status, 'open'),
+    isNotNull(feedback.creator)
+  ),
+  orderBy: (feedback, { desc }) => [desc(feedback.updatedAt)],
+  limit: 20
+})
+
+// Find first/single record
+const feedback = await db.query.feedback.findFirst({
+  where: (feedback, { eq }) => eq(feedback.id, feedbackId),
+  with: {
+    user: true,
+    entries: true,
+    comments: {
+      with: {
+        user: true
+      }
+    }
+  }
+})
+
+// Find with extras (computed fields)
+const feedbackWithExtras = await db.query.feedback.findMany({
+  extras: {
+    entryCount: sql<number>`(SELECT COUNT(*) FROM entries WHERE feedback_id = feedback.id)`.as('entry_count')
+  },
+  with: {
+    entries: true
+  }
+})
+```
+
+#### ❌ INCORRECT - Never use db.select():
+```typescript
+// NEVER DO THIS
+const result = await db.select().from(Feedback).where(eq(Feedback.id, id))
+const result = await db.select({...}).from(Feedback).leftJoin(...)
+```
+
+### Available Tables & Relations
+Based on the current schema:
+
+#### Tables:
+- `Users` - User accounts
+- `Feedback` - Feedback items
+- `Entries` - Customer feedback entries
+- `Comments` - Comments on feedback
+- `Areas` - Product areas
+
+#### Relations:
+- `Users` → many `Feedback`, `Entries`, `Comments`
+- `Feedback` → one `Users` (creator), many `Entries`, many `Comments`
+- `Entries` → one `Users` (creator), one `Feedback`
+- `Comments` → one `Users` (creator), one `Feedback`
+- `Areas` → (standalone table)
+
+### Query Patterns
+
+#### Filtering:
+```typescript
+// Use callback syntax for filters
+where: (table, { eq, and, or, isNull, isNotNull, gt, lt, like, ilike }) => and(
+  eq(table.status, 'open'),
+  isNotNull(table.creator),
+  ilike(table.title, '%search%')
+)
+```
+
+#### Ordering:
+```typescript
+// Use callback syntax for ordering
+orderBy: (table, { asc, desc }) => [desc(table.createdAt), asc(table.title)]
+```
+
+#### Pagination:
+```typescript
+// Only limit/offset at top level
+limit: 20,
+offset: 40
+```
+
+#### Including Relations:
+```typescript
+with: {
+  user: true, // Include full relation
+  entries: {
+    limit: 5,
+    orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+    with: {
+      user: true
+    }
+  }
+}
+```
+
+### Database Operations
+
+#### Inserts:
+```typescript
+import { Feedback } from '@/lib/db/schema'
+
+const newFeedback = await db.insert(Feedback).values({
+  title: 'New feedback',
+  description: 'Description',
+  creator: userId,
+  areaIds: ['area1', 'area2']
+}).returning()
+```
+
+#### Updates:
+```typescript
+const updated = await db.update(Feedback)
+  .set({
+    title: 'Updated title',
+    updatedAt: new Date().toISOString()
+  })
+  .where(eq(Feedback.id, feedbackId))
+  .returning()
+```
+
+#### Deletes:
+```typescript
+await db.delete(Comments)
+  .where(eq(Comments.id, commentId))
+```
+
+### Error Handling
+- Always handle database errors gracefully
+- Use try/catch blocks for database operations
+- Provide meaningful error messages
+- Log database errors appropriately
+
+### Performance Guidelines
+- Use `limit` to prevent large result sets
+- Only include necessary relations with `with`
+- Use prepared statements for repeated queries
+- Index frequently queried fields
+
+### Type Safety
+- Always use TypeScript with strict mode
+- Leverage Drizzle's inferred types
+- Import types from schema when needed
+- Use proper typing for custom SQL in extras
+
+### File Organization
+- Keep database queries in dedicated files/functions
+- Use consistent naming conventions
+- Group related queries together
+- Export reusable query functions
+
+### Common Anti-Patterns to Avoid
+1. **Never use `db.select()`** - Always use `db.query.TableName.findMany()` or `findFirst()`
+2. Don't manually construct joins - Use the `with` syntax
+3. Don't fetch all relations unnecessarily - Be selective
+4. Don't forget to handle null/undefined values from database
+5. Don't hardcode IDs - Use proper filtering
+6. Don't use raw SQL unless absolutely necessary for complex computations in `extras`
+
+## Code Style & Standards
+
+### TypeScript Requirements
+- Always use strict TypeScript with `"strict": true`
+- Leverage Drizzle's inferred types - avoid manual type annotations
+- Use Zod for runtime validation and type inference
+- Import specific operators when needed: `import { eq, and, or, sql } from 'drizzle-orm'`
+- Use proper error handling with try/catch blocks
+- Follow path alias patterns: `@/` for src directory
+
+### Next.js App Router Patterns
+- Use Server Components by default
+- Add `"use client"` only when necessary (interactivity, hooks, browser APIs)
+- Prefer Server Actions over API routes for mutations
+- Use `generateMetadata` for dynamic SEO
+- Implement proper loading and error boundaries
+- Use `notFound()` for 404 handling
+
+### Component Architecture
+```typescript
+// Server Component (default)
+export default async function FeedbackPage({ params }: { params: { id: string } }) {
+  const feedback = await getFeedbackById(params.id);
+  return <FeedbackDetail feedback={feedback} />;
+}
+
+// Client Component (when needed)
+"use client";
+import { useState } from "react";
+
+export function InteractiveFeedbackForm() {
+  const [state, setState] = useState();
+  // ... interactive logic
+}
+```
+
+### Import Patterns
+```typescript
+// External packages first
+import { z } from "zod"
+import { eq, and, or, sql } from "drizzle-orm"
+
+// Internal imports with @/ alias
+import { db } from "@/lib/db/index"
+import { Feedback, Users, Entries, Comments } from "@/lib/db/schema"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+```
+
+### shadcn/ui Component Usage
+- Import components from `@/components/ui/*`
+- Use `cn()` utility for conditional classes
+- Leverage Radix UI primitives for accessibility
+- Follow the New York style convention
+- Use CSS variables for theming
+
+```typescript
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+
+<Button variant="outline" size="sm" className={cn("w-full", isActive && "bg-primary")}>
+  Submit Feedback
+</Button>
+```
+
+### File Organization
+- **Action Clients**: `src/lib/actions/clients/` (next-safe-action clients)
+- **Server Actions**: `src/lib/actions/`
+- **Custom Hooks**: `src/hooks/` (data fetching hooks using SWR)
+- Database services: `src/lib/services/`
+- API routes: `src/app/(protected)/api/`
+- Page components: `src/app/(protected)/[route]/page.tsx`
+- Reusable components: `src/components/`
+- UI primitives: `src/components/ui/`
+- Utilities: `src/lib/utils.ts`
+- Type definitions: `src/types/`
+
+## Environment & Configuration
+
+### Required Environment Variables
+```bash
+# Database
+DATABASE_URL=postgresql://...  # Neon PostgreSQL connection
+
+# Site Configuration
+NEXT_PUBLIC_APP_URL=https://...
+
+# Snowflake Data Warehouse
+SNOWFLAKE_DATA_ACCOUNT=...
+SNOWFLAKE_DATA_USER=...
+SNOWFLAKE_DATA_PASSWORD=...
+SNOWFLAKE_DATA_ROLE=...
+SNOWFLAKE_DATA_WAREHOUSE=...
+
+# Vercel Storage
+BLOB_READ_WRITE_TOKEN=...
+
+# Webhooks
+FEEDBACK_WEBHOOK_BYPASS_TOKEN=...
+```
+
+### Environment Validation
+- Use Zod schemas in `src/lib/env.client.ts` and `src/lib/env.server.ts`
+- Client env vars must be prefixed with `NEXT_PUBLIC_`
+- Server env vars are validated at build time
+- Environment validation prevents runtime errors
+
+### Key Dependencies
+```json
+{
+  "dependencies": {
+    "next": "canary",
+    "react": "^19.0.0",
+    "drizzle-orm": "^0.44.5",
+    "drizzle-kit": "^0.31.4",
+    "pg": "^8.16.3",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/blob": "^1.1.1",
+    "tailwindcss": "^4",
+    "zod": "^3.25.62",
+    "lucide-react": "^0.513.0",
+    "class-variance-authority": "^0.7.1",
+    "tailwind-merge": "^2.6.0",
+    "nuqs": "^2.4.3",
+    "swr": "^2.3.3",
+    "next-safe-action": "^8.0.11"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
+
+## Server Actions with next-safe-action
+
+### Critical Requirement: Action Clients
+**MANDATORY: ONLY use next-safe-action clients for server actions. NEVER create raw server actions.**
+
+#### ✅ CORRECT - Use Action Clients:
+```typescript
+"use server";
+
+import { z } from "zod";
+import { authActionClient } from "@/lib/actions/clients/auth";
+
+const inputSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().max(1000),
+});
+
+export const createFeedback = authActionClient
+  .metadata({ actionName: "createFeedback", entity: "feedback" })
+  .inputSchema(inputSchema)
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const result = await db.insert(Feedback).values({
+      ...parsedInput,
+      creator: user.id
+    }).returning();
+    
+    revalidatePath("/feedback");
+    return { success: true, data: result[0] };
+  });
+```
+
+#### ❌ INCORRECT - Never use raw server actions:
+```typescript
+// NEVER DO THIS
+"use server";
+export async function createFeedback(formData: FormData) {
+  // Raw server action without type safety, validation, or middleware
+}
+```
+
+### Available Action Clients
+
+#### Base Client (`src/lib/actions/clients/index.ts`)
+- For public actions that don't require authentication
+- Includes error handling, logging, and metadata validation
+- Use sparingly - most actions should be authenticated
+
+```typescript
+import { baseClient } from "@/lib/actions/clients";
+
+export const publicAction = baseClient
+  .metadata({ actionName: "publicAction", entity: "feedback" })
+  .inputSchema(schema)
+  .action(async ({ parsedInput }) => {
+    // Public action logic
+  });
+```
+
+#### Authenticated Client (`src/lib/actions/clients/auth.ts`)
+- For actions requiring user authentication
+- Automatically validates session and adds user to context
+- **Most common client to use**
+
+```typescript
+import { authActionClient } from "@/lib/actions/clients/auth";
+
+export const userAction = authActionClient
+  .metadata({ actionName: "userAction", entity: "entry" })
+  .inputSchema(schema)
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    // user.id is automatically available in context
+  });
+```
+
+#### Admin Client (`src/lib/actions/clients/admin.ts`)
+- For actions requiring admin privileges
+- Includes authentication + admin permission checks
+- Use for sensitive operations
+
+```typescript
+import { adminActionClient } from "@/lib/actions/clients/admin";
+
+export const adminAction = adminActionClient
+  .metadata({ actionName: "adminAction", entity: "user" })
+  .inputSchema(schema)
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    // Only admin users can execute this
+  });
+```
+
+### Action Implementation Patterns
+
+#### Form Data Actions
+```typescript
+import { zfd } from "zod-form-data";
+
+const formSchema = zfd.formData({
+  title: zfd.text(z.string().min(1)),
+  severity: zfd.text(z.enum(["low", "medium", "high"])),
+  tags: zfd.text(z.string()).transform(val => val.split(",")),
+});
+
+export const formAction = authActionClient
+  .metadata({ actionName: "formAction", entity: "feedback" })
+  .inputSchema(formSchema)
+  .action(async ({ parsedInput }) => {
+    // Form data is automatically parsed and validated
+  });
+```
+
+#### Error Handling
+```typescript
+import { ActionError } from "@/lib/actions/clients";
+
+// In your action:
+if (!hasPermission) {
+  throw new ActionError("You don't have permission to perform this action");
+}
+
+// ActionError messages are returned to the client
+// Other errors are masked for security
+```
+
+#### Database Operations
+```typescript
+export const createEntry = authActionClient
+  .metadata({ actionName: "createEntry", entity: "entry" })
+  .inputSchema(schema)
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    try {
+      const result = await db.insert(Entries).values({
+        ...parsedInput,
+        creator: user.id,
+      }).returning();
+      
+      revalidatePath("/entries");
+      return { success: true, data: result[0] };
+    } catch (error) {
+      throw new ActionError("Failed to create entry");
+    }
+  });
+```
+
+### Client Usage Patterns
+
+#### React Hook Form Integration
+```typescript
+import { useAction } from "next-safe-action/hooks";
+import { createNewFeedbackItem } from "@/lib/actions/feedback";
+
+export function FeedbackForm() {
+  const { execute, result, isPending } = useAction(createNewFeedbackItem);
+  
+  const onSubmit = (data) => {
+    execute(data);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("title")} />
+      <button disabled={isPending} type="submit">
+        {isPending ? "Creating..." : "Create"}
+      </button>
+    </form>
+  );
+}
+```
+
+#### Direct Form Actions
+```typescript
+// Direct form usage
+<form action={createFeedback}>
+  <input name="title" required />
+  <button type="submit">Submit</button>
+</form>
+```
+
+#### Optimistic Updates
+```typescript
+import { useOptimisticAction } from "next-safe-action/hooks";
+
+const { execute, optimisticData } = useOptimisticAction(
+  updateFeedback,
+  optimisticUpdater
+);
+```
+
+### Action Metadata Requirements
+
+Every action MUST include metadata:
+```typescript
+.metadata({ 
+  actionName: "descriptiveActionName", 
+  entity: "feedback" | "entry" | "comment" | "user" | "area" | "account"
+})
+```
+
+### Action Anti-Patterns to Avoid
+
+1. **Never create raw server actions** - Always use action clients
+2. **Don't skip input validation** - Always use `inputSchema`
+3. **Don't ignore error handling** - Use ActionError for user-facing errors
+4. **Don't forget metadata** - Required for debugging and monitoring
+5. **Don't mix authentication levels** - Use appropriate client for access level
+6. **Don't skip revalidation** - Call `revalidatePath()` after mutations
+
+### Action File Organization
+
+```
+src/
+├── lib/actions/clients/    # Action client definitions
+│   ├── index.ts            # Base client + ActionError
+│   ├── admin.ts            # Admin client
+│   ├── auth.ts             # Authenticated client
+│   ├── entity-admin.ts     # Entity Admin client
+└── lib/actions/            # Legacy actions (migrate to new pattern)
+│   ├── feedback.ts         # Feedback-related actions
+│   ├── entries.ts          # Entry-related actions
+    └── comments.ts         # Comment-related actions
+```
+
+## Migration & Schema Management
+
+### Guidelines
+- Use Drizzle Kit for all schema changes: `npx drizzle-kit generate` and `npx drizzle-kit migrate`
+- Test migrations in development environment first
+- Keep migration files in version control
+- Document breaking schema changes in commit messages
+- Use descriptive migration names
+
+### Schema Files
+- Main schema: `src/lib/db/schema.ts`
+- Relations: `src/lib/db/relations-new.ts`
+- Database config: `drizzle.config.ts`
+
+## Performance Best Practices
+
+### Query Optimization
+- Always use `limit` to prevent large result sets
+- Be selective with `with` clauses - only include needed relations
+- Use `orderBy` for consistent sorting
+- Consider pagination with `limit` and `offset` for large datasets
+- Use indexes on frequently queried fields
+
+### Prepared Statements
+Use prepared statements for repeated queries:
+```typescript
+const getPinnedComments = db.query.Comments.findMany({
+  where: (comments, { eq, and }) => and(
+    eq(comments.feedbackId, placeholder('feedbackId')),
+    eq(comments.isPinned, true)
+  ),
+  with: { user: true }
+}).prepare();
+```
+
+## Development Workflow
+
+### Code Quality
+- **Linting**: Use Biome (`pnpm lint`) - replaces ESLint + Prettier
+- **Formatting**: Biome handles formatting (`pnpm format`)
+- **Type Checking**: Run `pnpm typecheck` before commits
+- **Import Organization**: Biome auto-organizes imports by groups
+
+### Build & Development
+- **Development**: `pnpm dev` (with Turbopack)
+- **Build**: `pnpm build` (with Turbopack)
+- **Database**: `pnpm db:studio` for Drizzle Studio
+
+### Component Development
+- Use shadcn/ui components from `@/components/ui/*`
+- Extend components in `@/components/` directory
+- Follow accessibility patterns from Radix UI
+- Use Tailwind v4 with CSS variables for theming
+
+### Performance Considerations
+- Leverage Next.js 15 features: PPR, optimized imports
+- Use Server Components for data fetching
+- Implement proper caching strategies
+- Monitor with Vercel Analytics & Speed Insights
+
+## Key Patterns & Best Practices
+
+### Custom Hooks Pattern
+**MANDATORY: All data fetching hooks in `src/hooks/` MUST use SWR for consistent caching and state management.**
+
+#### ✅ CORRECT - Data Fetching Hook with SWR:
+```typescript
+import useSWR from "swr";
+import type { Account } from "@/lib/snowflake/types";
+
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Failed to fetch");
+  return response.json();
+};
+
+export function useAccount(accountId: string | null | undefined) {
+  const key = accountId ? `/api/accounts/${encodeURIComponent(accountId)}` : null;
+  
+  const { data, error, isLoading, mutate } = useSWR<{
+    account: Account | null;
+    opportunities: Opportunity[];
+  }>(key, fetcher, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
+
+  return {
+    account: data?.account ?? null,
+    opportunities: data?.opportunities ?? [],
+    loading: isLoading,
+    error: error ? (error as Error).message : null,
+    mutate,
+  };
+}
+```
+
+#### ✅ CORRECT - Batch Data Fetching Hook with SWR:
+```typescript
+import useSWR from "swr";
+
+const accountsFetcher = async (accountIds: string[]) => {
+  if (accountIds.length === 0) return {};
+  
+  const promises = accountIds.map(async (id) => {
+    try {
+      const data = await fetcher(`/api/accounts/${encodeURIComponent(id)}`);
+      return { id, data };
+    } catch {
+      return { id, data: { account: null, opportunities: [] } };
+    }
+  });
+  
+  const results = await Promise.all(promises);
+  const accountsData = {};
+  results.forEach(({ id, data }) => {
+    accountsData[id] = data;
+  });
+  return accountsData;
+};
+
+export function useAccounts(accountIds: string[]) {
+  const { data, error, isLoading, mutate } = useSWR(
+    accountIds.length > 0 ? ["accounts", ...accountIds.sort()] : null,
+    () => accountsFetcher(accountIds),
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      dedupingInterval: 60000, // 1 minute
+    }
+  );
+
+  return {
+    accounts: data || {},
+    loading: isLoading,
+    error: error ? (error as Error).message : null,
+    mutate,
+  };
+}
+```
+
+#### Hook Requirements:
+1. **Use SWR**: All data fetching hooks must use SWR for consistent caching and state management
+2. **Consistent Return Shape**: Return objects with descriptive properties (data, loading, error, mutate)
+3. **Error Handling**: Gracefully handle errors and provide user-friendly error messages
+4. **Type Safety**: Use proper TypeScript types for all data structures
+5. **SWR Configuration**: Use appropriate SWR options for caching, revalidation, and retry behavior
+6. **Key Design**: Design cache keys thoughtfully to enable proper deduplication and invalidation
+
+#### ❌ INCORRECT - Don't use raw fetch or other data fetching libraries:
+```typescript
+// NEVER DO THIS in hooks
+export function useAccount(accountId: string) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    // Raw fetch without SWR caching/deduplication
+    fetch(`/api/accounts/${accountId}`)
+      .then(res => res.json())
+      .then(setData);
+  }, [accountId]);
+  
+  return { data, loading };
+}
+```
+
+### Server Actions Pattern
+**IMPORTANT: Use next-safe-action clients instead of raw server actions. See "Server Actions with next-safe-action" section above.**
+
+```typescript
+"use server";
+
+import { z } from "zod";
+import { authActionClient } from "@/lib/actions/clients/auth";
+
+const inputSchema = z.object({
+  title: z.string().min(1),
+});
+
+export const createFeedback = authActionClient
+  .metadata({ actionName: "createFeedback", entity: "feedback" })
+  .inputSchema(inputSchema)
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const feedback = await db.insert(Feedback).values({
+      title: parsedInput.title,
+      creator: user.id,
+    }).returning();
+    
+    revalidatePath("/feedback");
+    return { success: true, data: feedback[0] };
+  });
+```
+
+### Form Handling with Zod
+```typescript
+import { z } from "zod";
+
+const feedbackSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  severity: z.enum(["low", "medium", "high"]),
+});
+
+type FeedbackInput = z.infer<typeof feedbackSchema>;
+```
+
+### URL State Management with Nuqs
+```typescript
+import { useQueryState } from "nuqs";
+
+export function FeedbackFilters() {
+  const [status, setStatus] = useQueryState("status", { defaultValue: "open" });
+  const [search, setSearch] = useQueryState("search", { defaultValue: "" });
+  
+  return (
+    <div>
+      <input value={search} onChange={(e) => setSearch(e.target.value)} />
+      <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <option value="open">Open</option>
+        <option value="shipped">Shipped</option>
+      </select>
+    </div>
+  );
+}
+```
+
+Remember: This modern stack provides type safety, optimal performance, and excellent developer experience. The Drizzle Relational Query Builder is the ONLY approved database query method for this project.
+
+## Workflow File Structure
+
+### Critical Requirement: Folder Organization
+**MANDATORY: Never put shared steps in a nested `steps` folder within the `shared` folder. Anything within the `shared` folder is already a step. Workflows go directly within the parent `workflows` folder.**
+
+#### ✅ CORRECT - File Structure:
+```
+apps/www/src/workflows/
+├── shared/                          # All files here are step functions
+│   ├── get-all-feedback-items.ts    # Step function
+│   ├── track-event.ts               # Step function
+│   ├── delete-unprocessed-entry.ts  # Step function
+│   └── slack/                       # Subfolder for Slack-specific steps
+│       └── get-slack-user-id.ts     # Step function
+├── process-customer-entry.ts        # Workflow (uses "use workflow")
+├── feedback/
+│   └── new-feedback/
+│       └── index.ts                 # Workflow
+│       └── steps/                   # Steps specific to this workflow
+│           └── get-creator-email.ts
+└── ingest-slack-feedback/
+    └── index.ts                     # Workflow
+```
+
+#### ❌ INCORRECT - Never nest steps in shared:
+```
+apps/www/src/workflows/
+├── shared/
+│   └── steps/                      # ❌ NEVER DO THIS
+│       └── track-event.ts
+```
+
+### Import Patterns:
+```typescript
+// ✅ CORRECT - Import from shared directly
+import { trackEvent } from "../shared/track-event";
+import { getAllFeedbackItems } from "../shared/get-all-feedback-items";
+import { deleteUnprocessedEntryStep } from "./shared/delete-unprocessed-entry";
+
+// ❌ INCORRECT - Never import from shared/steps/
+import { trackEvent } from "../shared/steps/track-event";
+```
+
+### Key Rules:
+1. **Everything in `shared/` is a step function** - Files should have `"use step"` directive
+2. **Workflows go directly in `workflows/`** - Not in nested folders unless organizing by feature
+3. **Workflow-specific steps** - Can be in `workflows/[workflow-name]/steps/` for steps only used by that workflow
+4. **Shared steps** - Must be directly in `workflows/shared/`, never in `workflows/shared/steps/`

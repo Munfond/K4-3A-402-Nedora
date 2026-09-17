@@ -1,0 +1,92 @@
+[
+  {
+    "id": "gy-001",
+    "thoiDiem": "2026-09-02 09:14",
+    "nguoiGui": "hv-004",
+    "video": "d1",
+    "deHieu": 3,
+    "nhipDo": 2,
+    "yKienThem": "Đoạn giữa hơi nhanh em không kịp ghi."
+  },
+  {
+    "id": "gy-005",
+    "thoiDiem": "2026-09-02 13:05",
+    "nguoiGui": "hv-031",
+    "video": "d1",
+    "deHieu": 4,
+    "nhipDo": 3,
+    "yKienThem": "Năm giây suy nghĩ ngắn quá, em chưa kịp nghĩ đã thấy đáp án."
+  },
+  {
+    "id": "gy-006",
+    "thoiDiem": "2026-09-02 13:22",
+    "nguoiGui": "hv-037",
+    "video": "d1",
+    "deHieu": 4,
+    "nhipDo": 3,
+    "yKienThem": "Khoảng dừng để suy nghĩ hơi dài, em thấy sốt ruột, rút ngắn lại được không ạ."
+  },
+  {
+    "id": "gy-009",
+    "thoiDiem": "2026-09-02 19:00",
+    "nguoiGui": "hv-050",
+    "video": "d1",
+    "deHieu": 5,
+    "nhipDo": 5,
+    "yKienThem": "Video hay ạ."
+  },
+  {
+    "id": "gy-013",
+    "thoiDiem": "2026-09-02 21:00",
+    "nguoiGui": "hv-063",
+    "video": "d1",
+    "deHieu": 4,
+    "nhipDo": 4,
+    "yKienThem": "Em nghĩ nên có ví dụ về tiếng Việt, mấy ví dụ thư rác với áp phích hơi xa với công việc của em."
+  },
+  {
+    "id": "gy-015",
+    "thoiDiem": "2026-09-03 08:45",
+    "nguoiGui": "hv-070",
+    "video": "d1",
+    "deHieu": 3,
+    "nhipDo": 3,
+    "yKienThem": "Chỗ giải thích mô hình học máy nằm bên trong bộ lọc em nghe ba lần mới hiểu."
+  },
+  {
+    "id": "gy-019",
+    "thoiDiem": "2026-09-03 09:02",
+    "nguoiGui": "hv-081",
+    "video": "d1",
+    "deHieu": 4,
+    "nhipDo": 4,
+    "yKienThem": ""
+  },
+  {
+    "id": "gy-020",
+    "thoiDiem": "2026-09-03 09:15",
+    "nguoiGui": "hv-082",
+    "video": "d1",
+    "deHieu": 2,
+    "nhipDo": 2,
+    "yKienThem": "Nhiều khái niệm quá, bốn cái tên mà em cứ lẫn giữa tạo sinh với mô hình ngôn ngữ lớn."
+  },
+  {
+    "id": "gy-021",
+    "thoiDiem": "2026-09-03 09:40",
+    "nguoiGui": "hv-085",
+    "video": "d1",
+    "deHieu": 5,
+    "nhipDo": 4,
+    "yKienThem": "Phần bản đồ khái niệm dễ nhớ ạ."
+  },
+  {
+    "id": "gy-022",
+    "thoiDiem": "2026-09-03 10:05",
+    "nguoiGui": "hv-090",
+    "video": "d1",
+    "deHieu": 3,
+    "nhipDo": 4,
+    "yKienThem": "Em vẫn không rõ ứng dụng trò chuyện khác mô hình ngôn ngữ lớn ở chỗ nào."
+  }
+]

@@ -1,0 +1,9 @@
+export { GongIcon } from "./gong-icon";
+export { LinearIcon } from "./linear-icon";
+export { NeonIcon } from "./neon-icon";
+export { NotionIcon } from "./notion-icon";
+export { SalesforceIcon } from "./salesforce-icon";
+export { SlackIcon } from "./slack-icon";
+export { V0Icon } from "./v0-icon";
+export { VercelIcon } from "./vercel-icon";
+export { ZoomIcon } from "./zoom-icon";

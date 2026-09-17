@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/update-sfdc-data",
+      "schedule": "0 */12 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "0 16 * * 1"
+    },
+    {
+      "path": "/api/cron/sync-embeddings",
+      "schedule": "0 16 * * 0"
+    },
+    {
+      "path": "/api/cron/area-insights",
+      "schedule": "0 13 * * 1-5"
+    }
+  ]
+}

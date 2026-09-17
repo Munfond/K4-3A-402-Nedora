@@ -1,0 +1,5 @@
+# CODEOWNERS file
+
+
+# Global rule: any one of these three people can approve
+* @gt-codes @willsather @mcabs3 
