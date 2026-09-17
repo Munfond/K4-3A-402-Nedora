@@ -21,19 +21,27 @@ function doc(key: string): BangQuyetDinh {
   }
 }
 
-export function getLastRunId(): string {
+/**
+ * `scope` = "<videoId>:<versionId>" để mỗi video nhớ run riêng (C3-STO-03).
+ * Không truyền scope thì dùng khóa chung cũ (các trang /van-de, /xuat, /lich-su).
+ */
+function lastRunKey(scope?: string): string {
+  return scope ? `${LAST_RUN_KEY}:${scope}` : LAST_RUN_KEY;
+}
+
+export function getLastRunId(scope?: string): string {
   if (typeof window === "undefined") return "";
   try {
-    return window.localStorage.getItem(LAST_RUN_KEY) || "";
+    return window.localStorage.getItem(lastRunKey(scope)) || "";
   } catch {
     return "";
   }
 }
 
-export function setLastRunId(runId: string): void {
+export function setLastRunId(runId: string, scope?: string): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(LAST_RUN_KEY, runId);
+    window.localStorage.setItem(lastRunKey(scope), runId);
     window.dispatchEvent(
       new CustomEvent("revision:run-changed", { detail: runId }),
     );
@@ -42,15 +50,23 @@ export function setLastRunId(runId: string): void {
   }
 }
 
-export function useQuyetDinh(explicitRunId?: string) {
+/**
+ * `scoped: true` (trang video): chỉ dùng đúng runId truyền vào, không rơi về
+ * run cuối cùng của video khác khi chưa có run.
+ */
+export function useQuyetDinh(
+  explicitRunId?: string,
+  options: { scoped?: boolean } = {},
+) {
+  const scoped = options.scoped ?? false;
   const [activeRunId, setActiveRunId] = useState<string>(explicitRunId || "");
   const [bang, setBang] = useState<BangQuyetDinh>({});
   const [isStorageFailed, setIsStorageFailed] = useState<boolean>(false);
 
   // Lấy runId hiện tại nếu không truyền trực tiếp
   useEffect(() => {
-    if (explicitRunId) {
-      setActiveRunId(explicitRunId);
+    if (explicitRunId || scoped) {
+      setActiveRunId(explicitRunId || "");
     } else {
       const last = getLastRunId();
       if (last) setActiveRunId(last);
@@ -58,14 +74,14 @@ export function useQuyetDinh(explicitRunId?: string) {
 
     const onRunChanged = (e: Event) => {
       const ce = e as CustomEvent<string>;
-      if (!explicitRunId && ce.detail) {
+      if (!explicitRunId && !scoped && ce.detail) {
         setActiveRunId(ce.detail);
       }
     };
     window.addEventListener("revision:run-changed", onRunChanged);
     return () =>
       window.removeEventListener("revision:run-changed", onRunChanged);
-  }, [explicitRunId]);
+  }, [explicitRunId, scoped]);
 
   const storageKey = activeRunId ? getDecisionStorageKey(activeRunId) : "";
   const eventName = activeRunId
@@ -74,7 +90,10 @@ export function useQuyetDinh(explicitRunId?: string) {
 
   // Tải dữ liệu ban đầu
   useEffect(() => {
-    if (!storageKey) return;
+    if (!storageKey) {
+      setBang({});
+      return;
+    }
     setBang(doc(storageKey));
 
     const dongBo = () => {

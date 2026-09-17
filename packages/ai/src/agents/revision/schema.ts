@@ -33,7 +33,7 @@ export const UnsupportedOperationKind = z.enum([
 ]);
 export type UnsupportedOperationKind = z.infer<typeof UnsupportedOperationKind>;
 
-export const AgentPatch = z.object({
+export const AgentPatch = z.strictObject({
   n: z.number().int(),
   field: PatchField,
   before: z.string(),
@@ -41,7 +41,7 @@ export const AgentPatch = z.object({
 });
 export type AgentPatch = z.infer<typeof AgentPatch>;
 
-export const AgentOption = z.object({
+export const AgentOption = z.strictObject({
   label: z.enum(["A", "B"]),
   title: z.string().max(120),
   rationale: z.string().max(300),
@@ -50,7 +50,7 @@ export const AgentOption = z.object({
   remaining: z.string().max(200).nullable(),
   needsHumanCheck: z.string().max(200).nullable(),
   unsupportedOperation: z
-    .object({
+    .strictObject({
       kind: UnsupportedOperationKind,
       description: z.string().max(200),
     })
@@ -58,24 +58,24 @@ export const AgentOption = z.object({
 });
 export type AgentOption = z.infer<typeof AgentOption>;
 
-export const AgentStance = z.object({
+export const AgentStance = z.strictObject({
   direction: z.string().max(40),
   feedbackIds: z.array(z.string()),
 });
 export type AgentStance = z.infer<typeof AgentStance>;
 
-export const AgentCauseHypothesis = z.object({
+export const AgentCauseHypothesis = z.strictObject({
   text: z.string().max(200),
   source: z.enum(["nguoi-gop-y", "ai-doi-chieu"]),
 });
 export type AgentCauseHypothesis = z.infer<typeof AgentCauseHypothesis>;
 
-export const AgentIssue = z.object({
+export const AgentIssue = z.strictObject({
   key: z.string(),
   summary: z.string().max(200),
   category: Category,
   feedbackIds: z.array(z.string()).min(1),
-  location: z.object({
+  location: z.strictObject({
     status: z.enum(["da-dinh-vi", "can-xac-nhan"]),
     sentenceNs: z.array(z.number().int()),
     basis: z.string().max(200),
@@ -83,7 +83,7 @@ export const AgentIssue = z.object({
   stances: z.array(AgentStance).max(4),
   uncertainties: z.array(z.string().max(200)).max(5),
   causeHypothesis: AgentCauseHypothesis.nullable(),
-  impact: z.object({
+  impact: z.strictObject({
     level: z.enum(["cao", "vua", "thap"]),
     reason: z.string().max(200),
   }),
@@ -91,14 +91,14 @@ export const AgentIssue = z.object({
 });
 export type AgentIssue = z.infer<typeof AgentIssue>;
 
-export const AgentFeedbackItem = z.object({
+export const AgentFeedbackItem = z.strictObject({
   id: z.string(),
   label: Label,
   note: z.string().max(200),
 });
 export type AgentFeedbackItem = z.infer<typeof AgentFeedbackItem>;
 
-export const RevisionAgentOutput = z.object({
+export const RevisionAgentOutput = z.strictObject({
   feedback: z.array(AgentFeedbackItem),
   issues: z.array(AgentIssue),
 });

@@ -56,6 +56,7 @@ interface DecisionDossierProps {
   onDefer: (reason: string) => void;
   onReject: (reason: string) => void;
   onReset: () => void;
+  onViewDetailedScript?: (sentenceN: number) => void;
 }
 
 export default function DecisionDossier({
@@ -70,6 +71,7 @@ export default function DecisionDossier({
   onDefer,
   onReject,
   onReset,
+  onViewDetailedScript,
 }: DecisionDossierProps) {
   const [showVideoPreview, setShowVideoPreview] = useState(false);
   const [showDeferModal, setShowDeferModal] = useState(false);
@@ -476,6 +478,18 @@ export default function DecisionDossier({
               </>
             )}
           </Button>
+
+          {onViewDetailedScript && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onViewDetailedScript(currentCase.sentenceNs[0])}
+              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <ExternalLink className="size-3.5" /> Xem trong kịch bản chi tiết
+            </Button>
+          )}
         </div>
 
         {/* Video Player on demand */}
@@ -671,6 +685,15 @@ export default function DecisionDossier({
                 script,
               );
               const delta = computeIncrementalWork(opt);
+              // Hồ sơ vùng gom nhiều vấn đề, mỗi vấn đề có A/B riêng: ghi rõ
+              // phương án thuộc vấn đề nào để không có hai nút "Chọn A" giống nhau.
+              const issueIdx = currentCase.issues.findIndex((iss) =>
+                iss.options.some((o) => o.id === opt.id),
+              );
+              const optName =
+                currentCase.issues.length > 1 && issueIdx >= 0
+                  ? `${opt.label} (vấn đề ${issueIdx + 1})`
+                  : opt.label;
 
               return (
                 <Card
@@ -687,7 +710,7 @@ export default function DecisionDossier({
                         variant={isSelected ? "default" : "outline"}
                         className="font-bold text-xs"
                       >
-                        Phương án {opt.label}
+                        Phương án {optName}
                       </Badge>
                       <Badge
                         variant="outline"
@@ -703,6 +726,12 @@ export default function DecisionDossier({
                       </Badge>
                     </div>
 
+                    {currentCase.issues.length > 1 && issueIdx >= 0 && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Cho vấn đề {issueIdx + 1}:{" "}
+                        {currentCase.issues[issueIdx].summary}
+                      </p>
+                    )}
                     <CardTitle className="text-sm font-bold text-foreground">
                       {opt.title}
                     </CardTitle>
@@ -803,12 +832,12 @@ export default function DecisionDossier({
                         {isSelected ? (
                           <>
                             <Check className="size-4" /> Đã chọn phương án{" "}
-                            {opt.label}
+                            {optName}
                           </>
                         ) : isDisabled ? (
                           "Không thể chọn"
                         ) : (
-                          `Chọn phương án ${opt.label}`
+                          `Chọn phương án ${optName}`
                         )}
                       </Button>
                     </div>

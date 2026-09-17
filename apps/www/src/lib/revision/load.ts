@@ -278,9 +278,82 @@ export function loadD1RawFeedback(
   return combinedItems.sort((a, b) => a.id.localeCompare(b.id));
 }
 
+function validateSurvey(
+  survey: NewFeedbackInput["survey"],
+): FeedbackItem["survey"] | undefined {
+  if (!survey) return undefined;
+  const check = (v: number | undefined, name: string) => {
+    if (v === undefined || v === null) return undefined;
+    if (!Number.isInteger(v) || v < 1 || v > 5) {
+      throw new Error(`C3-IN-03 Điểm ${name} phải là số nguyên 1–5`);
+    }
+    return v;
+  };
+  const deHieu = check(survey.deHieu, "dễ hiểu");
+  const nhipDo = check(survey.nhipDo, "nhịp độ");
+  if (deHieu === undefined && nhipDo === undefined) return undefined;
+  return { deHieu, nhipDo, diemSo: deHieu };
+}
+
+function validateLocation(
+  location: NewFeedbackInput["location"],
+  script: ScriptData,
+): FeedbackItem["location"] | undefined {
+  if (!location) return undefined;
+  const { sentenceN, timeSeconds } = location;
+  const lastEnd = script.cau.at(-1)?.ketThucGiay ?? 0;
+  if (sentenceN != null && !script.cau.some((c) => c.n === sentenceN)) {
+    throw new Error(`C3-IN-03 Câu ${sentenceN} không có trong kịch bản`);
+  }
+  if (timeSeconds != null && (timeSeconds < 0 || timeSeconds > lastEnd)) {
+    throw new Error(
+      `C3-IN-03 Mốc ${timeSeconds} giây nằm ngoài thời lượng video (0–${lastEnd})`,
+    );
+  }
+  if (sentenceN == null && timeSeconds == null) return undefined;
+  return {
+    sentenceN: sentenceN ?? undefined,
+    timeSeconds: timeSeconds ?? undefined,
+  };
+}
+
+/**
+ * C3-IN-03: kiểm tra và làm sạch góp ý mới. Dùng chung cho API lưu góp ý và
+ * đường phân tích, để góp ý nhập ở UI qua đúng một lớp làm sạch.
+ */
+export function buildNewFeedbackItems(
+  items: NewFeedbackInput[],
+  script: ScriptData,
+  idPrefix: string,
+  startAt = 1,
+): FeedbackItem[] {
+  let counter = startAt;
+  return items.map((item) => {
+    const text = (item.text || "").trim();
+    const survey = validateSurvey(item.survey);
+    const surveyOnly = item.channel === "khao-sat" && survey !== undefined;
+    if ((text.length < 1 && !surveyOnly) || text.length > 2000) {
+      throw new Error(
+        `C3-IN-03 Nội dung góp ý mới phải từ 1 đến 2000 ký tự (hiện có ${text.length} ký tự)`,
+      );
+    }
+    const location = validateLocation(item.location, script);
+    const sanitized = sanitizeFeedbackItem({
+      id: item.id || `${idPrefix}-${counter++}`,
+      channel: item.channel || "binh-luan",
+      sender: item.sender,
+      text,
+      time: item.time,
+      survey,
+    });
+    return location ? { ...sanitized, location } : sanitized;
+  });
+}
+
 export function prepareAnalyzeInput(
   input: AnalyzeInput,
   dataDir: string = getDataDir(),
+  storedFeedback: FeedbackItem[] = [],
 ): {
   script: ScriptData;
   allFeedback: FeedbackItem[];
@@ -311,24 +384,10 @@ export function prepareAnalyzeInput(
   }
 
   // 3. Xử lý góp ý mới C3-IN-03
-  let newCounter = 1;
-  for (const item of newItems) {
-    const text = (item.text || "").trim();
-    if (text.length < 1 || text.length > 2000) {
-      throw new Error(
-        `C3-IN-03 Nội dung góp ý mới phải từ 1 đến 2000 ký tự (hiện có ${text.length} ký tự)`,
-      );
-    }
+  allFeedback.push(...buildNewFeedbackItems(newItems, script, "moi"));
 
-    const assignedId = item.id || `moi-${newCounter++}`;
-    const sanitized = sanitizeFeedbackItem({
-      id: assignedId,
-      channel: item.channel || "binh-luan",
-      sender: item.sender,
-      text,
-    });
-    allFeedback.push(sanitized);
-  }
+  // 3b. Góp ý đã lưu cùng video (đã làm sạch khi lưu) — chỉ server truyền vào
+  allFeedback.push(...storedFeedback);
 
   if (allFeedback.length > 60) {
     throw new Error(
@@ -349,9 +408,13 @@ export function prepareAnalyzeInput(
     channel: f.channel,
     sender: f.sender,
     text: f.sanitizedText,
+    survey: f.survey ?? null,
+    location: f.location ?? null,
   }));
 
   const hashPayload = {
+    videoId: input.videoId ?? script.id,
+    versionId: input.versionId ?? "v1",
     scriptId: script.id,
     scriptSentenceCount: script.cau.length,
     feedback: normalizedFeedbackList.sort((a, b) => a.id.localeCompare(b.id)),

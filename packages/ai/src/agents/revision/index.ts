@@ -1,3 +1,4 @@
+import { createOpenAI } from "@ai-sdk/openai";
 import { Output, generateText, gateway, type LanguageModel } from "ai";
 import {
   PROMPT_VERSION,
@@ -12,6 +13,9 @@ import {
 
 export * from "./schema";
 export * from "./prompt";
+export * from "./prompt-p1";
+export * from "./schema-p1";
+export * from "./run-step";
 
 export interface RevisionAgentScriptSentence {
   n: number;
@@ -33,6 +37,8 @@ export interface RevisionAgentFeedbackInput {
     nhipDo?: number;
     diemSo?: number;
   };
+  /** Vị trí do chính người gửi chọn, không phải AI suy ra. */
+  location?: { sentenceN?: number; timeSeconds?: number };
 }
 
 export interface RevisionAgentInput {
@@ -107,6 +113,21 @@ export type MockModelCaller = (params: {
   timeoutMs: number;
 }) => Promise<unknown>;
 
+function formatLocation(location: {
+  sentenceN?: number;
+  timeSeconds?: number;
+}): string {
+  const parts: string[] = [];
+  if (location.sentenceN != null) parts.push(`câu ${location.sentenceN}`);
+  if (location.timeSeconds != null) {
+    const s = Math.floor(location.timeSeconds);
+    parts.push(
+      `mốc ${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`,
+    );
+  }
+  return `người gửi chọn ${parts.join(", ")}`;
+}
+
 function serializePromptInput(
   input: RevisionAgentInput,
   previousError?: string,
@@ -126,6 +147,7 @@ function serializePromptInput(
       sender: f.sender,
       text: f.text,
       ...(f.survey ? { survey: f.survey } : {}),
+      ...(f.location ? { viTriNguoiGuiChon: formatLocation(f.location) } : {}),
     })),
   };
 
@@ -140,13 +162,27 @@ function serializePromptInput(
   return JSON.stringify(payload, null, 2);
 }
 
-function classifyError(err: unknown): {
+export function classifyRevisionError(err: unknown): {
   code: RevisionErrorCode;
   message: string;
   isRetryable: boolean;
 } {
   const msg = err instanceof Error ? err.message : String(err);
   const lower = msg.toLowerCase();
+  const statusCode =
+    err && typeof err === "object" && "statusCode" in err
+      ? Number((err as { statusCode?: unknown }).statusCode)
+      : undefined;
+
+  // Provider từ chối request (ví dụ schema không hợp lệ với json_schema chặt):
+  // gửi lại y hệt cũng lỗi, nên không retry và không gọi là lỗi output.
+  if (statusCode === 400 || statusCode === 404 || statusCode === 422) {
+    return {
+      code: "MODEL_CALL_FAILED",
+      message: `Provider từ chối request (HTTP ${statusCode}): ${msg}`,
+      isRetryable: false,
+    };
+  }
 
   if (
     lower.includes("timeout") ||
@@ -161,6 +197,8 @@ function classifyError(err: unknown): {
   }
 
   if (
+    statusCode === 401 ||
+    statusCode === 403 ||
     lower.includes("401") ||
     lower.includes("403") ||
     lower.includes("unauthorized") ||
@@ -196,6 +234,38 @@ function classifyError(err: unknown): {
   };
 }
 
+export function isReasoningModelId(modelId: string): boolean {
+  const name = modelId.split("/").pop() ?? "";
+  return /^(gpt-5|o\d)/i.test(name);
+}
+
+/** REVISION_MODEL; nếu trống thì lấy model đầu tiên trong OPENAI_MODELS (danh sách cách nhau bởi dấu phẩy). */
+export function resolveRevisionModelId(explicit?: string): string {
+  if (explicit) return explicit;
+  if (process.env.REVISION_MODEL) return process.env.REVISION_MODEL;
+  const firstOpenAiModel = process.env.OPENAI_MODELS?.split(",")[0]?.trim();
+  return firstOpenAiModel ? `openai/${firstOpenAiModel}` : "";
+}
+
+/**
+ * Có khóa AI Gateway thì đi qua gateway như các agent khác trong repo;
+ * không có thì gọi thẳng OpenAI bằng OPENAI_API_KEY (chỉ cho model "openai/…").
+ */
+export function resolveLanguageModelForRevision(
+  modelId: string,
+): LanguageModel | null {
+  if (process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN) {
+    return gateway(modelId) as LanguageModel;
+  }
+  if (process.env.OPENAI_API_KEY) {
+    const [provider, ...rest] = modelId.split("/");
+    const name = rest.length > 0 ? rest.join("/") : provider;
+    if (rest.length > 0 && provider !== "openai") return null;
+    return createOpenAI({ apiKey: process.env.OPENAI_API_KEY })(name);
+  }
+  return null;
+}
+
 export async function runRevisionAgent(params: {
   input: RevisionAgentInput;
   config?: RevisionAgentConfig;
@@ -203,9 +273,14 @@ export async function runRevisionAgent(params: {
 }): Promise<RevisionAgentResult> {
   const { input, config = {}, callModel } = params;
 
-  const modelId = config.modelId || process.env.REVISION_MODEL || "";
-  const timeoutMs = config.timeoutMs ?? 90000;
-  const maxOutputTokens = config.maxOutputTokens ?? 8000;
+  const modelId = resolveRevisionModelId(config.modelId);
+  const timeoutMs =
+    config.timeoutMs ??
+    // Run D1 thật mất 70–80 s; 90 s cũ quá sát.
+    (Number(process.env.REVISION_MODEL_TIMEOUT_MS) || 150000);
+  const maxOutputTokens =
+    config.maxOutputTokens ??
+    (Number(process.env.REVISION_MAX_OUTPUT_TOKENS) || 16000);
   const temperature = config.temperature ?? 0;
   const promptHash = getPromptHash(REVISION_SYSTEM_PROMPT);
 
@@ -238,6 +313,7 @@ export async function runRevisionAgent(params: {
   }
 
   // Kiểm tra cấu hình môi trường nếu không có mock
+  let languageModel: LanguageModel | null = null;
   if (!callModel) {
     if (!modelId) {
       metadata.durationMs = Date.now() - startAll;
@@ -246,22 +322,19 @@ export async function runRevisionAgent(params: {
         error: {
           code: "MODEL_NOT_CONFIGURED",
           message:
-            "Biến môi trường REVISION_MODEL chưa được thiết lập trên server",
+            "Chưa chọn model: đặt REVISION_MODEL (hoặc OPENAI_MODELS) trên server",
         },
         metadata,
       };
     }
-    const hasApiKey = Boolean(
-      process.env.AI_GATEWAY_API_KEY || process.env.OPENAI_API_KEY,
-    );
-    if (!hasApiKey) {
+    languageModel = resolveLanguageModelForRevision(modelId);
+    if (!languageModel) {
       metadata.durationMs = Date.now() - startAll;
       return {
         ok: false,
         error: {
           code: "MODEL_NOT_CONFIGURED",
-          message:
-            "Biến môi trường AI_GATEWAY_API_KEY hoặc OPENAI_API_KEY chưa được thiết lập trên server",
+          message: `Không có khóa dùng được cho model ${modelId}: cần AI_GATEWAY_API_KEY, hoặc OPENAI_API_KEY với model openai/…`,
         },
         metadata,
       };
@@ -300,21 +373,24 @@ export async function runRevisionAgent(params: {
           );
         }
         parsedOutput = parseRes.data;
-      } else {
-        const model = gateway(modelId) as LanguageModel;
+      } else if (languageModel) {
         const result = await generateText({
-          model,
+          model: languageModel,
           system: REVISION_SYSTEM_PROMPT,
           prompt: promptText,
           output: Output.object({ schema: RevisionAgentOutput }),
           abortSignal: AbortSignal.timeout(timeoutMs),
-          temperature,
+          maxOutputTokens,
+          // Model suy luận (gpt-5*, o*) không nhận temperature; gửi vào chỉ sinh cảnh báo.
+          ...(isReasoningModelId(modelId) ? {} : { temperature }),
         });
 
         parsedOutput = result.output;
         rawResult = result.output;
         inputTokens = result.usage?.inputTokens ?? 0;
         outputTokens = result.usage?.outputTokens ?? 0;
+      } else {
+        throw new Error("Chưa có model để gọi");
       }
 
       const dur = Date.now() - startAttempt;
@@ -338,7 +414,7 @@ export async function runRevisionAgent(params: {
       };
     } catch (err: unknown) {
       const dur = Date.now() - startAttempt;
-      const classified = classifyError(err);
+      const classified = classifyRevisionError(err);
       lastError = classified;
 
       attempts.push({

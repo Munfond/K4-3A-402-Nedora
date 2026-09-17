@@ -4,6 +4,8 @@ Ngày khảo sát và cập nhật: 17/09/2026. Phạm vi: lập kế hoạch tr
 
 **Ưu tiên mới theo yêu cầu người dùng: hoàn thành luồng chạy thật cho checkpoint 3 bằng dữ liệu hiện có trước. Chấp nhận chất lượng phân tích ban đầu chưa tốt; ghi nhận lỗi trung thực. Người dùng bổ sung dữ liệu chính thức song song, không lấy việc hoàn thiện dữ liệu làm điều kiện bắt đầu tích hợp.**
 
+**Định vị lại (cập nhật 17/09, sau lượt UI đầu):** đề xuất trước nhầm phạm vi tính năng với phạm vi sản phẩm — chỉ dựng màn duyệt cho D1 nên biến dữ liệu mẫu thành giới hạn của ứng dụng. Sản phẩm đúng là **một video studio quản lý nhiều video, có thêm tính năng lập kế hoạch chỉnh sửa từ góp ý**. Revision Planner vẫn là phần làm sâu; phần studio xung quanh chỉ cần đủ để tìm video, xem kịch bản–hình–giọng theo thời gian và bắt đầu một đợt sửa. Không xây lại công cụ sinh video. Chi tiết ở §0 “Studio nhiều video — khung UI CP3” và §7; hiện trạng code ở §0 “Hiện trạng sau lượt UI studio”.
+
 Nguồn cập nhật: rubric cuộc thi người dùng cung cấp và transcript hướng dẫn CP1–CP3. Theo rubric lớp 3A, CP3 là 16:00 ngày 17/09; CP4 chốt spec/quality bar lúc 21:00 ngày 17/09. Đây là mốc của hướng dẫn, không phải xác nhận nhóm đã nộp hoặc còn bao nhiêu thời gian.
 
 ## 0. Kế hoạch ưu tiên checkpoint 3 — thực hiện trước
@@ -16,20 +18,22 @@ Giữ điểm bắt đầu/kết thúc của luồng mock hiện tại: góp ý 
 
 ### Luồng phải chạy thật trước
 
-1. Người dùng chọn bộ D1 hiện có hoặc nhập thêm một góp ý mới bằng ô văn bản. Đọc cả JSON góp ý và khảo sát hiện tại qua adapter có sẵn; chưa cần giao diện upload mọi định dạng.
-2. Bấm **Phân tích góp ý** → server tạo `runId`, làm sạch, gọi model thật. Không đọc `ket-qua-mau.json` để thay kết quả.
+0. Mở ứng dụng vào **thư viện video**, thêm video đã có hoặc chọn một video (D1 là một mục gắn nhãn “Dữ liệu mẫu”). Mở video thấy **video đang có** cùng kịch bản đồng bộ theo câu–timestamp, không phải kết quả phân tích.
+1. Trong tab **Góp ý** của video và phiên bản đang chọn: dùng bộ góp ý đã lưu cùng video (D1: JSON góp ý + khảo sát qua adapter có sẵn), thêm góp ý tại thời điểm đang phát, dán bình luận/tin nhắn hoặc nhập khảo sát. Chưa cần upload mọi định dạng.
+2. Bấm **Phân tích góp ý** → server tạo `runId` gắn `videoId` + `versionId`, làm sạch, gọi model thật. Không đọc `ket-qua-mau.json` để thay kết quả. Người dùng không nạp lại kịch bản/timecode đã lưu cùng video.
 3. Một agent trả output có schema: phân loại/cách ly phản hồi, vấn đề, feedback IDs, câu liên quan hoặc chưa rõ vị trí, điều chưa chắc và phương án có nội dung thay thế cụ thể.
-4. Code kiểm tra ID/patch, tính số người, chia vùng đơn giản và tính phạm vi. UI hiển thị kết quả thật của run vừa xong bằng các màn hình hiện có.
-5. Người dùng duyệt một phương án hoặc bỏ/hoãn. Code áp dụng duy nhất patch đã duyệt, tính lại tập câu/cảnh cần làm, hiển thị trước/sau.
-6. Xuất JSON/Markdown kịch bản có lời mới thật và danh sách việc; có đường truy ngược về góp ý. Không sửa tay file trung gian để luồng đi tiếp.
-7. Mở lịch sử run để đối chiếu đầu vào mới → lần gọi model → kết quả đang hiển thị. Thực hiện golden set qua cùng service mà UI gọi và giữ nguyên toàn bộ kết quả lượt đầu.
+4. Code kiểm tra ID/patch, tính số người, chia vùng đơn giản và tính phạm vi. Tab **Đợt chỉnh sửa** của chính video đó hiển thị kết quả thật của run vừa xong, giữ tên video, phiên bản nguồn và đoạn phát lại.
+5. Người dùng chọn A/B, hoãn hoặc giữ nguyên. Code áp dụng duy nhất patch đã duyệt, tính lại tập câu/cảnh/phụ đề cần làm, hiển thị trước/sau và phần việc tăng thêm.
+6. Tab **Bản sửa** xuất JSON/Markdown kịch bản có lời mới thật và danh sách việc; có đường truy ngược về góp ý. Trạng thái là “Bản sửa dự kiến cho v2 · Chưa có video v2”. Không sửa tay file trung gian để luồng đi tiếp.
+7. Mở lịch sử run (theo video) để đối chiếu đầu vào mới → lần gọi model → kết quả đang hiển thị. Thực hiện golden set qua cùng service mà UI gọi và giữ nguyên toàn bộ kết quả lượt đầu.
 
 ### Phạm vi CP3 và phần hoãn
 
 | Làm ngay cho CP3 | Hoãn đến sau khi luồng và lượt đo đầu đã chạy |
 |---|---|
 | Một agent gọi thật, output có cấu trúc, log đối chiếu được | Tách ba agent interpret/propose/verify và vòng phản biện |
-| Tận dụng D1 và UI hiện có; thêm ô góp ý mới, nút chạy, trạng thái và lỗi | Thiết kế lại toàn bộ UI, trang import nhiều bước, upload mọi định dạng |
+| Thư viện nhiều video → thêm/chọn video → trang xem đồng bộ câu–timestamp → góp ý → AI thật → duyệt → bản sửa; thiết kế đơn giản nhưng nối thật | Tạo kịch bản/sinh video, timeline dựng, waveform, căn từng từ/frame, biểu đồ khảo sát, trang import nhiều bước, upload mọi định dạng |
+| Phân tích thật chỉ cần chạy được cho video có kịch bản + timecode hợp lệ (hiện là D1); video khác vẫn mở được và hiện rõ phần dữ liệu còn thiếu | Loader tổng quát cho mọi định dạng kịch bản; lưu video bền bằng database |
 | Một hoặc hai phương án nếu model tạo được; chọn tối đa một phương án/vùng | Bắt buộc sinh cặp gộp/sửa riêng ở mọi ca phù hợp, tối ưu so sánh nâng cao |
 | Đổi lời/chữ màn hình/ý đồ hình trên câu hiện có; before/after rõ | Chèn/xóa câu, đổi khoảng dừng/kiểu đọc và dependency nâng cao |
 | Tập thu lại ±1 cho đổi lời, loại trùng, đếm ký tự lời mới; phát hiện hai patch ghi khác cùng field | Dependency graph đầy đủ, nhóm slide, budget nhiều chiều, ảnh hưởng timing chính xác |
@@ -46,11 +50,68 @@ Phương án đòi thao tác chưa hỗ trợ được hiển thị “ngoài ph
 - Đặt schema, validator, áp dụng patch và tính việc trong `apps/www/src/lib/revision/` trước; chưa tạo package mới hoặc tổ chức lại monorepo.
 - Thêm `POST /api/revisions/analyze`: gọi cùng `analyzeRevision(input, config)` mà eval runner sử dụng. Khóa model/API ở server.
 - Model không được cấp tool ghi file/kịch bản/quyết định; nó chỉ trả đề xuất. Code chịu trách nhiệm áp dụng sau duyệt.
-- Mỗi kết quả có `runId`, input hash và schema version. Adapter đưa dữ liệu thật vào `/van-de`, trang chi tiết và `/xuat`; bỏ phụ thuộc static params/mock result ở đường chạy này.
-- Giữ kết quả đã làm sạch trong session store/localStorage cho demo một người; quyết định dùng khóa theo `runId` và option ID để không áp vào kết quả cũ. Sửa nhánh lưu thất bại để vẫn cập nhật bộ nhớ và báo chưa lưu.
+- Mỗi kết quả có `runId`, `videoId`, `versionId`, input hash và schema version. Kết quả hiển thị trong trang `/videos/[id]` (tab Đợt chỉnh sửa, Bản sửa); các route cũ `/van-de`, `/gop-y`, `/xuat` chỉ chuyển hướng vào đúng tab của video, không là điểm vào song song. Bỏ phụ thuộc static params/mock result ở đường chạy này.
+- Registry video tối thiểu ở server (seed D1 + video người dùng thêm, lưu file JSON local cạnh run log); danh sách chỉ trả metadata, chi tiết mới trả kịch bản; không tải nguồn phát ở trang chủ. Không cần Postgres cho CP3.
+- Giữ kết quả đã làm sạch trong session store/localStorage cho demo một người; quyết định dùng khóa theo `runId` và option ID để không áp vào kết quả cũ. `lastRunId` phải theo từng video: mở video khác không được hiện run hoặc quyết định của video trước. Sửa nhánh lưu thất bại để vẫn cập nhật bộ nhớ và báo chưa lưu.
 - Log run lưu file phía server cho demo local. Nếu chạy host không lưu file bền, bổ sung tải trace JSON ngay; không bắt việc triển khai database mới chặn CP3.
 - Khi model lỗi/thiếu key/timeout/output không hợp lệ: hiện lỗi và thử lại; không fallback âm thầm sang kết quả mẫu. Retry tự động tối đa một lần, cả lần đầu và retry đều có trace.
 - Không hardcode số 22/20 vào UI: đó là thống kê của bộ hiện tại; nhập mới phải được đếm lại.
+
+### Studio nhiều video — khung UI CP3
+
+```text
+Trang chủ / Thư viện video
+  ├─ Thêm video đã có
+  └─ Chọn một video  (/videos/[id], phiên bản nguồn: v1 ▾)
+       ├─ Xem video và kịch bản      (đồng bộ câu ↔ timestamp)
+       ├─ Góp ý cho phiên bản
+       ├─ Đợt chỉnh sửa              (phân tích và duyệt phương án)
+       ├─ Bản sửa                    (gói bàn giao)
+       └─ Lịch sử phiên bản
+```
+
+Một video có nhiều phiên bản. **Mỗi góp ý, đợt phân tích và quyết định gắn với một phiên bản nguồn cụ thể**; không đem phản hồi của v1 áp vào v2.
+
+**Thư viện (trang chủ).** Không mở ứng dụng là vào danh sách vấn đề. Thẻ video: tên, ảnh đại diện, thời lượng; phiên bản đang có; số góp ý chưa phân tích; đợt sửa đang dở; nút **Mở video** (không tự chạy AI). Nút **Thêm video đã có** nhận nguồn phát (tệp hoặc URL) kèm kịch bản và bảng timecode; thiếu phần nào thì tạo được mục video và hiện rõ phần thiếu + bước bổ sung, không bắt phải có góp ý. D1 là một mục gắn nhãn **Dữ liệu mẫu**. Chỉ dùng metadata/ảnh đại diện; không tải nguồn phát ở trang chủ.
+
+**Trang video.** Mặc định mở tab xem: trình phát + cột kịch bản (câu đang phát, lời đọc, chữ trên màn hình, ý đồ hình) + thanh thời gian chia theo câu và khoảng lặng.
+- Video chạy tới đâu, câu và đoạn phụ đề tương ứng được đánh dấu tới đó; bấm câu → tua tới mốc bắt đầu câu.
+- Chọn câu → lời đọc, chữ màn hình, ý đồ hình, mốc bắt đầu / hết tiếng / hết cảnh; khoảng lặng hiển thị khác câu có lời.
+- **Góp ý tại thời điểm này** tự đính kèm timestamp và câu nếu xác định được. **Chuẩn bị bản sửa** dẫn sang tab Góp ý.
+- Chỉ khẳng định đúng mức dữ liệu có: đồng bộ theo câu và đoạn phụ đề (mốc phụ đề làm tròn giây). **Không vẽ waveform, ranh giới frame hay căn từng từ bằng dữ liệu giả.** Video thiếu transcript/timecode vẫn mở được; chức năng định vị hiện “thiếu dữ liệu”, không tự bịa liên kết.
+
+**Tab Góp ý.** Thêm nhận xét từ trình phát, dán bình luận/tin nhắn, nhập khảo sát; xem toàn bộ phản hồi theo phiên bản, nguồn, vị trí và trạng thái; bấm phản hồi có vị trí để xem lại đoạn đó. Nguồn vị trí phải phân biệt ba loại: **Người gửi đã chọn vị trí** (chỉ khi dữ liệu có trường vị trí có cấu trúc, ví dụ góp ý tạo từ trình phát) · **AI đề xuất vị trí** (chỉ sau khi có run, lấy từ vị trí vấn đề đã qua kiểm tra) · **Chưa xác định được vị trí**. Bộ D1 không có trường vị trí có cấu trúc, nên trước khi phân tích mọi góp ý D1 là “Chưa xác định”. Góp ý bị cách ly chỉ hiện ID và lý do trung lập. Nút **Phân tích góp ý** tạo đợt phân tích cho video + phiên bản đang chọn; khi chạy hiện tiến trình và lỗi thật.
+
+**Tab Đợt chỉnh sửa (Revision Planner trong ngữ cảnh video).** Bốn khu vực: danh sách vùng sửa (vị trí, vấn đề, số người, trạng thái) · video và ngữ cảnh (đoạn đang xét, câu, lời đọc, chữ/hình, phụ đề) · hồ sơ quyết định (bằng chứng, bất đồng, điều chưa rõ, phương án trước–sau) · tóm tắt bản sửa (tổng việc đã chọn, phần tăng thêm, cảnh báo). Chọn vùng sửa đồng thời chọn đoạn trên trình phát và kịch bản; chọn góp ý làm nổi câu góp ý được gắn vào. Người duyệt sửa lại được vị trí nếu AI gắn sai — sửa vị trí là thay đổi đầu vào, tạo đợt phân tích mới hoặc đánh dấu hồ sơ “cần duyệt lại”, không âm thầm giữ quyết định cũ. Nếu không kịp cho CP3, hiện nút “Báo vị trí sai” ghi nhận vào trace và để sửa vị trí thật sau CP3.
+
+**Tab Bản sửa.** Nội dung đã thay đổi, việc thu âm/hình/phụ đề, vấn đề hoãn hoặc chưa xử lý, nút **Xuất gói bàn giao**. Trạng thái: **“Bản sửa dự kiến cho v2 · Chưa có video v2”**. Lịch sử phiên bản phân biệt **video v1 đã có** · **bản sửa v2 đang duyệt** · **video v2 đã sản xuất**; không đổi nhãn thành “video v2” chỉ vì xuất được JSON kịch bản. Không dùng nhãn “Đã sửa video”.
+
+**Lưu ý khóa trước khi sửa UI.**
+- **Không hardcode D1:** video, phiên bản, góp ý, đợt phân tích và quyết định có ID riêng; đổi video không mang theo quyết định, run hay số đếm của video trước. Tiêu đề, số câu, thời lượng tính từ dữ liệu của video đang mở.
+- **Không giả định studio có backend đầy đủ:** chức năng tạo kịch bản/sinh video chưa nối thì không đặt nút như thể hoạt động. Không seed video “trông như thật” với metadata bịa (thời lượng, số câu, “đã có kịch bản”) khi không có tệp tương ứng; video minh họa phải ghi rõ là minh họa hoặc không đưa vào.
+- **Không đồng nhất frame, slide và cảnh:** nhóm slide chưa xác nhận; đơn vị chi phí vẫn theo quy tắc dữ liệu nguồn (câu/cảnh).
+- **Timestamp thuộc đúng phiên bản:** mốc v1 dùng để xem bằng chứng v1; lời mới chưa thu thì chưa có thời gian phát v2.
+- **Phát video cho người dùng và AI phân tích video là hai khả năng riêng;** hệ thống vẫn không xem/nghe video.
+- **Không bắt UI chờ dữ liệu hoàn hảo;** thiếu dữ liệu thì hiện trạng thái thiếu.
+
+### Hiện trạng sau lượt UI studio (kiểm tra mã ngày 17/09, commit `1ad4228 new MVP`)
+
+Agent khác đã dựng: thư viện `/`, trang `/videos/[id]` năm tab (Kịch bản & Trình phát · Góp ý · Đợt chỉnh sửa · Bản sửa v2 & Bàn giao · Lịch sử phiên bản), `VideoPlayerSync` (đánh dấu câu theo `currentTime`, bấm câu để tua, “Góp ý tại …”, ghi chú không vẽ waveform), `VideoFeedbackTab` (lọc theo nguồn vị trí, thêm góp ý có điểm khảo sát), cột vùng sửa / hồ sơ 4 phần / cột “Đang chuẩn bị bản sửa v2”, `/api/studio/videos`. Typecheck `apps/www` sạch. Các lỗi dưới đây **chặn luồng CP3** hoặc trái nguyên tắc; danh sách đầy đủ và cách kiểm ở spec §A19.
+
+| Mức | Hiện trạng | Hệ quả |
+|---|---|---|
+| Chặn | Trang video gọi `POST /api/revisions/analyze` với `{ includeD1, feedback }`, thiếu `scriptId`, sai tên `includeD1Feedback`/`newFeedback`, đọc `data.run.runId` trong khi API trả `runId`; lỗi chỉ `console.error` | Nút phân tích trong studio luôn nhận 400 và không báo gì; góp ý mới thêm trong tab không bao giờ tới model |
+| Chặn | `.gitignore` đã bỏ dòng `/data` | Có thể commit nguyên datapack, trái chính sách dữ liệu |
+| Cao | Seed gán `locationSource: "nguoi-chon"` cho góp ý D1 khi chữ chứa “23”, gán câu 23 = 121 s (121,5 s là mốc câu 20), “học máy/spam” → câu 10 “AI đề xuất” mà không có run | Nhãn nguồn vị trí bịa, trái mục “Người gửi đã chọn / AI đề xuất / Chưa xác định” |
+| Cao | Hai video seed `ml-deep-learning`, `prompt-engineering` có thời lượng, số câu, `hasScript/hasTimecodes: true` nhưng không có kịch bản/tệp; `releaseStatus: "has_video"` khi chưa có MP4 | Metadata bịa; video người dùng thêm (POST) chỉ nằm trong bộ nhớ và `GET /api/studio/videos/[id]` không thấy → mở ra 404 |
+| Cao | `activeRunId` lấy từ `revision:lastRunId` chung, run không có `videoId` | Mở video khác vẫn thấy vùng sửa và quyết định của D1 |
+| Cao | Header toàn cục hardcode “v1 · 40 câu · khoảng 4 phút 11 giây”, liên kết cứng `/videos/d1`; seed `feedbackCount: 22`; bản nháp v2 có ngày tạo giả | Sai với mọi video khác D1; vi phạm không hardcode 22/20 |
+| Vừa | “Giữ nguyên” vẫn ghi `type: "bo"`; bộ lọc Có nhận xét/Chỉ chấm điểm/Bị loại được thay bằng lọc nguồn vị trí; góp ý cách ly hiển thị như “(Không có lời nhận xét)”; góp ý thêm ở tab không qua làm sạch (gán sẵn `label: "gop-y"`) và mất khi tải lại | Lệch thiết kế và luật cách ly |
+| Cao | Đang thêm (chưa commit): tab Kịch bản chi tiết dùng `slide-d1.json` và 40 ảnh `public/slide-anh` chép từ pack; bảng slide D1 viết cứng trong `lib/studio/slides.ts`; chưa ghi nhãn “nhóm slide tự sinh, chưa rà tay” | Bản sao pack có thể bị commit; slide chưa xác nhận dễ bị hiểu là cảnh thật |
+| Vừa | Route cũ `/van-de`, `/gop-y`, `/xuat`, `/lich-su` vẫn là trang đầy đủ (chỉ `/van-de/[id]` chuyển hướng) | Hai đường vào song song, dễ lệch trạng thái |
+| Vừa | `eval/runs/test-baseline`, `test-multivideo`, `test-studio` đều `model: mock-agent` và 20/20 | Không phải bằng chứng; không được trích như kết quả đo. Bằng chứng thật duy nhất hiện có là run UI `run-20260917-123309-c233` (model thật, 73 s), chưa phải lượt golden set |
+
+Bản sửa trước đó (đã vào commit): runId không còn bị bộ lọc PII làm hỏng; hỗ trợ `OPENAI_API_KEY` + `OPENAI_MODELS` bên cạnh AI Gateway; schema zod dùng `strictObject` để OpenAI chấp nhận `json_schema` chặt. Còn tồn: lỗi 400 schema request bị retry và gắn nhầm `OUTPUT_SCHEMA_INVALID`; `maxOutputTokens` chưa truyền vào `generateText`; một run thật mất ~73 s, sát timeout mặc định 90 s (đề xuất `REVISION_MODEL_TIMEOUT_MS=180000`); `docs/checkpoint-3.md` ghi mọi C3-AT “ĐẠT” và không nói `cp3-run-001` là mock — phải sửa trước khi nộp.
 
 ### Những yêu cầu tối thiểu vẫn giữ
 
@@ -91,17 +152,17 @@ Không commit nguyên datapack hoặc bản sao của pack để phục vụ eva
 
 Trace công khai gồm run/case ID, input refs/hash hoặc nội dung synthetic đã làm sạch, model, prompt version, thời điểm, status, output hợp lệ, token usage nếu có. Với case bị cách ly chỉ lưu ID/nhãn; không sao chép nguyên văn công kích vào trace.
 
-Video 30 giây dự kiến: 0–5s nhập góp ý mới; 5–10s bấm phân tích và thấy trạng thái gọi thật; 10–20s xem vấn đề/câu/bằng chứng/phương án; 20–26s duyệt và xem bản sửa; 26–30s hiện run ID và số đo lượt đầu. Nếu cắt đoạn chờ phải ghi rõ. Demo trực tiếp mở trace/bảng đủ case và giải thích một lỗi ưu tiên. Không cần tải/phân tích video D1 để chuẩn bị luồng; video 30 giây là quay màn hình sản phẩm do nhóm thực hiện khi luồng đã sẵn sàng.
+Video 30 giây dự kiến: 0–5s thư viện → mở D1 (nhãn Dữ liệu mẫu), bấm một câu để thấy video tua đúng mốc, thêm góp ý tại thời điểm đang phát; 5–10s bấm phân tích và thấy trạng thái gọi thật; 10–20s xem vấn đề/câu/bằng chứng/phương án; 20–26s duyệt và xem bản sửa; 26–30s hiện run ID và số đo lượt đầu. Nếu cắt đoạn chờ phải ghi rõ. Demo trực tiếp mở trace/bảng đủ case và giải thích một lỗi ưu tiên. Không cần tải/phân tích video D1 để chuẩn bị luồng; video 30 giây là quay màn hình sản phẩm do nhóm thực hiện khi luồng đã sẵn sàng.
 
 Hoàn tất CP3 cần cả code chạy thật, bằng chứng đo, video mở được và xác nhận biểu mẫu đúng lớp đã gửi. Không ghi “đã hoàn tất CP3” chỉ vì code chạy local.
 
 ## 1. Quyết định sản phẩm
 
-Xây một tính năng **chuẩn bị bản sửa cho video đã có**: người phụ trách nạp góp ý, duyệt từng vùng sửa và xuất gói bàn giao cho phiên bản tiếp theo.
+Xây **một video studio quản lý nhiều video**, trong đó tính năng trọng tâm là **chuẩn bị bản sửa cho video đã có**: người phụ trách chọn video và phiên bản, xem video cùng kịch bản đồng bộ, đưa góp ý vào, duyệt từng vùng sửa và xuất gói bàn giao cho phiên bản tiếp theo.
 
 Đơn vị quyết định là **phương án trong vùng sửa**. Đơn vị tổng hợp là **gói phát hành**. AI hiểu và đề xuất; code kiểm chứng cấu trúc, tính công việc, phát hiện xung đột; người duyệt quyết định.
 
-Không xây studio đầy đủ, trang tạo video, trình dựng timeline, chatbot tổng quát hoặc hệ thống quản trị khóa học. Không sinh âm thanh/video. Không mở rộng thành soát toàn bộ kịch bản. Không tự chọn phương án tối ưu thay người duyệt.
+Phần studio chỉ gồm thư viện, thêm video đã có, trang xem đồng bộ câu–timestamp, góp ý theo phiên bản và lịch sử phiên bản. Không xây trang tạo kịch bản/sinh video, trình dựng timeline, chatbot tổng quát hoặc hệ thống quản trị khóa học. Không sinh âm thanh/video. Không mở rộng thành soát toàn bộ kịch bản. Không tự chọn phương án tối ưu thay người duyệt.
 
 Hướng triển khai hiện tại: **nối một agent thật vào luồng có sẵn → duyệt và xuất thật → chạy ≥20 case, giữ lượt đo đầu → chuẩn bị bằng chứng CP3 → mở rộng core và UI sau đó**. Schema và validator chỉ xây đến mức cần cho luồng này. Các mục 2–3 giữ kết quả khảo sát; các mục 4–8 là kiến trúc đích sau CP3, áp dụng trong CP3 chỉ ở phần đã chọn tại mục 0. Không dùng toàn bộ kiến trúc đích làm điều kiện để bắt đầu gọi AI.
 
@@ -311,45 +372,55 @@ Các vùng gộp hết các issue liền kề, nên ví dụ hai vùng rời nha
 
 Khi bấm xem thử phương án chưa chọn, tính cả tổng riêng và **phần việc tăng thêm trong gói hiện tại**. Khi chọn, lưu quyết định và snapshot theo transaction/version; không để hai lần bấm hoặc hai tab ghi đè âm thầm.
 
-## 7. UI đích dành riêng cho kịch bản Revision Planner — sau luồng CP3
+## 7. UI đích — Revision Planner trong studio nhiều video
 
-Khung nhỏ gọn: `Video D1 / Chuẩn bị bản v2`, trạng thái đã lưu, 3 mục chính **Dữ liệu góp ý · Duyệt vùng sửa · Gói bàn giao**. Tra cứu góp ý gắn cờ là bộ lọc phụ. Không có menu tạo kịch bản, sinh video, thư viện media hay màn hình studio giả.
+Khung CP3 đã chốt ở §0 “Studio nhiều video — khung UI CP3”: thư viện → trang video (Xem · Góp ý · Đợt chỉnh sửa · Bản sửa · Phiên bản). Mục này ghi phần mở rộng sau CP3 cho từng khu vực; không thêm menu tạo kịch bản, sinh video hay thư viện media.
 
-### Màn 1 — Dữ liệu góp ý
+### Thư viện và thêm video
 
-- Có nút dùng bộ D1 mẫu; nhận JSON góp ý, CSV khảo sát và văn bản dán. Kịch bản/timecode/transcript là input của video đã có.
-- Preview số bản ghi hợp lệ, bản trùng, thông tin đã ẩn, bản ghi lỗi và vị trí lỗi. Không bắt người dùng học schema nội bộ.
+- Thẻ video đọc số liệu thật: số góp ý chưa phân tích = góp ý của phiên bản hiện tại chưa nằm trong run `xong` nào; “đợt sửa đang dở” = run mới nhất của video có hồ sơ còn chờ duyệt.
+- Thêm video đã có: nguồn phát, `kich-ban.json` theo `hackathon-kich-ban/1`, bảng timecode CSV/JSON, transcript tùy chọn. Kiểm tra cấu trúc bằng cùng loader của pipeline (C3-IN-01); lỗi hiện dòng/trường, không chặn việc tạo mục video.
+- Sau CP3: lưu bền registry video/phiên bản (Postgres/Drizzle theo §8), ảnh đại diện sinh ở server.
+
+### Trang xem video
+
+- Đồng bộ theo câu và trang phụ đề; khoảng lặng là đoạn riêng trên thanh thời gian. Không waveform, không ranh giới frame.
+- Player chỉ gắn nguồn khi trang video mở; lỗi phát vẫn đọc được kịch bản/transcript. Khi phát triển và kiểm tra UI theo yêu cầu hiện tại dùng stub player, không tải video nặng.
+- “Góp ý tại thời điểm này” tạo góp ý nháp có `timeSeconds` + `sentenceN` (nếu mốc nằm trong một câu), nguồn vị trí `nguoi-chon`.
+
+### Góp ý
+
+- Nhận JSON góp ý, CSV khảo sát và văn bản dán; preview số bản ghi hợp lệ, trùng, thông tin đã ẩn, lỗi và vị trí lỗi. Không bắt người dùng học schema nội bộ.
 - Khi thiếu mã người gửi, không khẳng định số người độc lập chính xác; cho sửa mapping.
-- Trạng thái thực của các bước: kiểm tra dữ liệu → phân tích góp ý → lập hồ sơ. Hiện kết quả từng phần và nút thử lại bước lỗi.
-- Góp ý mới trong demo được thêm vào đợt hiện tại, phân tích lại phần liên quan; quyết định cũ chỉ bị đánh dấu cần duyệt lại khi hồ sơ của nó thay đổi.
+- Góp ý mới được thêm vào đợt hiện tại, phân tích lại phần liên quan; quyết định cũ chỉ bị đánh dấu cần duyệt lại khi hồ sơ của nó thay đổi.
 
-### Màn 2 — Duyệt vùng sửa, màn hình trung tâm
+### Đợt chỉnh sửa — màn hình trung tâm
 
-Desktop: danh sách vùng bên trái; hồ sơ vùng ở giữa; tóm tắt gói bên phải hoặc thanh cố định phía dưới. Màn nhỏ xếp thành từng phần, vẫn giữ thanh quyết định.
+Desktop: danh sách vùng sửa bên trái; video + ngữ cảnh và hồ sơ ở giữa; tóm tắt bản sửa bên phải. Màn nhỏ xếp thành từng phần, vẫn giữ thanh quyết định.
 
 Một hồ sơ đọc theo thứ tự:
 
-1. Người học đang vướng gì; câu và mốc trên bản gốc; số người độc lập, số lần nhắc.
-2. Bằng chứng có ID, nhóm người gửi, hai chiều ý kiến; bấm mở đúng đoạn kịch bản/phát lại khi người dùng cần.
-3. “Điều chưa rõ”: vị trí, giả thuyết nguyên nhân, phản hồi không khớp phiên bản, hình/âm chưa kiểm chứng.
-4. A/B so sánh ngang: nội dung trước/sau, vấn đề dự kiến giải, vấn đề còn lại, số câu thu lại/thu mới, cảnh, phụ đề và phần việc tăng thêm.
-5. Chọn A/B, chỉnh tay rồi duyệt, giữ nguyên, hoãn hoặc từ chối. Hoãn/từ chối ghi lý do ngắn. Không chọn sẵn A.
+1. Người học đang vướng gì; câu và mốc trên bản gốc; số người độc lập, số lần nhắc; nhãn “Vị trí cần xác nhận”, “Có ý kiến trái chiều”.
+2. Bằng chứng nhóm theo người gửi, hai chiều ý kiến đặt cạnh nhau, điểm khảo sát cạnh góp ý nhưng không dùng điểm thấp để kết luận nguyên nhân; bấm một góp ý làm nổi câu nó được gắn vào.
+3. Ngữ cảnh v1: Lời đọc · Chữ & hình (ghi rõ là mô tả trong kịch bản, không phải hình đã kiểm chứng) · Phụ đề; nút xem đoạn v1.
+4. “Điều chưa rõ”: vị trí, giả thuyết nguyên nhân, phản hồi không khớp phiên bản, hình/âm chưa kiểm chứng.
+5. A/B so sánh ngang: cách xử lý, nội dung trước → sau, dự kiến giải quyết, còn lại, công việc (thu âm, cảnh, phụ đề), **tăng thêm trong gói**.
+6. Chọn A · Chọn B · Hoãn · Giữ nguyên. Hoãn/giữ nguyên ghi lý do ngắn. Không chọn sẵn A. Sau CP3 thêm chỉnh tay và sửa vị trí thật.
 
-Mỗi câu bị kéo theo có nhãn lý do, ví dụ “Thu lại vì lời câu 22 đổi”. Bất đồng và điều chưa rõ không giấu trong tooltip. Dùng chữ và biểu tượng cùng màu để người dùng không phải phân biệt chỉ bằng màu.
+Mỗi câu bị kéo theo có nhãn lý do, ví dụ “Câu 21 — thu lại vì lời câu 22 thay đổi”. Bất đồng và điều chưa rõ không giấu trong tooltip. Dùng chữ và biểu tượng cùng màu.
 
-Preview trước khi duyệt không sửa bản nháp chính. Sau duyệt, hiện tổng việc mới, xung đột hoặc vượt giới hạn ngay. Chỉnh tay làm mất hiệu lực lần duyệt cũ và chạy lại validator; không âm thầm giữ trạng thái đã duyệt.
+Preview trước khi duyệt không sửa bản nháp chính. Sau duyệt, hiện tổng việc mới, xung đột hoặc vượt giới hạn ngay. Chỉnh tay làm mất hiệu lực lần duyệt cũ và chạy lại validator.
 
-Player kế thừa khả năng seek/stop của component hiện có, nhưng chỉ gắn nguồn/tải khi người dùng yêu cầu; lỗi video vẫn đọc được transcript. Trong quá trình phát triển và kiểm tra UI theo yêu cầu hiện tại dùng stub player, không tải video nặng.
+### Bản sửa và gói bàn giao
 
-### Màn 3 — Gói bàn giao
-
-- Danh sách “Đã chọn để xử lý”, “Giải quyết một phần”, “Chưa xử lý”: gồm chờ duyệt, hoãn, từ chối, giữ nguyên và chưa định vị. “Đã chọn” không có nghĩa đã chứng minh người học hết vướng.
-- Kịch bản trước/sau theo câu; danh sách thu âm, dựng hình, phụ đề, kỹ thuật. Cho truy ngược từng việc tới option → issue → feedback.
-- Budget bar hiển thị đơn vị cụ thể; vượt trần cho điều chỉnh lựa chọn hoặc chủ động thay giới hạn kèm ghi nhận.
+- Tiêu đề trạng thái “Bản sửa dự kiến cho v2 · Chưa có video v2”. Không dùng “Đã sửa video”.
+- Ba tab: **Kịch bản** (trước/sau, tô đúng trường đổi) · **Việc cần làm** (thu âm, dựng hình, phụ đề; truy ngược quyết định → góp ý) · **Chưa xử lý** (chờ duyệt, hoãn, giữ nguyên, cần xác nhận, kỹ thuật, kèm lý do). “Đã chọn” không có nghĩa đã chứng minh người học hết vướng.
 - Khu vực xung đột chỉ rõ câu, vùng và hai lựa chọn; có đường quay lại hồ sơ.
-- Tách “Tải bản nháp có cảnh báo” và “Xuất gói đã chốt”. Gói đã chốt yêu cầu không có conflict cứng, patch hợp lệ, xác nhận bắt buộc hoàn tất và trạng thái unresolved được ghi đầy đủ.
-- File bàn giao: `kich-ban-v2.json`, `kich-ban-v2.md`, `thu-am.csv`, `dung-hinh.csv`, `phu-de.csv`, `quyet-dinh-va-bang-chung.json`; tác vụ kỹ thuật có danh sách riêng nếu phát sinh.
-- Bảng phụ đề ghi nội dung/tác vụ và tham chiếu timing gốc; không giả tạo SRT cuối cùng cho audio chưa thu.
+- Sau CP3: budget bar; tách “Tải bản nháp có cảnh báo” và “Xuất gói đã chốt”; file `thu-am.csv`, `dung-hinh.csv`, `phu-de.csv`, `quyet-dinh-va-bang-chung.json`. Bảng phụ đề ghi nội dung/tác vụ và tham chiếu timing gốc; không giả tạo SRT cho audio chưa thu.
+
+### Lịch sử phiên bản
+
+Ba trạng thái tách biệt: **video đã sản xuất** (có nguồn phát), **bản sửa đang duyệt** (có run + quyết định, chưa có video), **video phiên bản mới đã sản xuất** (chỉ khi người dùng thêm nguồn phát của phiên bản đó). Mỗi đợt sửa ghi phiên bản nguồn; góp ý của v1 không tự chuyển sang v2.
 
 ## 8. Tổ chức mã nguồn và API đích — chưa refactor toàn bộ cho CP3
 
@@ -390,8 +461,9 @@ Bỏ lộ trình 12–18 ngày công làm kế hoạch trước mắt. Làm theo
 | Thứ tự | Công việc | Điều kiện xong |
 |---|---|---|
 | CP3-1 | Schema output tối thiểu, cấu hình model server, agent revision, endpoint + run trace | Gửi một góp ý mới, nhận kết quả model thật có runId; không cần đổi UI lớn |
-| CP3-2 | Nối kết quả run vào danh sách/chi tiết hiện tại; loading/error/retry, bằng chứng và chưa rõ vị trí | Người dùng đi từ nút chạy đến hồ sơ của chính input đó, không dùng JSON kết quả mẫu |
-| CP3-3 | Duyệt patch, tính công việc tối thiểu, loại trùng, xuất nội dung mới | Bấm duyệt rồi tải file thấy lời đã đổi; chưa duyệt không đổi; xung đột ghi cùng field bị chặn |
+| CP3-2 | Khung studio: registry video (seed D1 + thêm video, lưu file local), thư viện, trang video đồng bộ câu–timestamp, tab Góp ý theo phiên bản | Thêm một video mới rồi mở lại sau khi tải trang vẫn thấy; video thiếu kịch bản mở được và hiện phần thiếu; không metadata bịa, không số D1 cứng ở video khác |
+| CP3-3 | Nối tab Góp ý → `analyze` đúng hợp đồng (có `videoId`/`versionId`, góp ý mới đi qua làm sạch ở server); tab Đợt chỉnh sửa đọc run của chính video; loading/error/retry, bằng chứng và chưa rõ vị trí | Từ trang video thêm một góp ý, bấm phân tích, thấy hồ sơ của chính input đó; lỗi model hiện mã + `runId`; video khác không thấy run này |
+| CP3-3b | Duyệt patch (Chọn A/B · Hoãn · Giữ nguyên), phần việc tăng thêm, cảnh báo chéo, tab Bản sửa, xuất nội dung mới | Bấm duyệt rồi tải file thấy lời đã đổi; chưa duyệt không đổi; xung đột ghi cùng field bị chặn; nhãn “Chưa có video v2” |
 | CP3-4 | Golden set ≥20 case, đóng băng expected/config, runner cùng service, bảng đủ kết quả | Có results + trace + số đạt/tổng đã chạy + %, kể cả lỗi; xác định một nhóm lỗi ưu tiên |
 | CP3-5 | Demo đầu vào mới, quay 30 giây, kiểm tra link, điền số đo thực vào artifact nộp | Bằng chứng mở được; nhóm gửi đúng biểu mẫu và kiểm tra xác nhận |
 | Sau CP3 → CP4 | Dùng lỗi lượt đầu và dữ liệu người dùng bổ sung để chỉnh spec/phạm vi, khóa quality bar | `spec.md` có ngưỡng bằng số được commit trước hạn CP4, nêu phần còn thiếu |
@@ -399,7 +471,7 @@ Bỏ lộ trình 12–18 ngày công làm kế hoạch trước mắt. Làm theo
 
 Song song do người dùng/nhóm chuẩn bị: dữ liệu chính thức, provenance chatlog, mapping bốn lớp chỗ khó, expected và nhận xét TA. Đội triển khai giữ adapter/version để nhận dữ liệu bổ sung; không đợi bộ này hoàn chỉnh mới chạy agent. Những dữ liệu thay đổi dùng bộ/run version mới, không sửa lịch sử lượt đầu.
 
-Nếu phải giảm phạm vi: bỏ trước phần trang trí UI, database, thêm/xóa câu, multi-agent và benchmark nâng cao. Giữ lời gọi AI thật, input mới, trace, một kết quả sửa thiết yếu, duyệt, export, golden set và kết quả đủ case. Nếu không chạy hết, báo chính xác phần chưa chạy; không tuyên bố đã đủ checkpoint.
+Nếu phải giảm phạm vi: bỏ trước phần trang trí UI, sửa vị trí thật (giữ nút “Báo vị trí sai”), database, thêm/xóa câu, multi-agent và benchmark nâng cao. Không giảm bằng cách quay lại màn duyệt chỉ dành cho D1: thư viện + trang video + tab theo video là phạm vi đã chốt. Giữ lời gọi AI thật, input mới, trace, một kết quả sửa thiết yếu, duyệt, export, golden set và kết quả đủ case. Nếu không chạy hết, báo chính xác phần chưa chạy; không tuyên bố đã đủ checkpoint.
 
 ## 10. Đánh giá đầy đủ sau lượt đầu CP3
 

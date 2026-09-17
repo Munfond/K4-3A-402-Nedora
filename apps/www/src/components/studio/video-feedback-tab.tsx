@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   AlertTriangle,
   CheckCircle2,
   Clock,
+  FileSpreadsheet,
   Filter,
   HelpCircle,
   MapPin,
@@ -14,7 +15,9 @@ import {
   Play,
   Search,
   Sparkles,
+  Upload,
   Users,
+  X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -23,20 +26,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { dinhDangPhut } from "@/lib/revision/format";
+import type { NewFeedbackInput } from "@/lib/revision/types";
+import { parseSurveyCsv, type CsvParseResult } from "@/lib/studio/csv-import";
 import type {
   LocationSource,
   StudioFeedback,
   StudioVideo,
 } from "@/lib/studio/types";
 
+type StatusFilter = "all" | "co-nhan-xet" | "chi-cham-diem" | "bi-loai";
+
+function feedbackStatus(f: StudioFeedback): Exclude<StatusFilter, "all"> {
+  if (f.isQuarantined) return "bi-loai";
+  if (f.label === "chi-cham-diem") return "chi-cham-diem";
+  return "co-nhan-xet";
+}
+
 interface VideoFeedbackTabProps {
   video: StudioVideo;
   feedbacks: StudioFeedback[];
   onSeekToTime?: (timeSeconds: number) => void;
-  onAddNewFeedback: (fb: Partial<StudioFeedback>) => void;
+  /** Trả về thông báo lỗi, hoặc null khi server đã lưu. */
+  onAddNewFeedback: (fb: NewFeedbackInput) => Promise<string | null>;
+  /** Lưu nhiều góp ý từ CSV; trả về lỗi hoặc null khi server đã lưu hết. */
+  onImportFeedbacks?: (items: NewFeedbackInput[]) => Promise<string | null>;
   onTriggerAnalyze: () => void;
   isAnalyzing: boolean;
   analysisTimer: number;
+  analyzeError?: { code: string; message: string; runId?: string } | null;
+  canAnalyze?: boolean;
+  initialTimeSeconds?: number | null;
+  initialSearchQuery?: string;
+  initialAddFormOpen?: boolean;
+  initialSentenceN?: number | null;
+  initialText?: string;
 }
 
 export default function VideoFeedbackTab({
@@ -44,33 +67,139 @@ export default function VideoFeedbackTab({
   feedbacks,
   onSeekToTime,
   onAddNewFeedback,
+  onImportFeedbacks,
   onTriggerAnalyze,
   isAnalyzing,
   analysisTimer,
+  analyzeError,
+  canAnalyze = true,
+  initialTimeSeconds,
+  initialSearchQuery,
+  initialAddFormOpen,
+  initialSentenceN,
+  initialText,
 }: VideoFeedbackTabProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery || "");
   const [locationFilter, setLocationFilter] = useState<"all" | LocationSource>(
     "all",
   );
   const [channelFilter, setChannelFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form thêm góp ý
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newText, setNewText] = useState("");
+  const [showAddForm, setShowAddForm] = useState(!!initialAddFormOpen);
+  const [newText, setNewText] = useState(initialText || "");
   const [newSender, setNewSender] = useState("");
   const [newChannel, setNewChannel] = useState<
     "binh-luan" | "tin-nhan" | "khao-sat"
   >("binh-luan");
-  const [newSentenceN, setNewSentenceN] = useState<string>("");
+  const [newSentenceN, setNewSentenceN] = useState<string>(
+    initialSentenceN != null ? String(initialSentenceN) : "",
+  );
   const [newTimeSeconds, setNewTimeSeconds] = useState<string>("");
   const [newDeHieu, setNewDeHieu] = useState<number | undefined>();
   const [newNhipDo, setNewNhipDo] = useState<number | undefined>();
+
+  // Tải lên CSV khảo sát/bình luận
+  const [showCsvPanel, setShowCsvPanel] = useState(false);
+  const [csvResult, setCsvResult] = useState<CsvParseResult | null>(null);
+  const [csvFileName, setCsvFileName] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [csvError, setCsvError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCsvFile = useCallback((file: File) => {
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setCsvError("Chỉ hỗ trợ file .csv");
+      return;
+    }
+    setCsvError(null);
+    setCsvFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        setCsvResult(parseSurveyCsv(String(e.target?.result ?? "")));
+      } catch {
+        setCsvError("Không thể đọc file. Vui lòng kiểm tra lại định dạng CSV.");
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleCsvFile(file);
+    },
+    [handleCsvFile],
+  );
+
+  const handleResetCsv = () => {
+    setCsvResult(null);
+    setCsvFileName("");
+    setCsvError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleConfirmCsvImport = async () => {
+    if (!csvResult || csvResult.rows.length === 0) return;
+    setIsImporting(true);
+    setCsvError(null);
+    const items: NewFeedbackInput[] = csvResult.rows.map(
+      ({ rowKey: _rowKey, ...fb }) => fb,
+    );
+    const error = onImportFeedbacks
+      ? await onImportFeedbacks(items)
+      : await (async () => {
+          for (const fb of items) {
+            const e = await onAddNewFeedback(fb);
+            if (e) return e;
+          }
+          return null;
+        })();
+    setIsImporting(false);
+    if (error) {
+      setCsvError(error);
+      return;
+    }
+    handleResetCsv();
+    setShowCsvPanel(false);
+  };
+
+  // Synchronize when initial props change
+  useEffect(() => {
+    if (initialSearchQuery !== undefined) {
+      setSearchQuery(initialSearchQuery);
+    }
+  }, [initialSearchQuery]);
+
+  useEffect(() => {
+    if (initialAddFormOpen) {
+      setShowAddForm(true);
+    }
+    if (initialSentenceN != null) {
+      setNewSentenceN(String(initialSentenceN));
+    }
+    if (initialText) {
+      setNewText(initialText);
+    }
+    if (initialTimeSeconds != null) {
+      setNewTimeSeconds(String(Math.floor(initialTimeSeconds)));
+    }
+  }, [initialAddFormOpen, initialSentenceN, initialText, initialTimeSeconds]);
 
   const filteredFeedbacks = useMemo(() => {
     return feedbacks.filter((f) => {
       if (locationFilter !== "all" && f.locationSource !== locationFilter)
         return false;
       if (channelFilter !== "all" && f.channel !== channelFilter) return false;
+      if (statusFilter !== "all" && feedbackStatus(f) !== statusFilter)
+        return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -82,7 +211,7 @@ export default function VideoFeedbackTab({
 
       return true;
     });
-  }, [feedbacks, locationFilter, channelFilter, searchQuery]);
+  }, [feedbacks, locationFilter, channelFilter, statusFilter, searchQuery]);
 
   const counts = useMemo(() => {
     let nguoiChon = 0;
@@ -95,44 +224,56 @@ export default function VideoFeedbackTab({
       else chuaXacDinh++;
     }
 
-    return { total: feedbacks.length, nguoiChon, aiDeXuat, chuaXacDinh };
+    const byStatus = { "co-nhan-xet": 0, "chi-cham-diem": 0, "bi-loai": 0 };
+    for (const f of feedbacks) byStatus[feedbackStatus(f)]++;
+    return {
+      total: feedbacks.length,
+      senders: new Set(feedbacks.map((f) => f.sender)).size,
+      nguoiChon,
+      aiDeXuat,
+      chuaXacDinh,
+      ...byStatus,
+    };
   }, [feedbacks]);
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const hasScore = newDeHieu !== undefined || newNhipDo !== undefined;
+  const canSubmit =
+    newText.trim().length > 0 || (newChannel === "khao-sat" && hasScore);
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newText.trim()) return;
+    if (!canSubmit || isSaving) return;
 
     const sentenceN = newSentenceN.trim()
       ? parseInt(newSentenceN, 10)
       : undefined;
-    const timeSec = newTimeSeconds.trim()
+    const timeSeconds = newTimeSeconds.trim()
       ? parseInt(newTimeSeconds, 10)
       : undefined;
-    const locationSource: LocationSource =
-      sentenceN != null || timeSec != null ? "nguoi-chon" : "chua-xac-dinh";
 
-    onAddNewFeedback({
-      id: `gy-user-${Date.now().toString(36)}`,
+    setIsSaving(true);
+    setSaveError(null);
+    // Nhãn, cách ly và mã người gửi ẩn danh do server gán sau khi làm sạch.
+    const error = await onAddNewFeedback({
+      text: newText.trim(),
       channel: newChannel,
-      sender:
-        newSender.trim() ||
-        `nguoi-hoc-${Math.floor(Math.random() * 900 + 100)}`,
-      sanitizedText: newText.trim(),
-      time: new Date().toISOString(),
-      label: "gop-y",
-      moderationBy: "code",
-      isQuarantined: false,
-      locationSource,
-      sentenceN,
-      timeSeconds: timeSec,
+      sender: newSender.trim() || undefined,
+      location:
+        sentenceN != null || timeSeconds != null
+          ? { sentenceN, timeSeconds }
+          : undefined,
       survey:
-        newDeHieu || newNhipDo
-          ? {
-              deHieu: newDeHieu,
-              nhipDo: newNhipDo,
-            }
+        newChannel === "khao-sat" && hasScore
+          ? { deHieu: newDeHieu, nhipDo: newNhipDo }
           : undefined,
     });
+    setIsSaving(false);
+
+    if (error) {
+      // Giữ nguyên nội dung đang nhập để người dùng sửa lại.
+      setSaveError(error);
+      return;
+    }
 
     setNewText("");
     setNewSender("");
@@ -153,7 +294,7 @@ export default function VideoFeedbackTab({
               Phiên bản: {video.currentVersion}
             </Badge>
             <span className="font-bold text-sm text-foreground">
-              {feedbacks.length} phản hồi đã thu thập
+              {counts.total} góp ý từ {counts.senders} người
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -162,32 +303,79 @@ export default function VideoFeedbackTab({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              setShowCsvPanel(false);
+            }}
             className="text-xs gap-1.5 h-8"
           >
             <MessageSquarePlus className="size-3.5" />
-            {showAddForm ? "Đóng form thêm" : "Thêm phản hồi mới"}
+            {showAddForm ? "Đóng form" : "Thêm thủ công"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!canAnalyze}
+            title={
+              canAnalyze
+                ? undefined
+                : "Video chưa có kịch bản và timecode nên chưa nhận góp ý"
+            }
+            onClick={() => {
+              if (!showCsvPanel) handleResetCsv();
+              setShowCsvPanel(!showCsvPanel);
+              setShowAddForm(false);
+            }}
+            className="text-xs gap-1.5 h-8"
+          >
+            <FileSpreadsheet className="size-3.5" />
+            {showCsvPanel ? "Đóng CSV" : "Tải lên file CSV"}
           </Button>
 
           <Button
             type="button"
             size="sm"
-            disabled={isAnalyzing || feedbacks.length === 0}
+            disabled={isAnalyzing || feedbacks.length === 0 || !canAnalyze}
+            title={
+              canAnalyze
+                ? undefined
+                : "Video chưa có kịch bản và timecode nên chưa phân tích được"
+            }
             onClick={onTriggerAnalyze}
             className="text-xs gap-1.5 h-8 font-semibold shadow-xs"
           >
             <Sparkles className="size-3.5" />
             {isAnalyzing
-              ? `Đang phân tích (${analysisTimer}s)...`
+              ? `Đang gọi model (${analysisTimer}s)...`
               : `Phân tích góp ý cho ${video.currentVersion}`}
           </Button>
         </div>
       </div>
+
+      {analyzeError && (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs space-y-1"
+        >
+          <p className="font-semibold text-destructive flex items-center gap-1.5">
+            <AlertCircle className="size-3.5" /> Phân tích thất bại ·{" "}
+            {analyzeError.code}
+          </p>
+          <p className="break-words">{analyzeError.message}</p>
+          {analyzeError.runId && (
+            <p className="font-mono text-muted-foreground">
+              runId: {analyzeError.runId}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* FORM THÊM GÓP Ý THỦ CÔNG */}
       {showAddForm && (
@@ -258,7 +446,10 @@ export default function VideoFeedbackTab({
 
               <div>
                 <label className="block text-muted-foreground mb-1 font-medium">
-                  Nội dung góp ý *
+                  Nội dung góp ý{" "}
+                  {newChannel === "khao-sat"
+                    ? "(tùy chọn nếu đã chấm điểm)"
+                    : "*"}
                 </label>
                 <Textarea
                   placeholder="Nhập nội dung phàn nàn, nhận xét hoặc đề xuất..."
@@ -266,7 +457,6 @@ export default function VideoFeedbackTab({
                   onChange={(e) => setNewText(e.target.value)}
                   rows={3}
                   className="text-xs"
-                  required
                 />
               </div>
 
@@ -317,6 +507,11 @@ export default function VideoFeedbackTab({
                 </div>
               )}
 
+              {saveError && (
+                <p role="alert" className="text-destructive text-xs">
+                  {saveError}
+                </p>
+              )}
               <div className="flex justify-end gap-2 pt-1">
                 <Button
                   type="button"
@@ -326,14 +521,283 @@ export default function VideoFeedbackTab({
                 >
                   Hủy
                 </Button>
-                <Button type="submit" size="sm">
-                  Lưu phản hồi
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={!canSubmit || isSaving}
+                >
+                  {isSaving ? "Đang lưu..." : "Lưu phản hồi"}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
       )}
+
+      {/* PANEL UPLOAD CSV */}
+      {showCsvPanel && (
+        <Card className="border-2 border-primary/20 shadow-sm">
+          <CardHeader className="pb-3 border-b bg-muted/10">
+            <CardTitle className="text-sm font-bold flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2">
+                <FileSpreadsheet className="size-4 text-primary" />
+                Tải lên file khảo sát CSV
+              </span>
+              {csvResult && (
+                <button
+                  type="button"
+                  onClick={handleResetCsv}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-4">
+            {/* Hướng dẫn format */}
+            <div className="rounded-lg border bg-muted/30 p-3 text-[11px] text-muted-foreground space-y-1">
+              <p className="font-semibold text-foreground text-xs">
+                Định dạng CSV được hỗ trợ:
+              </p>
+              <p>
+                • <strong>Khảo sát:</strong>{" "}
+                <code className="bg-muted px-1 rounded">
+                  ma_gop_y, nguoi_gui, de_hieu_1_5, nhip_do_1_5, y_kien_them
+                </code>
+              </p>
+              <p>
+                • <strong>Bình luận:</strong>{" "}
+                <code className="bg-muted px-1 rounded">
+                  id, nguoi_gui, noi_dung
+                </code>{" "}
+                (hoặc text, comment)
+              </p>
+              <p>
+                Hệ thống tự nhận biết định dạng từ tên cột trong hàng đầu tiên.
+              </p>
+            </div>
+
+            {/* Khu drag-and-drop */}
+            {!csvResult && (
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(true);
+                }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors ${
+                  isDragOver
+                    ? "border-primary bg-primary/5"
+                    : "border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/30"
+                }`}
+              >
+                <Upload
+                  className={`size-8 ${isDragOver ? "text-primary" : "text-muted-foreground/50"}`}
+                />
+                <div className="text-center">
+                  <p className="text-sm font-medium text-foreground">
+                    {isDragOver
+                      ? "Thả file vào đây"
+                      : "Kéo thả file .csv vào đây"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    hoặc bấm để chọn file từ máy tính
+                  </p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleCsvFile(f);
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Lỗi đọc file */}
+            {csvError && (
+              <div className="flex items-center gap-2 p-3 rounded-lg border border-red-300 bg-red-50 text-red-700 text-xs dark:bg-red-950/40 dark:text-red-300">
+                <AlertCircle className="size-4 shrink-0" />
+                {csvError}
+              </div>
+            )}
+
+            {/* Preview kết quả parse */}
+            {csvResult && (
+              <div className="space-y-3">
+                {/* Tóm tắt */}
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border font-mono">
+                    <FileSpreadsheet className="size-3" />
+                    {csvFileName}
+                  </span>
+                  <Badge className="bg-green-50 text-green-700 border-green-200 border text-[11px] dark:bg-green-950 dark:text-green-300">
+                    {csvResult.rows.length} dòng hợp lệ
+                  </Badge>
+                  {csvResult.warnings.length > 0 && (
+                    <Badge className="bg-amber-50 text-amber-700 border-amber-200 border text-[11px] dark:bg-amber-950 dark:text-amber-300">
+                      ⚠ {csvResult.warnings.length} dòng bỏ qua
+                    </Badge>
+                  )}
+                  <span className="text-muted-foreground">
+                    Định dạng nhận diện:{" "}
+                    <strong>
+                      {csvResult.format === "khao-sat"
+                        ? "Khảo sát"
+                        : csvResult.format === "binh-luan"
+                          ? "Bình luận"
+                          : "Tự động"}
+                    </strong>
+                  </span>
+                </div>
+
+                {/* Cảnh báo dòng bị bỏ qua */}
+                {csvResult.warnings.length > 0 && (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-2.5 space-y-1 dark:bg-amber-950/20">
+                    {csvResult.warnings.map((w) => (
+                      <p
+                        key={w.row}
+                        className="text-[11px] text-amber-700 dark:text-amber-300"
+                      >
+                        <strong>Dòng {w.row}:</strong> {w.message}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Bảng preview */}
+                <div className="overflow-x-auto rounded-lg border">
+                  <table className="w-full text-[11px]">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
+                          #
+                        </th>
+                        <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
+                          Người gửi
+                        </th>
+                        <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
+                          Nội dung góp ý
+                        </th>
+                        <th className="px-3 py-2 text-center font-semibold text-muted-foreground">
+                          dễ hiểu
+                        </th>
+                        <th className="px-3 py-2 text-center font-semibold text-muted-foreground">
+                          nhịp độ
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {csvResult.rows.slice(0, 10).map((fb, i) => (
+                        <tr
+                          key={`${fb.rowKey}-${i}`}
+                          className="hover:bg-muted/20"
+                        >
+                          <td className="px-3 py-2 text-muted-foreground font-mono">
+                            {i + 1}
+                          </td>
+                          <td className="px-3 py-2 font-mono">{fb.sender}</td>
+                          <td className="px-3 py-2 max-w-xs">
+                            <span className="line-clamp-2 text-foreground">
+                              {fb.text || (
+                                <span className="italic text-muted-foreground">
+                                  (chỉ có điểm số)
+                                </span>
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            {fb.survey?.deHieu != null ? (
+                              <span className="font-bold text-amber-600">
+                                {fb.survey.deHieu}/5
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            {fb.survey?.nhipDo != null ? (
+                              <span className="font-bold text-sky-600">
+                                {fb.survey.nhipDo}/5
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {csvResult.rows.length > 10 && (
+                    <div className="px-3 py-2 text-center text-[11px] text-muted-foreground border-t bg-muted/20">
+                      ... và {csvResult.rows.length - 10} dòng nữa
+                    </div>
+                  )}
+                </div>
+
+                {/* Nút xác nhận */}
+                <div className="flex items-center justify-between pt-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleResetCsv}
+                    className="text-xs gap-1.5"
+                  >
+                    <X className="size-3.5" /> Chọn file khác
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleConfirmCsvImport}
+                    disabled={csvResult.rows.length === 0 || isImporting}
+                    className="text-xs gap-1.5 font-semibold"
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    {isImporting
+                      ? "Đang lưu..."
+                      : `Lưu ${csvResult.rows.length} góp ý vào ${video.currentVersion}`}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* BỘ LỌC TRẠNG THÁI (C3-UI-01) */}
+      <div className="flex flex-wrap items-center gap-1.5 text-xs">
+        <span className="font-semibold text-muted-foreground mr-1">
+          Trạng thái:
+        </span>
+        {(
+          [
+            ["all", `Tất cả (${counts.total})`],
+            ["co-nhan-xet", `Có nhận xét (${counts["co-nhan-xet"]})`],
+            ["chi-cham-diem", `Chỉ chấm điểm (${counts["chi-cham-diem"]})`],
+            ["bi-loai", `Bị loại (${counts["bi-loai"]})`],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setStatusFilter(value)}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+              statusFilter === value
+                ? "bg-primary text-primary-foreground"
+                : "bg-background border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* BỘ LỌC NGUỒN GỐC VỊ TRÍ (LOCATION PROVENANCE) */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border bg-muted/20">
@@ -450,7 +914,13 @@ export default function VideoFeedbackTab({
 
                 {/* Nội dung */}
                 <p className="text-foreground leading-relaxed italic bg-muted/20 p-2.5 rounded-lg border border-border/40">
-                  {f.sanitizedText ? (
+                  {f.isQuarantined ? (
+                    <span className="not-italic text-muted-foreground flex items-center gap-1.5">
+                      <AlertTriangle className="size-3.5" />
+                      {f.id} · Bị loại khỏi phân tích:{" "}
+                      {f.quarantineReason ?? "nội dung không phù hợp"}
+                    </span>
+                  ) : f.sanitizedText ? (
                     `"${f.sanitizedText}"`
                   ) : (
                     <span className="text-muted-foreground">

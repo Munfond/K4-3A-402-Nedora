@@ -1,6 +1,31 @@
 import { loadScriptD1, loadD1RawFeedback } from "@/lib/revision/load";
-import { sanitizeFeedbackItem } from "@/lib/revision/sanitize";
-import type { StudioFeedback, StudioVideo, LocationSource } from "./types";
+import type { FeedbackItem } from "@/lib/revision/types";
+import { loadStoredFeedback } from "./feedback-store";
+import type { StudioFeedback, StudioVideo } from "./types";
+
+export function toStudioFeedback(item: FeedbackItem): StudioFeedback {
+  const { rawText: _rawText, ...rest } = item;
+  const loc = item.location;
+  return {
+    ...rest,
+    locationSource:
+      loc && (loc.sentenceN != null || loc.timeSeconds != null)
+        ? "nguoi-chon"
+        : "chua-xac-dinh",
+    sentenceN: loc?.sentenceN,
+    timeSeconds: loc?.timeSeconds,
+  };
+}
+
+/** Góp ý của một video + phiên bản: bộ gốc (nếu là video mẫu) và góp ý đã lưu. */
+export function getVideoFeedback(
+  videoId: string,
+  versionId: string,
+): StudioFeedback[] {
+  const video = getInitialVideos().find((v) => v.id === videoId);
+  if (videoId === "d1" && versionId === "v1") return video?.feedbacks ?? [];
+  return loadStoredFeedback(videoId, versionId).map(toStudioFeedback);
+}
 
 // Seed danh sách video mẫu của Studio
 export function getInitialVideos(): StudioVideo[] {
@@ -11,45 +36,12 @@ export function getInitialVideos(): StudioVideo[] {
   try {
     scriptD1 = loadScriptD1();
     const rawF = loadD1RawFeedback();
-    d1Feedbacks = rawF.map((item) => {
-      // Gán locationSource thực tế dựa trên nội dung
-      let locationSource: LocationSource = "chua-xac-dinh";
-      let sentenceN: number | undefined;
-      let timeSeconds: number | undefined;
-
-      const txt = (item.sanitizedText || "").toLowerCase();
-      if (txt.includes("câu 23") || txt.includes("23")) {
-        locationSource = "nguoi-chon";
-        sentenceN = 23;
-        timeSeconds = 121;
-      } else if (
-        txt.includes("câu 10") ||
-        txt.includes("câu 11") ||
-        txt.includes("học máy") ||
-        txt.includes("spam")
-      ) {
-        locationSource = "ai-de-xuat";
-        sentenceN = 10;
-        timeSeconds = 65;
-      } else if (
-        txt.includes("phút 2") ||
-        txt.includes("02:00") ||
-        txt.includes("đoạn đầu")
-      ) {
-        locationSource = "nguoi-chon";
-        timeSeconds = 120;
-        sentenceN = 22;
-      } else if (item.channel === "khao-sat" && !item.sanitizedText) {
-        locationSource = "chua-xac-dinh";
-      }
-
-      return {
-        ...item,
-        locationSource,
-        sentenceN,
-        timeSeconds,
-      };
-    });
+    // Bộ góp ý D1 không có trường vị trí có cấu trúc: trước khi phân tích,
+    // mọi góp ý là "chưa xác định" (C3-UI-03). Không suy vị trí từ chữ.
+    d1Feedbacks = [
+      ...rawF.map(toStudioFeedback),
+      ...loadStoredFeedback("d1", "v1").map(toStudioFeedback),
+    ];
   } catch (err) {
     // Client fallback nếu không nạp trực tiếp được từ fs
     scriptD1 = undefined;
@@ -70,7 +62,7 @@ export function getInitialVideos(): StudioVideo[] {
       hasScript: true,
       hasTimecodes: true,
       hasVideoFile: true,
-      feedbackCount: 22,
+      feedbackCount: d1Feedbacks.length,
       activeRunId: null,
       script: scriptD1,
       feedbacks: d1Feedbacks,

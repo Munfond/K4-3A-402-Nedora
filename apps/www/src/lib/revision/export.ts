@@ -223,13 +223,16 @@ export function buildViecCanLamCsv(
     const issueIdSet = new Set<string>();
     const feedbackIdSet = new Set<string>();
 
-    for (const cid of caseIds) {
-      const c = caseMap.get(cid!);
-      if (c) {
-        c.issueIds.forEach((id) => issueIdSet.add(id));
-        c.issues.forEach((iss) =>
-          iss.feedbackIds.forEach((fid) => feedbackIdSet.add(fid)),
-        );
+    // Truy vết theo đúng vấn đề chứa phương án đã chọn, không lấy cả hồ sơ:
+    // một hồ sơ vùng có thể gom nhiều vấn đề khác góp ý.
+    for (const reason of w.reasons) {
+      const c = reason.caseId ? caseMap.get(reason.caseId) : undefined;
+      const issue = c?.issues.find((iss) =>
+        iss.options.some((o) => o.id === reason.optionId),
+      );
+      if (issue) {
+        issueIdSet.add(issue.id);
+        issue.feedbackIds.forEach((fid) => feedbackIdSet.add(fid));
       }
     }
 

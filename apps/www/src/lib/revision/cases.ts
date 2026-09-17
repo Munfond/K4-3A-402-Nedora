@@ -104,7 +104,14 @@ export function buildDecisionCases(
       ...group.map((iss) => iss.independentSenders),
       0,
     );
-    const totalMentions = group.reduce((sum, iss) => sum + iss.mentions, 0);
+    // Một góp ý có thể nằm trong nhiều vấn đề của cùng vùng: đếm không trùng.
+    const totalMentions = new Set(group.flatMap((iss) => iss.feedbackIds)).size;
+    const impactRank = { cao: 0, vua: 1, thap: 2 } as const;
+    const leadIssue = [...group].sort(
+      (a, b) =>
+        impactRank[a.impact.level] - impactRank[b.impact.level] ||
+        b.independentSenders - a.independentSenders,
+    )[0];
 
     const flags: string[] = [];
     if (hasDisagreement) flags.push("Trái chiều");
@@ -112,7 +119,7 @@ export function buildDecisionCases(
     cases.push({
       id: caseId,
       type: "vung",
-      title: `Vùng sửa câu ${fromN}–${toN}`,
+      title: leadIssue?.summary ?? `Vùng sửa câu ${fromN}–${toN}`,
       issueIds: group.map((iss) => iss.id),
       sentenceNs: allSentenceNs,
       tuGiay,

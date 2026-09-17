@@ -31,16 +31,22 @@ export async function analyzeRevision(
   input: AnalyzeInput,
   config?: RevisionAgentConfig,
   callModel?: MockModelCaller,
+  storedFeedback: FeedbackItem[] = [],
 ): Promise<AnalyzeServiceResponse> {
   const runId = generateRunId();
   const startTime = Date.now();
 
   // 1. Nạp và chuẩn bị dữ liệu
   const { script, allFeedback, feedbackForModel, inputHash } =
-    prepareAnalyzeInput(input);
+    prepareAnalyzeInput(input, undefined, storedFeedback);
 
   // Dùng cùng cách chọn model với agent, để run.json không ghi một model không được gọi.
   const modelId = resolveRevisionModelId(config?.modelId);
+  const runScope = {
+    videoId: input.videoId ?? script.id,
+    versionId: input.versionId ?? "v1",
+    mode: (callModel ? "gia-lap" : "that") as "that" | "gia-lap",
+  };
 
   // C3-AG-10: Nếu không còn góp ý nào để gửi model (tất cả bị cách ly hoặc chỉ chấm điểm)
   if (feedbackForModel.length === 0) {
@@ -90,12 +96,15 @@ export async function analyzeRevision(
       caseCount: 0,
       durationMs: Date.now() - startTime,
       caseId: input.caseId,
+      ...runScope,
     };
 
     saveRunTrace({
       runId,
       metadata,
       sanitizedInput: {
+        videoId: runScope.videoId,
+        versionId: runScope.versionId,
         includeD1Feedback: input.includeD1Feedback,
         newFeedback: input.newFeedback,
         inputHash,
@@ -129,6 +138,7 @@ export async function analyzeRevision(
     sender: f.sender,
     text: f.sanitizedText,
     survey: f.survey,
+    location: f.location,
   }));
 
   // 3. Gọi Revision Agent
@@ -169,6 +179,7 @@ export async function analyzeRevision(
       caseCount: 0,
       durationMs: Date.now() - startTime,
       caseId: input.caseId,
+      ...runScope,
       error: agentResult.error,
     };
 
@@ -176,6 +187,8 @@ export async function analyzeRevision(
       runId,
       metadata,
       sanitizedInput: {
+        videoId: runScope.videoId,
+        versionId: runScope.versionId,
         includeD1Feedback: input.includeD1Feedback,
         newFeedback: input.newFeedback,
         inputHash,
@@ -249,12 +262,15 @@ export async function analyzeRevision(
     caseCount: cases.length,
     durationMs: Date.now() - startTime,
     caseId: input.caseId,
+    ...runScope,
   };
 
   saveRunTrace({
     runId,
     metadata,
     sanitizedInput: {
+      videoId: runScope.videoId,
+      versionId: runScope.versionId,
       includeD1Feedback: input.includeD1Feedback,
       newFeedback: input.newFeedback,
       inputHash,

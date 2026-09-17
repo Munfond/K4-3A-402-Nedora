@@ -23,6 +23,8 @@ import {
   Sparkles,
   Subtitles,
   Users,
+  LayoutList,
+  Network,
 } from "lucide-react";
 
 import PageWrapper from "@/components/page-wrapper";
@@ -30,24 +32,36 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoPlayerSync from "@/components/studio/video-player-sync";
+import KichBanChiTietTab from "@/components/studio/kich-ban-chi-tiet-tab";
 import VideoFeedbackTab from "@/components/studio/video-feedback-tab";
 import VideoVersionsTab from "@/components/studio/video-versions-tab";
 import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
 import V2PreparationColumn from "@/components/studio/v2-preparation-column";
-import { getLastRunId, useQuyetDinh } from "@/hooks/use-quyet-dinh";
+import AnalysisProgressPanel from "@/components/studio/analysis-progress-panel";
+import RevisionGraphView from "@/components/studio/revision-graph-view";
+import {
+  getLastRunId,
+  setLastRunId,
+  useQuyetDinh,
+} from "@/hooks/use-quyet-dinh";
 import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import { dinhDangPhut } from "@/lib/revision/format";
 import type { StudioFeedback, StudioVideo } from "@/lib/studio/types";
 import type {
-  DecisionCase,
-  FeedbackItem,
+  NewFeedbackInput,
   RevisionOption,
   RevisionRunResult,
   RunMetadata,
 } from "@/lib/revision/types";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface AnalyzeError {
+  code: string;
+  message: string;
+  runId?: string;
+}
 
 export default function VideoDetailPage({
   params,
@@ -58,49 +72,122 @@ export default function VideoDetailPage({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const queryTab = searchParams.get("tab") || "kich-ban";
+  const queryTab = searchParams.get("tab") || "xem-video";
+  const normalizedInitialTab =
+    queryTab === "kich-ban"
+      ? "xem-video"
+      : queryTab === "chinh-sua"
+        ? "de-xuat"
+        : queryTab === "ban-giao"
+          ? "ban-sua"
+          : queryTab;
   const queryRunId = searchParams.get("run");
   const queryCaseId = searchParams.get("case");
+  const queryCau = searchParams.get("cau");
 
-  const [activeTab, setActiveTab] = useState<string>(queryTab);
+  const [activeTab, setActiveTab] = useState<string>(normalizedInitialTab);
   const [activeRunId, setActiveRunId] = useState<string>(queryRunId || "");
   const [selectedCaseId, setSelectedCaseId] = useState<string>(
     queryCaseId || "",
   );
+  const [targetSentenceN, setTargetSentenceN] = useState<number | undefined>(
+    queryCau ? parseInt(queryCau, 10) : undefined,
+  );
+  const [videoSeekTime, setVideoSeekTime] = useState<number | null>(null);
+  const [feedbackPrefillSentenceN, setFeedbackPrefillSentenceN] = useState<
+    number | null
+  >(null);
+  const [feedbackPrefillText, setFeedbackPrefillText] = useState<string>("");
+  const [feedbackPrefillTime, setFeedbackPrefillTime] = useState<number | null>(
+    null,
+  );
+  const [feedbackAutoOpen, setFeedbackAutoOpen] = useState<boolean>(false);
+  const [feedbackSearchQuery, setFeedbackSearchQuery] = useState<string>("");
 
-  // Đồng bộ run ID
   useEffect(() => {
-    if (queryRunId) {
-      setActiveRunId(queryRunId);
-    } else {
-      const last = getLastRunId();
-      if (last) setActiveRunId(last);
+    if (queryCau) {
+      setTargetSentenceN(parseInt(queryCau, 10));
     }
-  }, [queryRunId]);
+  }, [queryCau]);
 
   // Lấy dữ liệu video từ API studio
-  const { data: videoData, isLoading: isVideoLoading } = useSWR<{
+  const {
+    data: videoData,
+    isLoading: isVideoLoading,
+    mutate: mutateVideo,
+  } = useSWR<{
     video: StudioVideo;
   }>(`/api/studio/videos/${videoId}`, fetcher);
 
   const video = videoData?.video;
+  const versionId = video?.currentVersion ?? "v1";
+  const runScope = `${videoId}:${versionId}`;
+
+  // Đồng bộ run ID — mỗi video nhớ run của riêng nó (C3-STO-03)
+  useEffect(() => {
+    if (queryRunId) {
+      setActiveRunId(queryRunId);
+    } else {
+      setActiveRunId(getLastRunId(runScope));
+    }
+  }, [queryRunId, runScope]);
 
   // Lấy dữ liệu run (nếu có run)
   const {
     data: runData,
-    isLoading: isRunLoading,
+    error: runFetchError,
     mutate: mutateRun,
   } = useSWR<{
     run: RunMetadata;
     result?: RevisionRunResult;
+    error?: { code: string; message: string };
   }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
 
-  const result = runData?.result;
+  // Run cũ (trước studio) không có videoId/versionId: đều là D1 v1.
+  const runOwner = runData?.run
+    ? `${runData.run.videoId ?? "d1"}:${runData.run.versionId ?? "v1"}`
+    : null;
+  const runBelongsToVideo = runOwner === null || runOwner === runScope;
+  const runLoadError =
+    runData?.error?.message ??
+    (runFetchError ? String(runFetchError) : null) ??
+    (!runBelongsToVideo ? `Run ${activeRunId} thuộc video khác` : null);
+
+  // Xử lý khi tham số run trên URL không tồn tại (P0a - AP-09)
+  const [urlRunNotFoundMessage, setUrlRunNotFoundMessage] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    if (
+      queryRunId &&
+      (runFetchError ||
+        (runData && (runData.error || !runData.run || !runBelongsToVideo)))
+    ) {
+      setUrlRunNotFoundMessage(
+        `Không tìm thấy đợt phân tích ${queryRunId}; đã mở trạng thái mới nhất của video`,
+      );
+      const fallbackRunId = getLastRunId(runScope);
+      setActiveRunId(fallbackRunId !== queryRunId ? fallbackRunId : "");
+      const url = new URL(window.location.href);
+      url.searchParams.delete("run");
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, [queryRunId, runFetchError, runData, runBelongsToVideo, runScope]);
+
+  const result = runBelongsToVideo ? runData?.result : undefined;
+  const runMeta = runBelongsToVideo ? runData?.run : undefined;
+  const isMockRun =
+    runMeta?.mode === "gia-lap" || runMeta?.modelId?.startsWith("mock");
   const script = video?.script || result?.script;
   const cases = useMemo(() => result?.cases || [], [result]);
   const allFeedback = useMemo(() => result?.feedback || [], [result]);
 
-  const { bang, dat, xoa, isStorageFailed } = useQuyetDinh(activeRunId);
+  const { bang, dat, xoa, isStorageFailed } = useQuyetDinh(activeRunId, {
+    scoped: true,
+  });
+
+  const [viewMode, setViewMode] = useState<"danh-sach" | "do-thi">("danh-sach");
 
   // Set initial selected case
   useEffect(() => {
@@ -141,30 +228,39 @@ export default function VideoDetailPage({
     return () => clearInterval(t);
   }, [isAnalyzing]);
 
+  const [analyzeError, setAnalyzeError] = useState<AnalyzeError | null>(null);
+
   const handleTriggerAnalyze = async () => {
     setIsAnalyzing(true);
+    setAnalyzeError(null);
     try {
       const res = await fetch("/api/revisions/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          includeD1: video?.id === "d1",
-          feedback: video?.feedbacks || [],
-        }),
+        body: JSON.stringify({ videoId, versionId }),
       });
+      const data = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        throw new Error("Phân tích thất bại");
+      if (!res.ok || !data?.runId) {
+        setAnalyzeError({
+          code: data?.error?.code ?? `HTTP_${res.status}`,
+          message:
+            data?.error?.message ?? "Máy chủ không trả kết quả phân tích",
+          runId: data?.error?.runId,
+        });
+        return;
       }
 
-      const data = await res.json();
-      if (data.run?.runId) {
-        setActiveRunId(data.run.runId);
-        setActiveTab("chinh-sua");
-        router.push(`/videos/${videoId}?tab=chinh-sua&run=${data.run.runId}`);
-      }
+      setLastRunId(data.runId, runScope);
+      setActiveRunId(data.runId);
+      setSelectedCaseId("");
+      setActiveTab("de-xuat");
+      router.replace(`/videos/${videoId}?tab=de-xuat&run=${data.runId}`);
     } catch (err) {
-      console.error(err);
+      setAnalyzeError({
+        code: "NETWORK_ERROR",
+        message: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -174,6 +270,19 @@ export default function VideoDetailPage({
     setActiveTab(val);
     const url = new URL(window.location.href);
     url.searchParams.set("tab", val);
+    if (activeRunId) url.searchParams.set("run", activeRunId);
+    if (val !== "kich-ban-chi-tiet") {
+      url.searchParams.delete("cau");
+    }
+    window.history.replaceState(null, "", url.toString());
+  };
+
+  const handleViewDetailedScript = (sentenceN: number) => {
+    setTargetSentenceN(sentenceN);
+    setActiveTab("kich-ban-chi-tiet");
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", "kich-ban-chi-tiet");
+    url.searchParams.set("cau", String(sentenceN));
     if (activeRunId) url.searchParams.set("run", activeRunId);
     window.history.replaceState(null, "", url.toString());
   };
@@ -185,30 +294,99 @@ export default function VideoDetailPage({
     window.history.replaceState(null, "", url.toString());
   };
 
-  // Feedback local state addition
-  const [localFeedbacks, setLocalFeedbacks] = useState<StudioFeedback[]>([]);
-  useEffect(() => {
-    if (video?.feedbacks) {
-      setLocalFeedbacks(video.feedbacks);
-    }
+  // Góp ý nguồn thuần của video: không gắn vị trí suy luận của AI (P0a - C3)
+  const rawSourceFeedbacks = useMemo<StudioFeedback[]>(() => {
+    return video?.feedbacks ?? [];
   }, [video?.feedbacks]);
 
-  const handleAddNewFeedback = (fb: Partial<StudioFeedback>) => {
-    const completeFb: StudioFeedback = {
-      id: fb.id || `gy-${Date.now()}`,
-      channel: fb.channel || "binh-luan",
-      sender: fb.sender || "Người học",
-      sanitizedText: fb.sanitizedText || "",
-      time: new Date().toISOString(),
-      label: "gop-y",
-      moderationBy: "code",
-      isQuarantined: false,
-      locationSource: fb.locationSource || "chua-xac-dinh",
-      sentenceN: fb.sentenceN,
-      timeSeconds: fb.timeSeconds,
-      survey: fb.survey,
-    };
-    setLocalFeedbacks((prev) => [completeFb, ...prev]);
+  // Góp ý của video: lấy từ server (đã làm sạch). Sau khi có run, góp ý nằm
+  // trong vấn đề đã định vị được gắn "AI đề xuất vị trí" (C3-UI-03).
+  const localFeedbacks = useMemo<StudioFeedback[]>(() => {
+    const base = rawSourceFeedbacks;
+    if (!result) return base;
+    const aiLocation = new Map<string, number>();
+    for (const issue of result.issues) {
+      if (issue.location.status !== "da-dinh-vi") continue;
+      const first = Math.min(...issue.location.sentenceNs);
+      for (const fid of issue.feedbackIds) {
+        if (!aiLocation.has(fid)) aiLocation.set(fid, first);
+      }
+    }
+    const runLabels = new Map(result.feedback.map((f) => [f.id, f]));
+    return base.map((f) => {
+      const analysed = runLabels.get(f.id);
+      const merged = analysed
+        ? {
+            ...f,
+            label: analysed.label,
+            isQuarantined: analysed.isQuarantined,
+            quarantineReason: analysed.quarantineReason,
+          }
+        : f;
+      const n = aiLocation.get(f.id);
+      if (merged.locationSource !== "chua-xac-dinh" || n === undefined) {
+        return merged;
+      }
+      return {
+        ...merged,
+        locationSource: "ai-de-xuat" as const,
+        sentenceN: n,
+        timeSeconds: script?.cau.find((c) => c.n === n)?.batDauGiay,
+      };
+    });
+  }, [video?.feedbacks, result, script]);
+
+  const handleAddNewFeedback = async (
+    fb: NewFeedbackInput,
+  ): Promise<string | null> => {
+    try {
+      const res = await fetch(`/api/studio/videos/${videoId}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ versionId, items: [fb] }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        return (
+          data?.error?.message ?? `Lưu góp ý thất bại (HTTP ${res.status})`
+        );
+      }
+      await mutateVideo();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    }
+  };
+
+  // API nhận tối đa 20 góp ý mỗi lần nên CSV được gửi theo từng lô.
+  const handleImportFeedbacks = async (
+    items: NewFeedbackInput[],
+  ): Promise<string | null> => {
+    let saved = 0;
+    try {
+      for (let i = 0; i < items.length; i += 20) {
+        const batch = items.slice(i, i + 20);
+        const res = await fetch(`/api/studio/videos/${videoId}/feedback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ versionId, items: batch }),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          const msg =
+            data?.error?.message ?? `Lưu góp ý thất bại (HTTP ${res.status})`;
+          return saved > 0
+            ? `Đã lưu ${saved}/${items.length} góp ý, lô dòng ${i + 1}–${i + batch.length} lỗi: ${msg}`
+            : msg;
+        }
+        saved += batch.length;
+      }
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    } finally {
+      if (saved > 0) await mutateVideo();
+    }
   };
 
   // Decision actions for revision tab
@@ -373,23 +551,40 @@ export default function VideoDetailPage({
             </div>
           </div>
 
-          {/* TAB NAVIGATION CHÍNH */}
-          <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-lg border text-xs">
+          {/* TAB NAVIGATION CHÍNH: 5 TABS + LỊCH SỬ PHIÊN BẢN */}
+          <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-lg border text-xs overflow-x-auto max-w-full">
             <button
               type="button"
-              onClick={() => handleTabChange("kich-ban")}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                activeTab === "kich-ban"
+              onClick={() => handleTabChange("xem-video")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 ${
+                activeTab === "xem-video" || activeTab === "kich-ban"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Kịch bản & Trình phát
+              Xem video
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("kich-ban-chi-tiet")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "kich-ban-chi-tiet"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span>Kịch bản chi tiết</span>
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1 py-0 font-mono"
+              >
+                {script ? `${script.cau.length} câu` : "40 câu"}
+              </Badge>
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("gop-y")}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 flex items-center gap-1.5 ${
                 activeTab === "gop-y"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
@@ -405,15 +600,15 @@ export default function VideoDetailPage({
             </button>
             <button
               type="button"
-              onClick={() => handleTabChange("chinh-sua")}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
-                activeTab === "chinh-sua"
+              onClick={() => handleTabChange("de-xuat")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "de-xuat" || activeTab === "chinh-sua"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Sparkles className="size-3 text-primary" />
-              <span>Đợt chỉnh sửa</span>
+              <span>Đề xuất chỉnh sửa</span>
               {cases.length > 0 && (
                 <Badge
                   variant="secondary"
@@ -425,19 +620,19 @@ export default function VideoDetailPage({
             </button>
             <button
               type="button"
-              onClick={() => handleTabChange("ban-giao")}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                activeTab === "ban-giao"
+              onClick={() => handleTabChange("ban-sua")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 ${
+                activeTab === "ban-sua" || activeTab === "ban-giao"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Bản sửa v2 & Bàn giao
+              Bản sửa
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("phien-ban")}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 ${
                 activeTab === "phien-ban"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
@@ -449,47 +644,104 @@ export default function VideoDetailPage({
         </div>
       </div>
 
+      {/* THÔNG BÁO RUN KHÔNG TỒN TẠI (P0a - AP-09) */}
+      {urlRunNotFoundMessage && (
+        <div className="max-w-7xl mx-auto w-full px-4 pt-2">
+          <div className="rounded-lg border border-amber-500/40 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="size-4 text-amber-600 shrink-0" />
+              <span>{urlRunNotFoundMessage}</span>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setUrlRunNotFoundMessage(null)}
+              className="h-6 px-2 text-xs text-amber-700 hover:bg-amber-200/50"
+            >
+              Đóng
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* NỘI DUNG TỪNG TAB */}
       <div className="max-w-7xl mx-auto w-full p-4 flex-1 flex flex-col">
-        {/* TAB 1: KỊCH BẢN & TRÌNH PHÁT */}
-        {activeTab === "kich-ban" && (
+        {/* TAB 1: XEM VIDEO (KỊCH BẢN & TRÌNH PHÁT) */}
+        {(activeTab === "xem-video" || activeTab === "kich-ban") && (
           <VideoPlayerSync
             videoUrl={video.videoUrl}
             title={video.title}
             durationSeconds={video.durationSeconds}
             script={script}
+            initialSeekTime={videoSeekTime}
             onAddFeedbackAtTime={(sec, sentenceN) => {
-              setActiveTab("gop-y");
-              handleAddNewFeedback({
-                timeSeconds: sec,
-                sentenceN,
-                sanitizedText: `Góp ý tại mốc ${dinhDangPhut(sec)}${sentenceN ? ` (Câu ${sentenceN})` : ""}: `,
-                locationSource: "nguoi-chon",
-              });
+              // Vị trí đi vào trường có cấu trúc, không chèn vào nội dung góp ý.
+              setFeedbackPrefillSentenceN(sentenceN || null);
+              setFeedbackPrefillTime(sec);
+              setFeedbackPrefillText("");
+              setFeedbackAutoOpen(true);
+              handleTabChange("gop-y");
             }}
-            onGoToRevision={() => handleTabChange("chinh-sua")}
+            onGoToRevision={() => handleTabChange("de-xuat")}
           />
         )}
 
-        {/* TAB 2: GÓP Ý THEO PHIÊN BẢN */}
+        {/* TAB 2: KỊCH BẢN CHI TIẾT (29 NHÓM SLIDE, ẢNH TỪNG CÂU, DỮ LIỆU NGUỒN THUẦN - P0a) */}
+        {activeTab === "kich-ban-chi-tiet" && (
+          <KichBanChiTietTab
+            video={video}
+            script={script}
+            feedbacks={rawSourceFeedbacks}
+            activeRunId={activeRunId}
+            onGoToRevision={() => handleTabChange("de-xuat")}
+            highlightSentenceN={targetSentenceN}
+            onPlaySentence={(batDauGiay) => {
+              setVideoSeekTime(batDauGiay);
+              handleTabChange("xem-video");
+            }}
+            onAddFeedbackAtSentence={(sentenceN, slideId) => {
+              setFeedbackPrefillSentenceN(sentenceN);
+              setFeedbackPrefillTime(null);
+              setFeedbackPrefillText("");
+              setFeedbackAutoOpen(true);
+              handleTabChange("gop-y");
+            }}
+            onFilterFeedbackBySentence={(sentenceN) => {
+              setFeedbackSearchQuery(`câu ${sentenceN}`);
+              handleTabChange("gop-y");
+            }}
+          />
+        )}
+
+        {/* TAB 3: GÓP Ý THEO PHIÊN BẢN */}
         {activeTab === "gop-y" && (
           <VideoFeedbackTab
             video={video}
             feedbacks={localFeedbacks}
             onAddNewFeedback={handleAddNewFeedback}
+            onImportFeedbacks={handleImportFeedbacks}
             onTriggerAnalyze={handleTriggerAnalyze}
             isAnalyzing={isAnalyzing}
             analysisTimer={analysisTimer}
+            analyzeError={analyzeError}
+            canAnalyze={Boolean(script)}
+            initialTimeSeconds={feedbackPrefillTime}
+            initialSearchQuery={feedbackSearchQuery}
+            initialAddFormOpen={feedbackAutoOpen}
+            initialSentenceN={feedbackPrefillSentenceN}
+            initialText={feedbackPrefillText}
             onSeekToTime={(time) => {
-              setActiveTab("kich-ban");
+              setVideoSeekTime(time);
+              handleTabChange("xem-video");
             }}
           />
         )}
 
-        {/* TAB 3: ĐỢT CHỈNH SỬA (REVISION PLANNER 3 CỘT TRONG NGỮ CẢNH VIDEO) */}
-        {activeTab === "chinh-sua" && (
+        {/* TAB 4: ĐỀ XUẤT CHỈNH SỬA (REVISION PLANNER 3 CỘT TRONG NGỮ CẢNH VIDEO) */}
+        {(activeTab === "de-xuat" || activeTab === "chinh-sua") && (
           <div className="flex-1 flex flex-col min-h-[620px] space-y-3">
-            {!activeRunId || cases.length === 0 ? (
+            {!activeRunId ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-4 bg-muted/10">
                 <Sparkles className="size-10 text-primary animate-bounce" />
                 <div className="space-y-1">
@@ -498,14 +750,23 @@ export default function VideoDetailPage({
                     {video.currentVersion}
                   </h3>
                   <p className="text-xs text-muted-foreground max-w-md">
-                    Bấm nút bên dưới để AI tự động đối chiếu{" "}
-                    {localFeedbacks.length} phản hồi với 40 câu kịch bản của
-                    video này và tạo các hồ sơ quyết định sửa.
+                    Bấm nút bên dưới để AI đối chiếu {localFeedbacks.length} góp
+                    ý với{" "}
+                    {script
+                      ? `${script.cau.length} câu kịch bản`
+                      : "kịch bản (chưa có)"}{" "}
+                    của video này và tạo các hồ sơ quyết định sửa.
                   </p>
+                  {activeRunId && runLoadError && (
+                    <p className="text-xs text-destructive">{runLoadError}</p>
+                  )}
                 </div>
+                {analyzeError && <AnalyzeErrorBox error={analyzeError} />}
                 <Button
                   onClick={handleTriggerAnalyze}
-                  disabled={isAnalyzing || localFeedbacks.length === 0}
+                  disabled={
+                    isAnalyzing || localFeedbacks.length === 0 || !script
+                  }
                   className="gap-2 font-bold shadow-xs"
                 >
                   <Sparkles className="size-4" />
@@ -514,62 +775,168 @@ export default function VideoDetailPage({
                     : `Bắt đầu phân tích góp ý v1`}
                 </Button>
               </div>
+            ) : runMeta?.status === "dang-chay" ||
+              (isAnalyzing && cases.length === 0) ? (
+              <div className="space-y-3">
+                <AnalysisProgressPanel
+                  runId={activeRunId}
+                  runMeta={runMeta}
+                  onFinished={() => {
+                    mutateRun();
+                  }}
+                  onRetry={handleTriggerAnalyze}
+                />
+              </div>
+            ) : runMeta?.status === "loi" ? (
+              <div className="space-y-3">
+                <AnalysisProgressPanel
+                  runId={activeRunId}
+                  runMeta={runMeta}
+                  onFinished={() => {
+                    mutateRun();
+                  }}
+                  onRetry={handleTriggerAnalyze}
+                />
+              </div>
+            ) : cases.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-4 bg-muted/10">
+                <Sparkles className="size-10 text-primary" />
+                <div className="space-y-1">
+                  <h3 className="font-bold text-base text-foreground">
+                    Không có đề xuất chỉnh sửa nào trong đợt này
+                  </h3>
+                  <p className="text-xs text-muted-foreground max-w-md">
+                    Toàn bộ góp ý đã được xử lý hoặc không phát hiện vấn đề cần
+                    chỉnh sửa kịch bản.
+                  </p>
+                </div>
+                <Button
+                  onClick={handleTriggerAnalyze}
+                  disabled={isAnalyzing || localFeedbacks.length === 0}
+                  className="gap-2 font-bold shadow-xs"
+                >
+                  <Sparkles className="size-4" />
+                  Chạy lại phân tích
+                </Button>
+              </div>
             ) : (
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-[310px_minmax(0,1fr)_330px] xl:grid-cols-[340px_minmax(0,1fr)_360px] gap-3 h-full">
-                {/* CỘT 1 (TRÁI): DANH SÁCH VÙNG SỬA */}
-                <div className="h-full overflow-hidden">
-                  <CaseListColumn
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <RunBanner
+                    runId={activeRunId}
+                    run={runMeta}
+                    isMock={Boolean(isMockRun)}
+                    findingCount={result?.validation.findings.length ?? 0}
+                  />
+
+                  {/* CÔNG TẮC CHẾ ĐỘ: [DANH SÁCH] | [ĐỒ THỊ] (SPEC SECTION 5.3) */}
+                  <div className="flex items-center gap-1 bg-muted/70 p-1 rounded-lg border text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("danh-sach")}
+                      className={`px-2.5 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                        viewMode === "danh-sach"
+                          ? "bg-background text-foreground shadow-2xs font-semibold"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <LayoutList className="size-3.5" />
+                      <span>Danh sách (3 cột)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("do-thi")}
+                      className={`px-2.5 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                        viewMode === "do-thi"
+                          ? "bg-background text-foreground shadow-2xs font-semibold text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Network className="size-3.5 text-primary" />
+                      <span>Đồ thị</span>
+                    </button>
+                  </div>
+                </div>
+
+                {viewMode === "do-thi" ? (
+                  <RevisionGraphView
                     cases={cases}
-                    selectedCaseId={selectedCase?.id || ""}
+                    selectedCaseId={selectedCase?.id || cases[0]?.id || ""}
                     onSelectCase={handleSelectCase}
                     decisions={bang}
+                    onSelectOption={handleSelectOption}
+                    onDeferCase={handleDeferCase}
+                    onRejectCase={handleRejectCase}
+                    onResetCase={handleResetCase}
+                    script={script}
+                    feedbacks={localFeedbacks}
+                    allFeedback={allFeedback}
+                    snapshot={snapshot}
+                    onViewDetailedScript={handleViewDetailedScript}
+                    onPlaySentence={(batDauGiay) => {
+                      setVideoSeekTime(batDauGiay);
+                      handleTabChange("xem-video");
+                    }}
                   />
-                </div>
-
-                {/* CỘT 2 (GIỮA): HỒ SƠ QUYẾT ĐỊNH 4 PHẦN */}
-                <div className="h-full overflow-hidden">
-                  {selectedCase && script ? (
-                    <DecisionDossier
-                      currentCase={selectedCase}
-                      script={script}
-                      allFeedback={allFeedback}
-                      currentDecision={bang[selectedCase.id]}
-                      allDecisions={bang}
-                      allCases={cases}
-                      runId={activeRunId}
-                      onSelectOption={handleSelectOption}
-                      onDefer={handleDeferCase}
-                      onReject={handleRejectCase}
-                      onReset={handleResetCase}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
-                      Chọn một vùng sửa để xem hồ sơ.
+                ) : (
+                  <div className="flex-1 grid grid-cols-1 lg:grid-cols-[310px_minmax(0,1fr)_330px] xl:grid-cols-[340px_minmax(0,1fr)_360px] gap-3 h-full">
+                    {/* CỘT 1 (TRÁI): DANH SÁCH VÙNG SỬA */}
+                    <div className="h-full overflow-hidden">
+                      <CaseListColumn
+                        cases={cases}
+                        selectedCaseId={selectedCase?.id || ""}
+                        onSelectCase={handleSelectCase}
+                        decisions={bang}
+                      />
                     </div>
-                  )}
-                </div>
 
-                {/* CỘT 3 (PHẢI): ĐANG CHUẨN BỊ BẢN SỬA V2 THỜI GIAN THỰC */}
-                <div className="h-full overflow-hidden">
-                  {snapshot && script ? (
-                    <V2PreparationColumn
-                      snapshot={snapshot}
-                      script={script}
-                      runId={activeRunId}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
-                      Đang tính toán khối lượng v2...
+                    {/* CỘT 2 (GIỮA): HỒ SƠ QUYẾT ĐỊNH 4 PHẦN */}
+                    <div className="h-full overflow-hidden">
+                      {selectedCase && script ? (
+                        <DecisionDossier
+                          currentCase={selectedCase}
+                          script={script}
+                          allFeedback={allFeedback}
+                          currentDecision={bang[selectedCase.id]}
+                          allDecisions={bang}
+                          allCases={cases}
+                          runId={activeRunId}
+                          onSelectOption={handleSelectOption}
+                          onDefer={handleDeferCase}
+                          onReject={handleRejectCase}
+                          onReset={handleResetCase}
+                          onViewDetailedScript={handleViewDetailedScript}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
+                          Chọn một vùng sửa để xem hồ sơ.
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+
+                    {/* CỘT 3 (PHẢI): ĐANG CHUẨN BỊ BẢN SỬA V2 THỜI GIAN THỰC */}
+                    <div className="h-full overflow-hidden">
+                      {snapshot && script ? (
+                        <V2PreparationColumn
+                          snapshot={snapshot}
+                          script={script}
+                          runId={activeRunId}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
+                          Đang tính toán khối lượng v2...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
 
-        {/* TAB 4: BẢN SỬA V2 & BÀN GIAO */}
-        {activeTab === "ban-giao" && (
+        {/* TAB 5: BẢN SỬA V2 & BÀN GIAO */}
+        {(activeTab === "ban-sua" || activeTab === "ban-giao") && (
           <div className="space-y-6">
             {!snapshot || !script ? (
               <div className="p-12 text-center rounded-2xl border border-dashed space-y-4 text-muted-foreground text-xs">
@@ -731,14 +1098,79 @@ export default function VideoDetailPage({
           </div>
         )}
 
-        {/* TAB 5: LỊCH SỬ PHIÊN BẢN */}
+        {/* TAB 6: LỊCH SỬ PHIÊN BẢN */}
         {activeTab === "phien-ban" && (
           <VideoVersionsTab
             video={video}
-            onGoToRevision={() => handleTabChange("chinh-sua")}
+            onGoToRevision={() => handleTabChange("de-xuat")}
           />
         )}
       </div>
     </PageWrapper>
+  );
+}
+
+function AnalyzeErrorBox({ error }: { error: AnalyzeError }) {
+  return (
+    <div
+      role="alert"
+      className="max-w-lg w-full rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-left text-xs space-y-1"
+    >
+      <p className="font-semibold text-destructive flex items-center gap-1.5">
+        <AlertCircle className="size-3.5" /> Phân tích thất bại · {error.code}
+      </p>
+      <p className="text-foreground break-words">{error.message}</p>
+      {error.runId && (
+        <p className="text-muted-foreground font-mono">runId: {error.runId}</p>
+      )}
+    </div>
+  );
+}
+
+function RunBanner({
+  runId,
+  run,
+  isMock,
+  findingCount,
+}: {
+  runId: string;
+  run?: RunMetadata;
+  isMock: boolean;
+  findingCount: number;
+}) {
+  const failedChecks = run?.checks
+    ? Object.entries(run.checks).filter(([, ok]) => !ok).length
+    : 0;
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card px-3 py-2 text-xs">
+      <Badge variant="outline" className="font-mono">
+        {runId}
+      </Badge>
+      {run && <span className="text-muted-foreground">{run.modelId}</span>}
+      {run && (
+        <span className="text-muted-foreground">
+          {new Date(run.createdAt).toLocaleString("vi-VN")}
+        </span>
+      )}
+      <Badge variant="secondary" className="gap-1">
+        <AlertCircle className="size-3" /> Kết quả AI, chưa được duyệt
+      </Badge>
+      {isMock && (
+        <Badge className="bg-amber-100 text-amber-800 border border-amber-300">
+          Kết quả giả lập
+        </Badge>
+      )}
+      <span className="text-muted-foreground flex items-center gap-1">
+        {failedChecks === 0 ? (
+          <CheckCircle2 className="size-3.5 text-green-600" />
+        ) : (
+          <AlertCircle className="size-3.5 text-amber-600" />
+        )}
+        {failedChecks === 0
+          ? "Kiểm tra bằng code: đạt"
+          : `${failedChecks} nhóm kiểm tra không đạt`}
+        {findingCount > 0 && ` · ${findingCount} ghi nhận`}
+      </span>
+    </div>
   );
 }

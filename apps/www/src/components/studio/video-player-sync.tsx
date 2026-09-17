@@ -31,6 +31,7 @@ interface VideoPlayerSyncProps {
   title: string;
   durationSeconds: number;
   script?: ScriptData;
+  initialSeekTime?: number | null;
   onAddFeedbackAtTime?: (timeSeconds: number, sentenceN?: number) => void;
   onGoToRevision?: () => void;
 }
@@ -40,6 +41,7 @@ export default function VideoPlayerSync({
   title,
   durationSeconds,
   script,
+  initialSeekTime,
   onAddFeedbackAtTime,
   onGoToRevision,
 }: VideoPlayerSyncProps) {
@@ -47,13 +49,32 @@ export default function VideoPlayerSync({
   const sentenceListRef = useRef<HTMLDivElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(initialSeekTime || 0);
   const [duration, setDuration] = useState(durationSeconds || 251);
   const [isMuted, setIsMuted] = useState(false);
   const [activeSentenceN, setActiveSentenceN] = useState<number | null>(null);
   const [hoveredTime, setHoveredTime] = useState<number | null>(null);
 
   const sentences = useMemo(() => script?.cau || [], [script]);
+
+  // Handle external seek trigger
+  useEffect(() => {
+    if (initialSeekTime != null && videoRef.current) {
+      videoRef.current.currentTime = Math.max(
+        0,
+        Math.min(initialSeekTime, duration),
+      );
+      setCurrentTime(initialSeekTime);
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            // Autoplay policy may require user interaction
+          });
+      }
+    }
+  }, [initialSeekTime, duration]);
 
   // Đồng bộ câu đang phát theo currentTime
   useEffect(() => {

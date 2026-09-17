@@ -55,6 +55,7 @@ export interface FeedbackItem {
   sanitizedText: string;
   rawText?: string;
   time: string;
+  location?: { sentenceN?: number; timeSeconds?: number };
   survey?: {
     deHieu?: number;
     nhipDo?: number;
@@ -73,9 +74,16 @@ export interface NewFeedbackInput {
   text: string;
   channel?: "binh-luan" | "tin-nhan" | "khao-sat";
   sender?: string;
+  /** Khảo sát nhập tay: được để trống `text` nếu có ít nhất một điểm. */
+  survey?: { deHieu?: number; nhipDo?: number };
+  /** Chỉ có khi chính người gửi chọn vị trí (ví dụ từ trình phát). */
+  location?: { sentenceN?: number; timeSeconds?: number };
+  time?: string;
 }
 
 export interface AnalyzeInput {
+  videoId?: string;
+  versionId?: string;
   scriptId?: "d1";
   includeD1Feedback: boolean;
   newFeedback?: NewFeedbackInput[];
@@ -250,7 +258,7 @@ export interface RunAttemptMetadata {
 
 export interface RunMetadata {
   runId: string;
-  status: "xong" | "loi";
+  status: "xong" | "loi" | "dang-chay";
   createdAt: string;
   inputHash: string;
   modelId: string;
@@ -258,8 +266,9 @@ export interface RunMetadata {
   promptHash: string;
   schemaVersion: string;
   policyVersion: string;
+  graphVersion?: string;
   attempts: RunAttemptMetadata[];
-  checks: ValidationChecks;
+  checks?: ValidationChecks;
   totalFeedback: number;
   newFeedbackCount: number;
   independentSenders: number;
@@ -267,6 +276,10 @@ export interface RunMetadata {
   durationMs: number;
   caseId?: string;
   retryOf?: string;
+  videoId?: string;
+  versionId?: string;
+  /** "gia-lap" khi dùng model giả (eval --mock); run cũ không có trường này. */
+  mode?: "that" | "gia-lap";
   error?: {
     code: string;
     message: string;
