@@ -1,439 +1,459 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import useSWR from "swr";
 import {
+  AlertCircle,
   ArrowRight,
   CheckCircle2,
   Clock,
-  Flag,
-  GalleryVerticalEnd,
-  Loader2,
-  MessagesSquare,
+  FileCode,
+  Film,
+  Layers,
+  MessageSquare,
   Plus,
-  RefreshCw,
-  Trash2,
-  AlertCircle,
+  Search,
+  Sparkles,
+  Upload,
+  Video,
 } from "lucide-react";
-import type { Route } from "next";
-import Link from "next/link";
-import useSWR from "swr";
 
 import PageWrapper from "@/components/page-wrapper";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { getLastRunId, setLastRunId } from "@/hooks/use-quyet-dinh";
-import type {
-  NewFeedbackInput,
-  RevisionRunResult,
-  RunMetadata,
-} from "@/lib/revision/types";
 import { dinhDangPhut } from "@/lib/revision/format";
+import type { StudioVideo } from "@/lib/studio/types";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function TongQuanPage() {
-  const [includeD1, setIncludeD1] = useState(true);
-  const [newFeedbacks, setNewFeedbacks] = useState<NewFeedbackInput[]>([]);
-  const [currentText, setCurrentText] = useState("");
-  const [currentChannel, setCurrentChannel] = useState<
-    "binh-luan" | "tin-nhan" | "khao-sat"
-  >("binh-luan");
-  const [currentSender, setCurrentSender] = useState("");
+export default function ThuVienVideoPage() {
+  const { data, mutate, isLoading } = useSWR<{ videos: StudioVideo[] }>(
+    "/api/studio/videos",
+    fetcher,
+  );
 
-  const [analyzing, setAnalyzing] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [errorInfo, setErrorInfo] = useState<{
-    code: string;
-    message: string;
-    runId?: string;
-  } | null>(null);
-  const [activeRunId, setActiveRunId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  // Lấy lastRunId khi tải trang
-  useEffect(() => {
-    const last = getLastRunId();
-    if (last) setActiveRunId(last);
-  }, []);
+  // Form thêm video
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [durationStr, setDurationStr] = useState("180");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [scriptText, setScriptText] = useState("");
+  const [timecodeText, setTimecodeText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  // Timer khi đang phân tích
-  useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
-    if (analyzing) {
-      setElapsedSeconds(0);
-      interval = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1);
-      }, 1000);
-    } else {
-      setElapsedSeconds(0);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [analyzing]);
+  const videos = data?.videos || [];
 
-  // Lấy dữ liệu của active run
-  const { data: runData, mutate: mutateRun } = useSWR<{
-    run: RunMetadata;
-    result?: RevisionRunResult;
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  const filteredVideos = useMemo(() => {
+    if (!searchQuery.trim()) return videos;
+    const q = searchQuery.toLowerCase().trim();
+    return videos.filter(
+      (v) =>
+        v.title.toLowerCase().includes(q) ||
+        (v.description || "").toLowerCase().includes(q),
+    );
+  }, [videos, searchQuery]);
 
-  const handleAddFeedback = () => {
-    if (!currentText.trim()) return;
-    setNewFeedbacks((prev) => [
-      ...prev,
-      {
-        text: currentText.trim(),
-        channel: currentChannel,
-        sender: currentSender.trim() || undefined,
-      },
-    ]);
-    setCurrentText("");
-    setCurrentSender("");
-  };
+  const handleAddVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
 
-  const handleRemoveFeedback = (index: number) => {
-    setNewFeedbacks((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleStartAnalysis = async () => {
-    setAnalyzing(true);
-    setErrorInfo(null);
+    setIsSubmitting(true);
+    setFormError(null);
 
     try {
-      const res = await fetch("/api/revisions/analyze", {
+      let parsedScript = undefined;
+      if (scriptText.trim()) {
+        try {
+          parsedScript = JSON.parse(scriptText);
+        } catch {
+          // Parse lines nếu là plain text
+          const lines = scriptText.split(/\r?\n/).filter(Boolean);
+          parsedScript = {
+            id: `script-${Date.now()}`,
+            tieuDe: title,
+            cau: lines.map((line, idx) => ({
+              n: idx + 1,
+              phan: 1,
+              loi: line.trim(),
+              batDauGiay: idx * 6,
+              ketThucTiengGiay: idx * 6 + 5,
+              ketThucGiay: idx * 6 + 6,
+              soKyTu: line.trim().length,
+            })),
+          };
+        }
+      }
+
+      const res = await fetch("/api/studio/videos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          scriptId: "d1",
-          includeD1Feedback: includeD1,
-          newFeedback: newFeedbacks,
+          title: title.trim(),
+          description: description.trim(),
+          durationSeconds: parseInt(durationStr, 10) || 180,
+          videoUrl: videoUrl.trim(),
+          script: parsedScript,
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        setErrorInfo({
-          code: data.error?.code || `HTTP_${res.status}`,
-          message: data.error?.message || "Phân tích thất bại",
-          runId: data.error?.runId || data.runId,
-        });
-        if (data.runId) {
-          setActiveRunId(data.runId);
-          setLastRunId(data.runId);
-        }
-      } else {
-        const runId = data.runId;
-        setActiveRunId(runId);
-        setLastRunId(runId);
-        mutateRun();
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Không thể tạo video");
       }
+
+      await mutate();
+      setShowAddModal(false);
+      setTitle("");
+      setDescription("");
+      setVideoUrl("");
+      setScriptText("");
+      setTimecodeText("");
     } catch (err: unknown) {
-      setErrorInfo({
-        code: "NETWORK_ERROR",
-        message: err instanceof Error ? err.message : String(err),
-      });
+      setFormError(err instanceof Error ? err.message : String(err));
     } finally {
-      setAnalyzing(false);
+      setIsSubmitting(false);
     }
   };
 
-  const result = runData?.result;
-  const run = runData?.run;
-
   return (
-    <PageWrapper className="flex flex-col overflow-y-auto bg-sidebar pb-24 dark:bg-[#0a0a0a]">
-      <div className="mx-auto mt-8 w-full max-w-4xl shrink-0 px-4 text-center">
-        <p className="font-mono text-muted-foreground text-xs uppercase tracking-widest">
-          VIDEO D1 · BẢN V2 REVISION PLANNER
-        </p>
-        <h1 className="mt-2 text-balance font-bold text-3xl dark:text-gray-50 sm:text-4xl">
-          Đề xuất chỉnh sửa dựa trên phản hồi góp ý
-        </h1>
-        <p className="mt-2 text-balance text-muted-foreground text-sm dark:text-gray-400">
-          Biến các lời phàn nàn thành phương án sửa có bằng chứng, phân vùng độc
-          lập và tính gói bàn giao không trùng việc.
-        </p>
-      </div>
-
-      {/* KHUNG PHÂN TÍCH GÓP Ý (C3-UI-01) */}
-      <div className="mx-auto mt-6 w-full max-w-4xl px-4">
-        <Card className="border-neutral-200 shadow-sm dark:border-neutral-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between text-base">
-              <span>Đợt phân tích góp ý</span>
-              <Badge
-                variant="outline"
-                className="font-normal font-mono text-xs"
-              >
-                {includeD1 ? "D1 (22 góp ý)" : "Tùy chỉnh"} +{" "}
-                {newFeedbacks.length} góp ý mới
+    <PageWrapper className="overflow-y-auto pb-24">
+      <div className="max-w-7xl mx-auto px-4 mt-6 space-y-6">
+        {/* HEADER THƯ VIỆN VIDEO */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs bg-muted font-mono">
+                Video Studio
               </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <label className="flex items-center gap-2 cursor-pointer font-medium">
-              <input
-                type="checkbox"
-                checked={includeD1}
-                onChange={(e) => setIncludeD1(e.target.checked)}
-                className="size-4 rounded border-gray-300"
-              />
-              <span>Dùng bộ góp ý D1 hiện có (22 góp ý từ 20 người học)</span>
-            </label>
+              <span className="text-xs text-muted-foreground font-medium">
+                {videos.length} video trong thư viện
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Thư viện video bài học
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
+              Mở video để xem kịch bản–hình–giọng đồng bộ theo thời gian, tiếp
+              nhận góp ý của người học và lập kế hoạch chỉnh sửa phiên bản v2.
+            </p>
+          </div>
 
-            <div className="rounded-lg border bg-muted/40 p-3 space-y-3">
-              <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">
-                Thêm góp ý mới vào đợt này
-              </p>
-              <Textarea
-                placeholder="Nhập nội dung góp ý của người học (1–2000 ký tự)..."
-                value={currentText}
-                onChange={(e) => setCurrentText(e.target.value)}
-                rows={2}
-                className="resize-none text-sm bg-background"
-              />
-              <div className="flex flex-wrap items-center gap-2">
-                <select
-                  value={currentChannel}
-                  onChange={(e: any) => setCurrentChannel(e.target.value)}
-                  className="rounded-md border bg-background px-2.5 py-1.5 text-xs"
-                >
-                  <option value="binh-luan">Bình luận</option>
-                  <option value="tin-nhan">Tin nhắn</option>
-                  <option value="khao-sat">Khảo sát</option>
-                </select>
-                <Input
-                  placeholder="Mã người gửi (vd: hv-901, tùy chọn)"
-                  value={currentSender}
-                  onChange={(e) => setCurrentSender(e.target.value)}
-                  className="h-8 max-w-[200px] text-xs"
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleAddFeedback}
-                  disabled={!currentText.trim()}
-                  className="gap-1.5 ml-auto text-xs"
-                >
-                  <Plus className="size-3.5" />
-                  Thêm góp ý
-                </Button>
-              </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setShowAddModal(true)}
+              className="gap-1.5 text-xs font-semibold shadow-xs"
+            >
+              <Plus className="size-4" />
+              Thêm video đã có
+            </Button>
+          </div>
+        </div>
 
-              {newFeedbacks.length > 0 && (
-                <div className="space-y-1.5 pt-2 border-t">
-                  <p className="text-xs text-muted-foreground">
-                    Góp ý mới đã thêm ({newFeedbacks.length}):
-                  </p>
-                  <div className="max-h-36 overflow-y-auto space-y-1">
-                    {newFeedbacks.map((fb, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between gap-2 rounded bg-background p-2 text-xs border"
+        {/* THANH TÌM KIẾM & BỘ LỌC NHANH */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+            <Input
+              placeholder="Tìm theo tên video, chủ đề..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 text-xs"
+            />
+          </div>
+        </div>
+
+        {/* LƯỚI THẺ VIDEO (VIDEO CARDS) */}
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[300px]">
+            <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <span>Đang tải danh sách video...</span>
+            </div>
+          </div>
+        ) : filteredVideos.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl border border-dashed text-muted-foreground text-xs space-y-2">
+            <Film className="size-8 mx-auto text-muted-foreground/60" />
+            <p className="font-semibold text-foreground">
+              Không tìm thấy video nào
+            </p>
+            <p>
+              Thử tìm kiếm với từ khóa khác hoặc bấm nút "Thêm video đã có".
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredVideos.map((video) => {
+              const isSample = video.isSample;
+
+              return (
+                <Card
+                  key={video.id}
+                  className="flex flex-col justify-between overflow-hidden border shadow-xs hover:shadow-md transition-all group"
+                >
+                  {/* Thumbnail & Badges */}
+                  <div className="relative aspect-video w-full bg-muted/60 border-b flex items-center justify-center overflow-hidden">
+                    {/* Background preview effect */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+
+                    <Film className="size-12 text-muted-foreground/40 group-hover:scale-110 transition-transform" />
+
+                    {/* Top tags */}
+                    <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5">
+                      {isSample ? (
+                        <Badge className="bg-primary text-primary-foreground font-semibold text-[10px] shadow-xs">
+                          Dữ liệu mẫu
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] bg-background/80 backdrop-blur-xs"
+                        >
+                          Video Studio
+                        </Badge>
+                      )}
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] bg-background/80 backdrop-blur-xs font-mono"
                       >
-                        <span className="truncate max-w-[80%]">
-                          <strong className="text-muted-foreground">
-                            [{fb.channel}
-                            {fb.sender ? ` · ${fb.sender}` : ""}]
-                          </strong>{" "}
-                          {fb.text}
+                        {video.currentVersion}
+                      </Badge>
+                    </div>
+
+                    {/* Duration badge */}
+                    <div className="absolute bottom-2.5 right-2.5 z-20 bg-black/80 text-white font-mono text-[11px] px-2 py-0.5 rounded-md flex items-center gap-1">
+                      <Clock className="size-3" />
+                      <span>{dinhDangPhut(video.durationSeconds)}</span>
+                    </div>
+                  </div>
+
+                  {/* Body Info */}
+                  <CardContent className="p-4 space-y-3 flex-1 flex flex-col justify-between text-xs">
+                    <div className="space-y-2">
+                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                        {video.title}
+                      </h3>
+                      <p className="text-muted-foreground text-[11px] line-clamp-2 leading-relaxed">
+                        {video.description || "Chưa có mô tả chi tiết."}
+                      </p>
+                    </div>
+
+                    {/* Checklist dữ liệu sẵn có */}
+                    <div className="rounded-lg bg-muted/30 p-2.5 border text-[11px] space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Kịch bản:</span>
+                        {video.hasScript ? (
+                          <span className="text-green-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="size-3" /> Đầy đủ
+                          </span>
+                        ) : (
+                          <span className="text-amber-600 font-medium flex items-center gap-1">
+                            <AlertCircle className="size-3" /> Chưa nạp
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Timecode:</span>
+                        {video.hasTimecodes ? (
+                          <span className="text-green-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="size-3" /> Đã thẩm định
+                          </span>
+                        ) : (
+                          <span className="text-amber-600 font-medium flex items-center gap-1">
+                            <AlertCircle className="size-3" /> Chưa đồng bộ
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">
+                          Tệp video phát:
                         </span>
+                        {video.hasVideoFile ? (
+                          <span className="text-green-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="size-3" /> Có sẵn
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground italic">
+                            Video thô
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Trạng thái góp ý & Đợt sửa */}
+                    <div className="flex items-center justify-between pt-1 border-t text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <MessageSquare className="size-3.5 text-primary" />
+                        <span>
+                          <strong>{video.feedbackCount}</strong> phản hồi
+                        </span>
+                      </div>
+                      <span className="text-[10px] bg-muted px-2 py-0.5 rounded font-mono">
+                        Phiên bản {video.currentVersion}
+                      </span>
+                    </div>
+
+                    {/* NÚT MỞ VIDEO (KHÔNG TỰ CHẠY AI) */}
+                    <div className="pt-2">
+                      <Link
+                        href={`/videos/${video.id}` as any}
+                        className="w-full block"
+                      >
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveFeedback(idx)}
-                          className="size-6 text-muted-foreground hover:text-red-600"
+                          className="w-full text-xs gap-1.5 h-8 font-semibold group-hover:bg-primary/90"
                         >
-                          <Trash2 className="size-3.5" />
+                          <span>Mở video</span>
+                          <ArrowRight className="size-3.5" />
                         </Button>
-                      </div>
-                    ))}
-                  </div>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {/* MODAL THÊM VIDEO ĐÃ CÓ */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <Card className="max-w-xl w-full max-h-[90vh] flex flex-col p-5 space-y-4 shadow-xl">
+              <div className="border-b pb-3 space-y-1">
+                <CardTitle className="text-base font-bold flex items-center gap-2">
+                  <Plus className="size-4 text-primary" />
+                  Thêm video đã có vào Studio
+                </CardTitle>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Nhập thông tin video bài học đã sản xuất để theo dõi kịch bản
+                  và chuẩn bị các đợt chỉnh sửa tiếp theo.
+                </p>
+              </div>
+
+              {formError && (
+                <div className="p-2.5 rounded-lg border border-red-300 bg-red-50 text-red-800 text-xs dark:bg-red-950/50 dark:text-red-300">
+                  {formError}
                 </div>
               )}
-            </div>
 
-            {/* Trạng thái lỗi */}
-            {errorInfo && (
-              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-red-800 text-xs dark:border-red-900 dark:bg-red-950/50 dark:text-red-300 space-y-1">
-                <div className="flex items-center gap-2 font-semibold">
-                  <AlertCircle className="size-4" />
-                  <span>Lỗi: {errorInfo.code}</span>
+              <form
+                onSubmit={handleAddVideo}
+                className="space-y-3.5 overflow-y-auto flex-1 text-xs pr-1"
+              >
+                <div>
+                  <label className="block font-medium mb-1 text-foreground">
+                    Tên bài giảng / Video *
+                  </label>
+                  <Input
+                    placeholder="Ví dụ: Giới thiệu Hệ thống Khuyến nghị (Recommendation Systems)..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    className="h-8 text-xs"
+                  />
                 </div>
-                <p>{errorInfo.message}</p>
-                {errorInfo.runId && (
-                  <p className="font-mono text-muted-foreground">
-                    Run ID: {errorInfo.runId}
+
+                <div>
+                  <label className="block font-medium mb-1 text-foreground">
+                    Mô tả tóm tắt
+                  </label>
+                  <Textarea
+                    placeholder="Tóm tắt nội dung bài học hoặc mục tiêu đào tạo..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={2}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="block font-medium mb-1 text-foreground">
+                      Thời lượng (giây)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="180"
+                      value={durationStr}
+                      onChange={(e) => setDurationStr(e.target.value)}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-medium mb-1 text-foreground">
+                      Đường dẫn tệp video (URL hoặc MP4)
+                    </label>
+                    <Input
+                      placeholder="/video/my-video.mp4 hoặc https://..."
+                      value={videoUrl}
+                      onChange={(e) => setVideoUrl(e.target.value)}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Kịch bản & Timecode */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-medium text-foreground">
+                      Kịch bản (JSON hoặc từng dòng lời đọc)
+                    </label>
+                    <span className="text-[10px] text-muted-foreground">
+                      Tùy chọn bổ sung
+                    </span>
+                  </div>
+                  <Textarea
+                    placeholder="Dán JSON kịch bản hoặc mỗi dòng là một câu lời đọc..."
+                    value={scriptText}
+                    onChange={(e) => setScriptText(e.target.value)}
+                    rows={3}
+                    className="text-xs font-mono"
+                  />
+                </div>
+
+                {/* Hướng dẫn thiếu dữ liệu trung thực */}
+                <div className="rounded-lg border bg-muted/40 p-3 text-[11px] text-muted-foreground space-y-1">
+                  <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                    <AlertCircle className="size-3.5 text-amber-500" />
+                    <span>Xử lý khi chưa đủ dữ liệu:</span>
+                  </div>
+                  <p>
+                    Nếu bạn chưa có kịch bản hoặc timecode, video vẫn được tạo
+                    với nhãn <strong>Video thô</strong>. Bạn có thể mở video để
+                    xem trước và bổ sung kịch bản bất cứ lúc nào.
                   </p>
-                )}
-                <div className="pt-2">
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t">
                   <Button
                     type="button"
+                    variant="ghost"
                     size="sm"
-                    variant="outline"
-                    onClick={handleStartAnalysis}
-                    className="gap-1.5 text-xs h-7"
+                    onClick={() => setShowAddModal(false)}
+                    disabled={isSubmitting}
                   >
-                    <RefreshCw className="size-3" />
-                    Thử lại
+                    Hủy
+                  </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isSubmitting || !title.trim()}
+                  >
+                    {isSubmitting ? "Đang lưu..." : "Thêm video"}
                   </Button>
                 </div>
-              </div>
-            )}
-
-            {/* Trạng thái hoàn tất của run vừa xong */}
-            {result && !analyzing && (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-green-200 bg-green-50 p-3 text-green-900 text-xs dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-green-600" />
-                  <span>
-                    Đã hoàn thành phân tích (Run:{" "}
-                    <code className="font-mono font-bold">{result.runId}</code>)
-                    · {result.cases.length} hồ sơ duyệt
-                  </span>
-                </div>
-                <Link
-                  href={`/van-de?run=${result.runId}`}
-                  className="inline-flex items-center gap-1 font-semibold text-green-700 hover:underline dark:text-green-300"
-                >
-                  Xem danh sách vấn đề <ArrowRight className="size-3.5" />
-                </Link>
-              </div>
-            )}
-
-            {/* Nút Phân tích */}
-            <div className="flex items-center justify-between pt-2">
-              <div className="text-xs text-muted-foreground">
-                {analyzing ? (
-                  <span className="flex items-center gap-2 text-primary">
-                    <Loader2 className="size-4 animate-spin" />
-                    Đang gọi model phân tích... ({elapsedSeconds}s)
-                  </span>
-                ) : (
-                  <span>Sẵn sàng phân tích với model AI thật</span>
-                )}
-              </div>
-              <Button
-                type="button"
-                onClick={handleStartAnalysis}
-                disabled={
-                  analyzing || (!includeD1 && newFeedbacks.length === 0)
-                }
-                className="gap-2"
-              >
-                {analyzing ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Đang phân tích...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="size-4" />
-                    Phân tích góp ý
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* THẺ THỐNG KÊ RUN HIỆN TẠI */}
-      <div className="mx-auto mt-6 grid w-full max-w-4xl gap-3 px-4 sm:grid-cols-3">
-        <Link
-          href={
-            activeRunId ? `/van-de?run=${activeRunId}` : ("/van-de" as Route)
-          }
-        >
-          <Card className="h-full transition-colors hover:bg-muted/50">
-            <CardContent className="flex items-center gap-3 p-4">
-              <GalleryVerticalEnd className="size-5 text-muted-foreground" />
-              <div>
-                <p className="font-semibold text-2xl">
-                  {result ? result.cases.length : "—"}
-                </p>
-                <p className="text-muted-foreground text-xs">Hồ sơ vùng sửa</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link
-          href={activeRunId ? `/gop-y?run=${activeRunId}` : ("/gop-y" as Route)}
-        >
-          <Card className="h-full transition-colors hover:bg-muted/50">
-            <CardContent className="flex items-center gap-3 p-4">
-              <MessagesSquare className="size-5 text-muted-foreground" />
-              <div>
-                <p className="font-semibold text-2xl">
-                  {result ? result.feedback.length : "—"}
-                </p>
-                <p className="text-muted-foreground text-xs">Góp ý đã nhận</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link
-          href={
-            activeRunId
-              ? `/gop-y/gan-co?run=${activeRunId}`
-              : ("/gop-y/gan-co" as Route)
-          }
-        >
-          <Card className="h-full transition-colors hover:bg-muted/50">
-            <CardContent className="flex items-center gap-3 p-4">
-              <Flag className="size-5 text-muted-foreground" />
-              <div>
-                <p className="font-semibold text-2xl">
-                  {result ? result.quarantinedFeedback.length : "—"}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  Góp ý cách ly (gắn cờ)
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* HƯỚNG DẪN LUỒNG DUYỆT */}
-      <div className="mx-auto mt-6 w-full max-w-4xl px-4">
-        <Card>
-          <CardContent className="space-y-3 p-5 text-sm">
-            <p className="font-medium">
-              Luồng làm việc hai tầng của Revision Planner
-            </p>
-            <ol className="ml-4 list-decimal space-y-1 text-muted-foreground text-xs">
-              <li>
-                <strong className="text-foreground">
-                  Tầng 1 — Hồ sơ quyết định từng vùng:
-                </strong>{" "}
-                Người duyệt xem các vấn đề và bằng chứng gốc, so sánh ngang hai
-                phương án A/B (nội dung trước/sau, câu thu lại, cảnh dựng lại),
-                rồi chọn A, B, hoặc hoãn/bỏ.
-              </li>
-              <li>
-                <strong className="text-foreground">
-                  Tầng 2 — Gói phát hành cả phiên bản:
-                </strong>{" "}
-                Mỗi lựa chọn được code tự động tính lại toàn bộ: hợp nhất câu
-                thu lại theo ngữ cảnh ±1 câu, loại trùng, phát hiện xung đột và
-                xuất kịch bản mới cùng danh sách việc.
-              </li>
-            </ol>
-            {result && result.unassignedFeedback.length > 0 && (
-              <p className="text-muted-foreground text-xs">
-                Có {result.unassignedFeedback.length} phản hồi (khen / chỉ chấm
-                điểm / nhiễu) không tạo thành vấn đề cần sửa — xem tại trang Góp
-                ý gốc.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+              </form>
+            </Card>
+          </div>
+        )}
       </div>
     </PageWrapper>
   );

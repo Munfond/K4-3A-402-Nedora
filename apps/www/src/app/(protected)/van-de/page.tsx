@@ -1,7 +1,7 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import useSWR from "swr";
 import {
@@ -11,8 +11,6 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
-  Flag,
-  HelpCircle,
   Layers,
   Sparkles,
   Users,
@@ -20,14 +18,17 @@ import {
 } from "lucide-react";
 
 import PageWrapper from "@/components/page-wrapper";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { NhanLoaiVanDe, NhanNghiemTrong } from "@/components/c5/nhan";
-import { dinhDangPhut } from "@/lib/revision/format";
+import CaseListColumn from "@/components/studio/case-list-column";
+import DecisionDossier from "@/components/studio/decision-dossier";
+import V2PreparationColumn from "@/components/studio/v2-preparation-column";
 import { getLastRunId, useQuyetDinh } from "@/hooks/use-quyet-dinh";
+import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import type {
   DecisionCase,
+  FeedbackItem,
+  RevisionOption,
   RevisionRunResult,
   RunMetadata,
 } from "@/lib/revision/types";
@@ -36,8 +37,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DanhSachVanDePage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryRunId = searchParams.get("run");
+  const queryCaseId = searchParams.get("case");
+
   const [activeRunId, setActiveRunId] = useState<string>(queryRunId || "");
+  const [selectedCaseId, setSelectedCaseId] = useState<string>(
+    queryCaseId || "",
+  );
 
   useEffect(() => {
     if (queryRunId) {
@@ -48,7 +55,7 @@ export default function DanhSachVanDePage() {
     }
   }, [queryRunId]);
 
-  const { layQuyetDinh } = useQuyetDinh(activeRunId);
+  const { bang, dat, xoa, isStorageFailed } = useQuyetDinh(activeRunId);
 
   // Lấy dữ liệu run
   const { data, isLoading, error } = useSWR<{
@@ -58,365 +65,167 @@ export default function DanhSachVanDePage() {
 
   const result = data?.result;
   const run = data?.run;
-  const cases = result?.cases || [];
+  const cases = useMemo(() => result?.cases || [], [result]);
+  const script = result?.script;
+  const allFeedback = useMemo(() => result?.feedback || [], [result]);
 
-  // Phân nhóm cases
-  const vungCases = cases.filter((c) => c.type === "vung");
-  const canXacNhanCases = cases.filter((c) => c.type === "can-xac-nhan");
-  const kyThuatCases = cases.filter((c) => c.type === "ky-thuat");
+  // Set initial selected case
+  useEffect(() => {
+    if (queryCaseId) {
+      setSelectedCaseId(queryCaseId);
+    } else if (cases.length > 0 && !selectedCaseId) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [queryCaseId, cases, selectedCaseId]);
 
-  const [showFindings, setShowFindings] = useState(false);
+  const handleSelectCase = (caseId: string) => {
+    setSelectedCaseId(caseId);
+    // Update URL query param quietly without full reload
+    const url = new URL(window.location.href);
+    url.searchParams.set("case", caseId);
+    if (activeRunId) url.searchParams.set("run", activeRunId);
+    window.history.replaceState(null, "", url.toString());
+  };
+
+  const selectedCase = useMemo(() => {
+    return cases.find((c) => c.id === selectedCaseId) || cases[0];
+  }, [cases, selectedCaseId]);
+
+  // Tính snapshot phát hành v2 theo thời gian thực
+  const snapshot = useMemo(() => {
+    if (!script || cases.length === 0) return null;
+    return computeReleaseSnapshot({
+      runId: activeRunId,
+      inputHash: result?.inputHash || "default",
+      script,
+      cases,
+      decisions: bang,
+    });
+  }, [activeRunId, result, script, cases, bang]);
+
+  // Decision actions
+  const handleSelectOption = (option: RevisionOption) => {
+    if (!selectedCase) return;
+    if (option.status === "khong-hop-le" || option.status === "ngoai-pham-vi")
+      return;
+
+    dat(selectedCase.id, {
+      type: "chon",
+      optionId: option.id,
+      at: new Date().toISOString(),
+    });
+  };
+
+  const handleDeferCase = (reason: string) => {
+    if (!selectedCase) return;
+    dat(selectedCase.id, {
+      type: "hoan",
+      reason,
+      at: new Date().toISOString(),
+    });
+  };
+
+  const handleRejectCase = (reason: string) => {
+    if (!selectedCase) return;
+    dat(selectedCase.id, {
+      type: "bo",
+      reason,
+      at: new Date().toISOString(),
+    });
+  };
+
+  const handleResetCase = () => {
+    if (!selectedCase) return;
+    xoa(selectedCase.id);
+  };
+
+  if (isLoading) {
+    return (
+      <PageWrapper className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span>Đang tải hồ sơ quyết định sửa...</span>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (!result || !script || cases.length === 0) {
+    return (
+      <PageWrapper className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center space-y-4">
+        <p className="text-muted-foreground">
+          Chưa có lượt phân tích nào hoặc không tìm thấy dữ liệu run{" "}
+          <code>{activeRunId || "hiện tại"}</code>.
+        </p>
+        <Link href="/">
+          <Button size="sm" className="gap-2">
+            <Sparkles className="size-4" /> Về bước 1: Góp ý & Phân tích
+          </Button>
+        </Link>
+      </PageWrapper>
+    );
+  }
 
   return (
-    <PageWrapper className="flex flex-col overflow-y-auto pb-24">
-      {/* HEADER */}
-      <div className="mx-auto mt-6 w-full max-w-5xl shrink-0 px-4 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-bold text-2xl dark:text-neutral-50 sm:text-3xl">
-              Hồ sơ quyết định sửa
-            </h1>
-            <p className="mt-1 text-muted-foreground text-sm">
-              Góp ý được gom theo vùng câu chồng lấn hoặc liền kề. Người duyệt
-              chọn phương án độc lập cho từng vùng.
-            </p>
-          </div>
-          <Link href="/">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Sparkles className="size-3.5" />
-              Chạy đợt phân tích mới
-            </Button>
-          </Link>
-        </div>
-
-        {/* BANNER RUN & CHECKS C3-UI-02 */}
-        {run && (
-          <div className="rounded-lg border bg-card p-4 shadow-sm space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-foreground">
-                  Run: {run.runId}
-                </span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-muted-foreground">
-                  Model: {run.modelId}
-                </span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-muted-foreground">
-                  {new Date(run.createdAt).toLocaleString("vi-VN")}
-                </span>
-              </div>
-              <Badge
-                variant="outline"
-                className="bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300"
-              >
-                Kết quả AI · Chưa được duyệt
-              </Badge>
-            </div>
-
-            {/* CỜ KIỂM TRA CHECKS C3-VAL-10 */}
-            {result?.validation && (
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-xs">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-medium text-muted-foreground">
-                    Cờ kiểm tra:
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    {result.validation.checks.schemaOk ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
-                    ) : (
-                      <AlertCircle className="size-3.5 text-red-600" />
-                    )}
-                    Schema
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    {result.validation.checks.feedbackCoverageOk ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
-                    ) : (
-                      <AlertCircle className="size-3.5 text-red-600" />
-                    )}
-                    Phủ góp ý
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    {result.validation.checks.evidenceOk ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
-                    ) : (
-                      <AlertCircle className="size-3.5 text-red-600" />
-                    )}
-                    Bằng chứng
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    {result.validation.checks.locationsOk ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
-                    ) : (
-                      <AlertCircle className="size-3.5 text-red-600" />
-                    )}
-                    Vị trí
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    {result.validation.checks.patchesOk ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
-                    ) : (
-                      <AlertCircle className="size-3.5 text-red-600" />
-                    )}
-                    Patch
-                  </span>
-                </div>
-
-                {result.validation.findings.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowFindings(!showFindings)}
-                    className="text-primary hover:underline flex items-center gap-1 font-medium"
-                  >
-                    <span>
-                      {result.validation.findings.length} ghi nhận kiểm tra
-                    </span>
-                    <span className="text-xs">{showFindings ? "▲" : "▼"}</span>
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* DANH SÁCH FINDINGS NẾU MỞ */}
-            {showFindings && result?.validation.findings && (
-              <div className="rounded border bg-muted/30 p-2.5 max-h-48 overflow-y-auto space-y-1 text-xs font-mono">
-                {result.validation.findings.map((f, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-2 py-0.5 border-b border-muted/50 last:border-0"
-                  >
-                    <span
-                      className={
-                        f.level === "loi"
-                          ? "text-red-600 font-bold"
-                          : f.level === "canh-bao"
-                            ? "text-amber-600"
-                            : "text-muted-foreground"
-                      }
-                    >
-                      [{f.code}]
-                    </span>
-                    <span className="text-foreground">{f.message}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* THÔNG BÁO NẾU CHƯA CÓ RUN */}
-        {!activeRunId && !isLoading && (
-          <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
-            <p className="text-muted-foreground text-sm">
-              Chưa có lượt phân tích nào được chọn. Hãy chạy một đợt phân tích
-              mới trên trang Tổng quan.
-            </p>
-            <Link href="/">
-              <Button size="sm" className="gap-2">
-                <Sparkles className="size-4" />
-                Đến trang phân tích
-              </Button>
-            </Link>
-          </div>
-        )}
-
-        {/* LIÊN KẾT PHỤ C3-CASE-05 */}
-        {result && (
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <span>
-              Tổng <strong>{result.cases.length}</strong> hồ sơ duyệt (
-              {vungCases.length} vùng · {canXacNhanCases.length} cần xác nhận ·{" "}
-              {kyThuatCases.length} kỹ thuật)
-            </span>
-            <span>·</span>
-            <Link
-              href={`/gop-y?run=${activeRunId}`}
-              className="hover:text-foreground hover:underline"
-            >
-              {result.unassignedFeedback.length} góp ý không thành vấn đề
-            </Link>
-            <span>·</span>
-            <Link
-              href={`/gop-y/gan-co?run=${activeRunId}`}
-              className="text-red-600 hover:underline dark:text-red-400"
-            >
-              {result.quarantinedFeedback.length} góp ý cách ly
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* DANH SÁCH HỒ SƠ DUYỆT */}
-      {result && (
-        <div className="mx-auto mt-6 w-full max-w-5xl px-4 space-y-6">
-          {/* NHÓM 1: VÙNG SỬA */}
-          {vungCases.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Layers className="size-4 text-primary" />
-                <h2 className="font-semibold text-sm uppercase tracking-wider text-foreground">
-                  Vùng sửa ({vungCases.length})
-                </h2>
-              </div>
-              <div className="space-y-2.5">
-                {vungCases.map((c) => (
-                  <CaseCard
-                    key={c.id}
-                    c={c}
-                    runId={activeRunId}
-                    layQuyetDinh={layQuyetDinh}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* NHÓM 2: CẦN XÁC NHẬN VỊ TRÍ */}
-          {canXacNhanCases.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                <HelpCircle className="size-4" />
-                <h2 className="font-semibold text-sm uppercase tracking-wider">
-                  Cần xác nhận vị trí ({canXacNhanCases.length})
-                </h2>
-              </div>
-              <div className="space-y-2.5">
-                {canXacNhanCases.map((c) => (
-                  <CaseCard
-                    key={c.id}
-                    c={c}
-                    runId={activeRunId}
-                    layQuyetDinh={layQuyetDinh}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* NHÓM 3: KỸ THUẬT */}
-          {kyThuatCases.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400">
-                <Wrench className="size-4" />
-                <h2 className="font-semibold text-sm uppercase tracking-wider">
-                  Kỹ thuật ({kyThuatCases.length})
-                </h2>
-              </div>
-              <div className="space-y-2.5">
-                {kyThuatCases.map((c) => (
-                  <CaseCard
-                    key={c.id}
-                    c={c}
-                    runId={activeRunId}
-                    layQuyetDinh={layQuyetDinh}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+    <PageWrapper className="flex flex-col h-[calc(100vh-64px)] overflow-hidden p-3 sm:p-4">
+      {/* STORAGE WARNING */}
+      {isStorageFailed && (
+        <div className="mb-2 rounded-md border border-amber-300 bg-amber-50 p-2 text-amber-800 text-xs dark:bg-amber-950/40 dark:text-amber-300">
+          Lưu ý: Bộ nhớ trình duyệt (localStorage) đang bị chặn — tải lại trang
+          có thể làm mất các lựa chọn duyệt chưa xuất.
         </div>
       )}
-    </PageWrapper>
-  );
-}
 
-function CaseCard({
-  c,
-  runId,
-  layQuyetDinh,
-}: {
-  c: DecisionCase;
-  runId: string;
-  layQuyetDinh: (caseId: string) => any;
-}) {
-  const dec = layQuyetDinh(c.id);
-  const mainIssue = c.issues[0];
-
-  return (
-    <Link
-      href={`/van-de/${c.id}?run=${runId}`}
-      className="block transition-all"
-    >
-      <Card className="hover:border-primary/50 hover:bg-muted/30 transition-colors p-4">
-        <div className="space-y-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono font-bold text-xs bg-muted px-2 py-0.5 rounded border">
-                {c.id}
-              </span>
-              {mainIssue && (
-                <>
-                  <NhanNghiemTrong muc={mainIssue.impact.level} />
-                  <NhanLoaiVanDe loai={mainIssue.category} />
-                </>
-              )}
-              {c.hasDisagreement && (
-                <Badge
-                  variant="outline"
-                  className="bg-amber-50 text-amber-700 border-amber-200 text-xs dark:bg-amber-950 dark:text-amber-300"
-                >
-                  Trái chiều
-                </Badge>
-              )}
-            </div>
-
-            {/* Trạng thái quyết định */}
-            {dec ? (
-              <Badge
-                className={
-                  dec.type === "chon"
-                    ? "bg-green-600 text-white"
-                    : dec.type === "hoan"
-                      ? "bg-amber-500 text-white"
-                      : "bg-neutral-500 text-white"
-                }
-              >
-                {dec.type === "chon"
-                  ? `Đã chọn ${dec.optionId?.split("-").pop() || ""}`
-                  : dec.type === "hoan"
-                    ? "Đã hoãn"
-                    : "Đã bỏ"}
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="text-muted-foreground text-xs"
-              >
-                Chờ duyệt
-              </Badge>
-            )}
-          </div>
-
-          <h3 className="font-semibold text-sm text-foreground">{c.title}</h3>
-
-          <div className="space-y-1">
-            {c.issues.map((iss) => (
-              <p
-                key={iss.id}
-                className="text-xs text-muted-foreground line-clamp-1"
-              >
-                • {iss.summary}
-              </p>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-1 border-t text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5" />
-              Câu {c.sentenceNs.join(", ")} · {dinhDangPhut(c.tuGiay)}–
-              {dinhDangPhut(c.denGiay)}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Users className="size-3.5" />
-              {c.independentSenders} người ({c.mentions} góp ý)
-            </span>
-            <span className="inline-flex items-center gap-1 text-primary font-medium ml-auto">
-              Xem hồ sơ và duyệt <ArrowRight className="size-3" />
-            </span>
-          </div>
+      {/* 3-COLUMN WORKSPACE CONTAINER */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[310px_minmax(0,1fr)_330px] xl:grid-cols-[340px_minmax(0,1fr)_360px] gap-3 h-full overflow-hidden">
+        {/* CỘT 1 (TRÁI): DANH SÁCH CÁC VÙNG SỬA */}
+        <div className="h-full overflow-hidden">
+          <CaseListColumn
+            cases={cases}
+            selectedCaseId={selectedCase?.id || ""}
+            onSelectCase={handleSelectCase}
+            decisions={bang}
+          />
         </div>
-      </Card>
-    </Link>
+
+        {/* CỘT 2 (GIỮA): HỒ SƠ QUYẾT ĐỊNH (4 PHẦN A, B, C, D) */}
+        <div className="h-full overflow-hidden">
+          {selectedCase ? (
+            <DecisionDossier
+              currentCase={selectedCase}
+              script={script}
+              allFeedback={allFeedback}
+              currentDecision={bang[selectedCase.id]}
+              allDecisions={bang}
+              allCases={cases}
+              runId={activeRunId}
+              onSelectOption={handleSelectOption}
+              onDefer={handleDeferCase}
+              onReject={handleRejectCase}
+              onReset={handleResetCase}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
+              Chọn một vùng sửa từ cột bên trái để xem hồ sơ.
+            </div>
+          )}
+        </div>
+
+        {/* CỘT 3 (PHẢI): ĐANG CHUẨN BỊ BẢN SỬA V2 THỜI GIAN THỰC */}
+        <div className="h-full overflow-hidden">
+          {snapshot ? (
+            <V2PreparationColumn
+              snapshot={snapshot}
+              script={script}
+              runId={activeRunId}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
+              Đang tính toán khối lượng v2...
+            </div>
+          )}
+        </div>
+      </div>
+    </PageWrapper>
   );
 }

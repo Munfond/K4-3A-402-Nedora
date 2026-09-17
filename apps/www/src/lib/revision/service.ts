@@ -1,4 +1,5 @@
 import {
+  resolveRevisionModelId,
   runRevisionAgent,
   type MockModelCaller,
   type RevisionAgentConfig,
@@ -38,8 +39,8 @@ export async function analyzeRevision(
   const { script, allFeedback, feedbackForModel, inputHash } =
     prepareAnalyzeInput(input);
 
-  const modelId =
-    config?.modelId || process.env.REVISION_MODEL || "openai/gpt-4o-mini";
+  // Dùng cùng cách chọn model với agent, để run.json không ghi một model không được gọi.
+  const modelId = resolveRevisionModelId(config?.modelId);
 
   // C3-AG-10: Nếu không còn góp ý nào để gửi model (tất cả bị cách ly hoặc chỉ chấm điểm)
   if (feedbackForModel.length === 0) {

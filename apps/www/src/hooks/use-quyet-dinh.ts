@@ -113,6 +113,29 @@ export function useQuyetDinh(explicitRunId?: string) {
     [storageKey, eventName],
   );
 
+  const xoa = useCallback(
+    (caseId: string) => {
+      setBang((prev) => {
+        const moi = { ...prev };
+        delete moi[caseId];
+        if (storageKey) {
+          try {
+            window.localStorage.setItem(storageKey, JSON.stringify(moi));
+            setIsStorageFailed(false);
+          } catch {
+            setIsStorageFailed(true);
+          }
+        }
+        return moi;
+      });
+
+      if (eventName) {
+        window.dispatchEvent(new Event(eventName));
+      }
+    },
+    [storageKey, eventName],
+  );
+
   const xoaHet = useCallback(() => {
     setBang({});
     if (storageKey) {
@@ -139,6 +162,7 @@ export function useQuyetDinh(explicitRunId?: string) {
     setRunId: setActiveRunId,
     bang,
     dat,
+    xoa,
     xoaHet,
     layQuyetDinh,
     isStorageFailed,

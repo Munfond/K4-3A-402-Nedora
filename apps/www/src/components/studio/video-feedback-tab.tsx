@@ -1,0 +1,516 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Filter,
+  HelpCircle,
+  MapPin,
+  MessageSquare,
+  MessageSquarePlus,
+  Play,
+  Search,
+  Sparkles,
+  Users,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { dinhDangPhut } from "@/lib/revision/format";
+import type {
+  LocationSource,
+  StudioFeedback,
+  StudioVideo,
+} from "@/lib/studio/types";
+
+interface VideoFeedbackTabProps {
+  video: StudioVideo;
+  feedbacks: StudioFeedback[];
+  onSeekToTime?: (timeSeconds: number) => void;
+  onAddNewFeedback: (fb: Partial<StudioFeedback>) => void;
+  onTriggerAnalyze: () => void;
+  isAnalyzing: boolean;
+  analysisTimer: number;
+}
+
+export default function VideoFeedbackTab({
+  video,
+  feedbacks,
+  onSeekToTime,
+  onAddNewFeedback,
+  onTriggerAnalyze,
+  isAnalyzing,
+  analysisTimer,
+}: VideoFeedbackTabProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [locationFilter, setLocationFilter] = useState<"all" | LocationSource>(
+    "all",
+  );
+  const [channelFilter, setChannelFilter] = useState<string>("all");
+
+  // Form thêm góp ý
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newText, setNewText] = useState("");
+  const [newSender, setNewSender] = useState("");
+  const [newChannel, setNewChannel] = useState<
+    "binh-luan" | "tin-nhan" | "khao-sat"
+  >("binh-luan");
+  const [newSentenceN, setNewSentenceN] = useState<string>("");
+  const [newTimeSeconds, setNewTimeSeconds] = useState<string>("");
+  const [newDeHieu, setNewDeHieu] = useState<number | undefined>();
+  const [newNhipDo, setNewNhipDo] = useState<number | undefined>();
+
+  const filteredFeedbacks = useMemo(() => {
+    return feedbacks.filter((f) => {
+      if (locationFilter !== "all" && f.locationSource !== locationFilter)
+        return false;
+      if (channelFilter !== "all" && f.channel !== channelFilter) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchText = (f.sanitizedText || "").toLowerCase().includes(q);
+        const matchSender = (f.sender || "").toLowerCase().includes(q);
+        const matchId = f.id.toLowerCase().includes(q);
+        if (!matchText && !matchSender && !matchId) return false;
+      }
+
+      return true;
+    });
+  }, [feedbacks, locationFilter, channelFilter, searchQuery]);
+
+  const counts = useMemo(() => {
+    let nguoiChon = 0;
+    let aiDeXuat = 0;
+    let chuaXacDinh = 0;
+
+    for (const f of feedbacks) {
+      if (f.locationSource === "nguoi-chon") nguoiChon++;
+      else if (f.locationSource === "ai-de-xuat") aiDeXuat++;
+      else chuaXacDinh++;
+    }
+
+    return { total: feedbacks.length, nguoiChon, aiDeXuat, chuaXacDinh };
+  }, [feedbacks]);
+
+  const handleAddSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newText.trim()) return;
+
+    const sentenceN = newSentenceN.trim()
+      ? parseInt(newSentenceN, 10)
+      : undefined;
+    const timeSec = newTimeSeconds.trim()
+      ? parseInt(newTimeSeconds, 10)
+      : undefined;
+    const locationSource: LocationSource =
+      sentenceN != null || timeSec != null ? "nguoi-chon" : "chua-xac-dinh";
+
+    onAddNewFeedback({
+      id: `gy-user-${Date.now().toString(36)}`,
+      channel: newChannel,
+      sender:
+        newSender.trim() ||
+        `nguoi-hoc-${Math.floor(Math.random() * 900 + 100)}`,
+      sanitizedText: newText.trim(),
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "code",
+      isQuarantined: false,
+      locationSource,
+      sentenceN,
+      timeSeconds: timeSec,
+      survey:
+        newDeHieu || newNhipDo
+          ? {
+              deHieu: newDeHieu,
+              nhipDo: newNhipDo,
+            }
+          : undefined,
+    });
+
+    setNewText("");
+    setNewSender("");
+    setNewSentenceN("");
+    setNewTimeSeconds("");
+    setNewDeHieu(undefined);
+    setNewNhipDo(undefined);
+    setShowAddForm(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* HEADER TỔNG QUAN & NÚT PHÂN TÍCH */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border bg-card shadow-xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="font-mono text-xs bg-muted">
+              Phiên bản: {video.currentVersion}
+            </Badge>
+            <span className="font-bold text-sm text-foreground">
+              {feedbacks.length} phản hồi đã thu thập
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Phản hồi gắn chặt với phiên bản nguồn {video.currentVersion}, tránh
+            đem góp ý của v1 áp nhầm vào các bản sau.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="text-xs gap-1.5 h-8"
+          >
+            <MessageSquarePlus className="size-3.5" />
+            {showAddForm ? "Đóng form thêm" : "Thêm phản hồi mới"}
+          </Button>
+
+          <Button
+            type="button"
+            size="sm"
+            disabled={isAnalyzing || feedbacks.length === 0}
+            onClick={onTriggerAnalyze}
+            className="text-xs gap-1.5 h-8 font-semibold shadow-xs"
+          >
+            <Sparkles className="size-3.5" />
+            {isAnalyzing
+              ? `Đang phân tích (${analysisTimer}s)...`
+              : `Phân tích góp ý cho ${video.currentVersion}`}
+          </Button>
+        </div>
+      </div>
+
+      {/* FORM THÊM GÓP Ý THỦ CÔNG */}
+      {showAddForm && (
+        <Card className="border-2 border-primary/20 shadow-sm">
+          <CardHeader className="pb-3 border-b bg-muted/10">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <MessageSquarePlus className="size-4 text-primary" />
+              Thêm góp ý / phản hồi cho phiên bản {video.currentVersion}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <form onSubmit={handleAddSubmit} className="space-y-3 text-xs">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <label className="block text-muted-foreground mb-1 font-medium">
+                    Kênh tiếp nhận
+                  </label>
+                  <select
+                    value={newChannel}
+                    onChange={(e) => setNewChannel(e.target.value as any)}
+                    className="w-full h-8 rounded-md border bg-background px-2.5 text-xs"
+                  >
+                    <option value="binh-luan">Bình luận bài học</option>
+                    <option value="tin-nhan">Tin nhắn hỗ trợ</option>
+                    <option value="khao-sat">Khảo sát cuối video</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-muted-foreground mb-1 font-medium">
+                    Người gửi
+                  </label>
+                  <Input
+                    placeholder="hv-102 hoặc Nguyễn Văn A..."
+                    value={newSender}
+                    onChange={(e) => setNewSender(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-muted-foreground mb-1 font-medium">
+                      Câu số (nếu có)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Ví dụ: 12"
+                      value={newSentenceN}
+                      onChange={(e) => setNewSentenceN(e.target.value)}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-muted-foreground mb-1 font-medium">
+                      Giây (nếu có)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Ví dụ: 85"
+                      value={newTimeSeconds}
+                      onChange={(e) => setNewTimeSeconds(e.target.value)}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-muted-foreground mb-1 font-medium">
+                  Nội dung góp ý *
+                </label>
+                <Textarea
+                  placeholder="Nhập nội dung phàn nàn, nhận xét hoặc đề xuất..."
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                  rows={3}
+                  className="text-xs"
+                  required
+                />
+              </div>
+
+              {newChannel === "khao-sat" && (
+                <div className="flex gap-4 p-2.5 rounded-lg border bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">
+                      Điểm dễ hiểu (1–5):
+                    </span>
+                    <select
+                      value={newDeHieu ?? ""}
+                      onChange={(e) =>
+                        setNewDeHieu(
+                          e.target.value ? Number(e.target.value) : undefined,
+                        )
+                      }
+                      className="h-7 rounded border bg-background px-2 text-xs"
+                    >
+                      <option value="">Không chấm</option>
+                      {[1, 2, 3, 4, 5].map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">
+                      Điểm nhịp độ (1–5):
+                    </span>
+                    <select
+                      value={newNhipDo ?? ""}
+                      onChange={(e) =>
+                        setNewNhipDo(
+                          e.target.value ? Number(e.target.value) : undefined,
+                        )
+                      }
+                      className="h-7 rounded border bg-background px-2 text-xs"
+                    >
+                      <option value="">Không chấm</option>
+                      {[1, 2, 3, 4, 5].map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAddForm(false)}
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" size="sm">
+                  Lưu phản hồi
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* BỘ LỌC NGUỒN GỐC VỊ TRÍ (LOCATION PROVENANCE) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border bg-muted/20">
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="font-semibold text-muted-foreground mr-1">
+            Vị trí:
+          </span>
+          <button
+            type="button"
+            onClick={() => setLocationFilter("all")}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+              locationFilter === "all"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Tất cả ({counts.total})
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocationFilter("nguoi-chon")}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+              locationFilter === "nguoi-chon"
+                ? "bg-green-600 text-white"
+                : "bg-background border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="size-2 rounded-full bg-green-500 inline-block" />
+            Người gửi đã chọn ({counts.nguoiChon})
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocationFilter("ai-de-xuat")}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+              locationFilter === "ai-de-xuat"
+                ? "bg-amber-600 text-white"
+                : "bg-background border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="size-2 rounded-full bg-amber-500 inline-block" />
+            AI đề xuất vị trí ({counts.aiDeXuat})
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocationFilter("chua-xac-dinh")}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+              locationFilter === "chua-xac-dinh"
+                ? "bg-neutral-600 text-white"
+                : "bg-background border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="size-2 rounded-full bg-neutral-400 inline-block" />
+            Chưa xác định ({counts.chuaXacDinh})
+          </button>
+        </div>
+
+        <div className="relative w-full sm:w-60">
+          <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Tìm theo nội dung, người gửi..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 h-8 text-xs bg-background"
+          />
+        </div>
+      </div>
+
+      {/* DANH SÁCH PHẢN HỒI */}
+      <div className="grid gap-3 md:grid-cols-2">
+        {filteredFeedbacks.length === 0 ? (
+          <div className="col-span-full p-8 text-center text-muted-foreground text-xs rounded-xl border border-dashed">
+            Không tìm thấy phản hồi nào phù hợp bộ lọc.
+          </div>
+        ) : (
+          filteredFeedbacks.map((f) => (
+            <div
+              key={f.id}
+              className="rounded-xl border bg-card p-3.5 space-y-2 text-xs flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all"
+            >
+              <div className="space-y-2">
+                {/* Header người gửi & vị trí */}
+                <div className="flex items-center justify-between gap-2 border-b pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-foreground">
+                      {f.sender}
+                    </span>
+                    <Badge variant="outline" className="text-[10px] py-0">
+                      {f.channel === "khao-sat"
+                        ? "Khảo sát"
+                        : f.channel === "binh-luan"
+                          ? "Bình luận"
+                          : "Tin nhắn"}
+                    </Badge>
+                  </div>
+
+                  {/* Nhãn phân định nguồn gốc vị trí rõ ràng */}
+                  {f.locationSource === "nguoi-chon" ? (
+                    <Badge className="bg-green-50 text-green-700 border-green-300 border text-[10px] py-0 dark:bg-green-950 dark:text-green-300">
+                      🟢 Người gửi chọn vị trí
+                    </Badge>
+                  ) : f.locationSource === "ai-de-xuat" ? (
+                    <Badge className="bg-amber-50 text-amber-700 border-amber-300 border text-[10px] py-0 dark:bg-amber-950 dark:text-amber-300">
+                      🟡 AI đề xuất vị trí
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="text-muted-foreground text-[10px] py-0"
+                    >
+                      ⚪ Chưa rõ vị trí
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Nội dung */}
+                <p className="text-foreground leading-relaxed italic bg-muted/20 p-2.5 rounded-lg border border-border/40">
+                  {f.sanitizedText ? (
+                    `"${f.sanitizedText}"`
+                  ) : (
+                    <span className="text-muted-foreground">
+                      (Không có lời nhận xét)
+                    </span>
+                  )}
+                </p>
+
+                {/* Điểm số khảo sát nếu có */}
+                {f.survey &&
+                  (f.survey.deHieu != null || f.survey.nhipDo != null) && (
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      {f.survey.deHieu != null && (
+                        <span className="text-amber-700 font-medium">
+                          Dễ hiểu: {f.survey.deHieu}/5
+                        </span>
+                      )}
+                      {f.survey.nhipDo != null && (
+                        <span className="text-sky-700 font-medium">
+                          Nhịp độ: {f.survey.nhipDo}/5
+                        </span>
+                      )}
+                    </div>
+                  )}
+              </div>
+
+              {/* Mốc câu & Nút nhảy video */}
+              <div className="pt-2 flex items-center justify-between text-[11px] text-muted-foreground border-t mt-2">
+                <div>
+                  {f.sentenceN != null ? (
+                    <span>
+                      Gắn mốc: <strong>Câu {f.sentenceN}</strong>{" "}
+                      {f.timeSeconds != null &&
+                        `(${dinhDangPhut(f.timeSeconds)})`}
+                    </span>
+                  ) : f.timeSeconds != null ? (
+                    <span>
+                      Gắn mốc: <strong>{dinhDangPhut(f.timeSeconds)}</strong>
+                    </span>
+                  ) : (
+                    <span className="italic">Nhận xét chung bài</span>
+                  )}
+                </div>
+
+                {f.timeSeconds != null && onSeekToTime && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onSeekToTime(f.timeSeconds!)}
+                    className="h-6 text-[11px] px-2 text-primary hover:bg-primary/10 gap-1"
+                  >
+                    <Play className="size-3 fill-current" /> Xem đoạn này
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}

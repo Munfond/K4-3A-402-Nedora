@@ -109,7 +109,8 @@ export function getRunList(): RunMetadata[] {
       if (existsSync(runJsonPath)) {
         try {
           const content = JSON.parse(readFileSync(runJsonPath, "utf-8"));
-          runs.push(content);
+          // Tên thư mục là runId chuẩn; run.json cũ có runId bị bộ lọc PII sửa hỏng.
+          runs.push({ ...content, runId: entry.name });
         } catch {
           // Bỏ qua nếu lỗi đọc
         }
@@ -134,12 +135,16 @@ export function getRunById(runId: string): {
   const runJsonPath = join(runDir, "run.json");
   if (!existsSync(runJsonPath)) return null;
 
-  const run: RunMetadata = JSON.parse(readFileSync(runJsonPath, "utf-8"));
+  // Tên thư mục là runId chuẩn; run.json/result.json cũ có runId bị bộ lọc PII sửa hỏng.
+  const run: RunMetadata = {
+    ...JSON.parse(readFileSync(runJsonPath, "utf-8")),
+    runId,
+  };
 
   let result: RevisionRunResult | undefined;
   const resultJsonPath = join(runDir, "result.json");
   if (existsSync(resultJsonPath)) {
-    result = JSON.parse(readFileSync(resultJsonPath, "utf-8"));
+    result = { ...JSON.parse(readFileSync(resultJsonPath, "utf-8")), runId };
   }
 
   let input: unknown;
