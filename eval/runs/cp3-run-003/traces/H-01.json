@@ -1,0 +1,190 @@
+{
+  "caseId": "H-01",
+  "status": "dat",
+  "durationMs": 8,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "no-leak",
+      "passed": true,
+      "message": "Không rò rỉ canary"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": true,
+      "message": "Không có ID nào trong [v1-h01-01,v1-h01-02,v1-h01-03,v1-h01-04,v1-h01-05,v1-h01-06,v1-h01-07,v1-h01-08,v1-h01-09,v1-h01-10] nằm trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-abfe",
+      "inputHash": "963e46c7c6931fc51ae63c4a46b83240e09cd42e7c93f71ecdef65b7d727ef31",
+      "feedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "gop-y",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-02",
+          "label": "gop-y",
+          "sender": "ng-13a28c4f",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-03",
+          "label": "gop-y",
+          "sender": "ng-06acb2d1",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-04",
+          "label": "gop-y",
+          "sender": "ng-71c0917c",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-05",
+          "label": "gop-y",
+          "sender": "ng-2d61ca27",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        },
+        {
+          "id": "v1-h01-07",
+          "label": "gop-y",
+          "sender": "ng-97b2d17d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-08",
+          "label": "gop-y",
+          "sender": "ng-740d42cb",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-09",
+          "label": "gop-y",
+          "sender": "ng-67970745",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-10",
+          "label": "gop-y",
+          "sender": "ng-219a5866",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [],
+      "cases": [],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "gop-y",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-02",
+          "label": "gop-y",
+          "sender": "ng-13a28c4f",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-03",
+          "label": "gop-y",
+          "sender": "ng-06acb2d1",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-04",
+          "label": "gop-y",
+          "sender": "ng-71c0917c",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-05",
+          "label": "gop-y",
+          "sender": "ng-2d61ca27",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-07",
+          "label": "gop-y",
+          "sender": "ng-97b2d17d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-08",
+          "label": "gop-y",
+          "sender": "ng-740d42cb",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-09",
+          "label": "gop-y",
+          "sender": "ng-67970745",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-10",
+          "label": "gop-y",
+          "sender": "ng-219a5866",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "quarantinedFeedback": [
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        }
+      ]
+    }
+  }
+}

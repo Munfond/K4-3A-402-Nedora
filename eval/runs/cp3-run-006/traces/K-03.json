@@ -1,0 +1,185 @@
+{
+  "caseId": "K-03",
+  "status": "dat",
+  "durationMs": 8626,
+  "tokens": 7215,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k03-a,v1-k03-b]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          35
+        ]
+      }
+    },
+    {
+      "type": "disagreement",
+      "passed": true,
+      "message": "Có ý kiến trái chiều giữa các nhóm"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183752-5eb2",
+      "inputHash": "57ad3c888ca144ed5e438a37324472642de5d9af07c7fc2255088318b94f7771",
+      "feedback": [
+        {
+          "id": "v1-k03-a",
+          "label": "gop-y",
+          "sender": "ng-819e1bd2",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k03-b",
+          "label": "gop-y",
+          "sender": "ng-abd0f969",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "pause-sentence-35",
+          "summary": "Khoảng lặng suy nghĩ ở câu 35 được một người học thấy quá ngắn, trong khi người khác thấy quá dài.",
+          "category": "nhip-nhanh-cham",
+          "feedbackIds": [
+            "v1-k03-a",
+            "v1-k03-b"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              35
+            ],
+            "basis": "Cả hai góp ý đều nhắc trực tiếp đến khoảng dừng năm giây; kịch bản ghi câu 35 có trường dungGiay là “khoảng lặng 5 giây”."
+          },
+          "stances": [
+            {
+              "direction": "tăng thời lượng khoảng dừng",
+              "feedbackIds": [
+                "v1-k03-a"
+              ]
+            },
+            {
+              "direction": "giảm thời lượng khoảng dừng",
+              "feedbackIds": [
+                "v1-k03-b"
+              ]
+            }
+          ],
+          "uncertainties": [
+            "Chỉ có dữ liệu kịch bản và phản hồi, không xem hoặc nghe được video thực tế để đánh giá nhịp đọc và thời lượng im lặng trong ngữ cảnh toàn đoạn.",
+            "Chưa rõ nhóm người học mục tiêu cần bao nhiêu thời gian suy nghĩ cho câu hỏi này."
+          ],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Khoảng dừng ảnh hưởng trực tiếp đến cơ hội suy nghĩ và cảm giác liền mạch của bài học, nhưng không làm sai nội dung khái niệm."
+          },
+          "options": [],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": true
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-35-35",
+          "type": "vung",
+          "title": "Khoảng lặng suy nghĩ ở câu 35 được một người học thấy quá ngắn, trong khi người khác thấy quá dài.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            35
+          ],
+          "tuGiay": 212.1,
+          "denGiay": 217.1,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "pause-sentence-35",
+              "summary": "Khoảng lặng suy nghĩ ở câu 35 được một người học thấy quá ngắn, trong khi người khác thấy quá dài.",
+              "category": "nhip-nhanh-cham",
+              "feedbackIds": [
+                "v1-k03-a",
+                "v1-k03-b"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  35
+                ],
+                "basis": "Cả hai góp ý đều nhắc trực tiếp đến khoảng dừng năm giây; kịch bản ghi câu 35 có trường dungGiay là “khoảng lặng 5 giây”."
+              },
+              "stances": [
+                {
+                  "direction": "tăng thời lượng khoảng dừng",
+                  "feedbackIds": [
+                    "v1-k03-a"
+                  ]
+                },
+                {
+                  "direction": "giảm thời lượng khoảng dừng",
+                  "feedbackIds": [
+                    "v1-k03-b"
+                  ]
+                }
+              ],
+              "uncertainties": [
+                "Chỉ có dữ liệu kịch bản và phản hồi, không xem hoặc nghe được video thực tế để đánh giá nhịp đọc và thời lượng im lặng trong ngữ cảnh toàn đoạn.",
+                "Chưa rõ nhóm người học mục tiêu cần bao nhiêu thời gian suy nghĩ cho câu hỏi này."
+              ],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Khoảng dừng ảnh hưởng trực tiếp đến cơ hội suy nghĩ và cảm giác liền mạch của bài học, nhưng không làm sai nội dung khái niệm."
+              },
+              "options": [],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": true
+            }
+          ],
+          "options": [],
+          "hasDisagreement": true,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": [
+            "Trái chiều"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

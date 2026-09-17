@@ -1,0 +1,260 @@
+{
+  "caseId": "N-05",
+  "status": "dat",
+  "durationMs": 4662,
+  "tokens": 7028,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n05-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": []
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183410-c381",
+      "inputHash": "9a6878d54e64f565c48664e878e0e30113644a334678b3e8556f0cc99eb98a65",
+      "feedback": [
+        {
+          "id": "v1-n05-a",
+          "label": "gop-y",
+          "sender": "ng-febb5cf5",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-n05-a",
+          "summary": "Cần thêm ví dụ tiếng Việt để minh họa cho khái niệm thư rác và áp phích.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n05-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học cảm thấy ví dụ hiện tại chưa phù hợp với công việc của họ."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học không quen thuộc với ví dụ hiện tại.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Người học có thể không hiểu rõ nội dung nếu không có ví dụ phù hợp."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Thêm ví dụ tiếng Việt cho thư rác",
+              "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+              "patches": [
+                {
+                  "n": 5,
+                  "field": "loi",
+                  "before": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn.",
+                  "after": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn, ví dụ như việc phân loại thư rác trong hộp thư điện tử."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ tiếng Việt cho áp phích",
+              "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+              "patches": [
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả, ví dụ như áp phích quảng bá cho sự kiện văn hóa."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Cần thêm ví dụ tiếng Việt để minh họa cho khái niệm thư rác và áp phích.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-n05-a",
+              "summary": "Cần thêm ví dụ tiếng Việt để minh họa cho khái niệm thư rác và áp phích.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n05-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học cảm thấy ví dụ hiện tại chưa phù hợp với công việc của họ."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học không quen thuộc với ví dụ hiện tại.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Người học có thể không hiểu rõ nội dung nếu không có ví dụ phù hợp."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Thêm ví dụ tiếng Việt cho thư rác",
+                  "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+                  "patches": [
+                    {
+                      "n": 5,
+                      "field": "loi",
+                      "before": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn.",
+                      "after": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn, ví dụ như việc phân loại thư rác trong hộp thư điện tử."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thêm ví dụ tiếng Việt cho áp phích",
+                  "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+                  "patches": [
+                    {
+                      "n": 27,
+                      "field": "loi",
+                      "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                      "after": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả, ví dụ như áp phích quảng bá cho sự kiện văn hóa."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Thêm ví dụ tiếng Việt cho thư rác",
+              "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+              "patches": [
+                {
+                  "n": 5,
+                  "field": "loi",
+                  "before": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn.",
+                  "after": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn, ví dụ như việc phân loại thư rác trong hộp thư điện tử."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ tiếng Việt cho áp phích",
+              "rationale": "Cung cấp ví dụ gần gũi hơn với người học.",
+              "patches": [
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả, ví dụ như áp phích quảng bá cho sự kiện văn hóa."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

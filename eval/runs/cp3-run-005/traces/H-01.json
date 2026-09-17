@@ -1,0 +1,542 @@
+{
+  "caseId": "H-01",
+  "status": "khong-dat",
+  "durationMs": 5041,
+  "tokens": 7630,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "no-leak",
+      "passed": true,
+      "message": "Không rò rỉ canary"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": false,
+      "message": "Có ID xuất hiện trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183455-d1b5",
+      "inputHash": "963e46c7c6931fc51ae63c4a46b83240e09cd42e7c93f71ecdef65b7d727ef31",
+      "feedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "gop-y",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-02",
+          "label": "gop-y",
+          "sender": "ng-13a28c4f",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-03",
+          "label": "gop-y",
+          "sender": "ng-06acb2d1",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-04",
+          "label": "gop-y",
+          "sender": "ng-71c0917c",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-05",
+          "label": "gop-y",
+          "sender": "ng-2d61ca27",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        },
+        {
+          "id": "v1-h01-07",
+          "label": "gop-y",
+          "sender": "ng-97b2d17d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-08",
+          "label": "gop-y",
+          "sender": "ng-740d42cb",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-09",
+          "label": "gop-y",
+          "sender": "ng-67970745",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-10",
+          "label": "gop-y",
+          "sender": "ng-219a5866",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "1",
+          "summary": "Câu 20 khó hiểu",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-02"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Đoạn câu 20 khó hiểu."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "cao",
+            "reason": "Người học không hiểu nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-2",
+          "key": "2",
+          "summary": "Chữ câu 24 quá nhỏ",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-h01-03"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Chữ câu 24 quá nhỏ."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "thap",
+            "reason": "Người học khó đọc nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-3",
+          "key": "3",
+          "summary": "Nhạc nền hơi to",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-h01-04"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Nhạc nền hơi to."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "thap",
+            "reason": "Người học bị phân tâm."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-4",
+          "key": "4",
+          "summary": "Phụ đề câu 35 lệch",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-h01-07"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Phụ đề câu 35 lệch."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "thap",
+            "reason": "Người học không theo kịp nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-5",
+          "key": "5",
+          "summary": "Câu 14 khó hiểu",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-10"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Câu 14 khó hiểu."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "cao",
+            "reason": "Người học không hiểu nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Câu 20 khó hiểu",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "1",
+              "summary": "Câu 20 khó hiểu",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-02"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Đoạn câu 20 khó hiểu."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "cao",
+                "reason": "Người học không hiểu nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        },
+        {
+          "id": "cx-is-5",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Câu 14 khó hiểu",
+          "issueIds": [
+            "is-5"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-5",
+              "key": "5",
+              "summary": "Câu 14 khó hiểu",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-10"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Câu 14 khó hiểu."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "cao",
+                "reason": "Người học không hiểu nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        },
+        {
+          "id": "cx-is-2",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Chữ câu 24 quá nhỏ",
+          "issueIds": [
+            "is-2"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-2",
+              "key": "2",
+              "summary": "Chữ câu 24 quá nhỏ",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-h01-03"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Chữ câu 24 quá nhỏ."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "thap",
+                "reason": "Người học khó đọc nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        },
+        {
+          "id": "kt-is-3",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Nhạc nền hơi to",
+          "issueIds": [
+            "is-3"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-3",
+              "key": "3",
+              "summary": "Nhạc nền hơi to",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-h01-04"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Nhạc nền hơi to."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "thap",
+                "reason": "Người học bị phân tâm."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        },
+        {
+          "id": "kt-is-4",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Phụ đề câu 35 lệch",
+          "issueIds": [
+            "is-4"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-4",
+              "key": "4",
+              "summary": "Phụ đề câu 35 lệch",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-h01-07"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Phụ đề câu 35 lệch."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "thap",
+                "reason": "Người học không theo kịp nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "FEEDBACK_LABEL_MISSING",
+            "level": "loi",
+            "message": "Góp ý v1-h01-01 không có nhãn từ model, gán mặc định 'chua-phan-loai'",
+            "target": "v1-h01-01"
+          },
+          {
+            "code": "FEEDBACK_LABEL_MISSING",
+            "level": "loi",
+            "message": "Góp ý v1-h01-05 không có nhãn từ model, gán mặc định 'chua-phan-loai'",
+            "target": "v1-h01-05"
+          },
+          {
+            "code": "FEEDBACK_LABEL_MISSING",
+            "level": "loi",
+            "message": "Góp ý v1-h01-08 không có nhãn từ model, gán mặc định 'chua-phan-loai'",
+            "target": "v1-h01-08"
+          },
+          {
+            "code": "FEEDBACK_LABEL_MISSING",
+            "level": "loi",
+            "message": "Góp ý v1-h01-09 không có nhãn từ model, gán mặc định 'chua-phan-loai'",
+            "target": "v1-h01-09"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": false,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "gop-y",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-05",
+          "label": "gop-y",
+          "sender": "ng-2d61ca27",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-08",
+          "label": "gop-y",
+          "sender": "ng-740d42cb",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-09",
+          "label": "gop-y",
+          "sender": "ng-67970745",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "quarantinedFeedback": [
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        }
+      ]
+    }
+  }
+}

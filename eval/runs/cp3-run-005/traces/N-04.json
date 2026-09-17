@@ -1,0 +1,280 @@
+{
+  "caseId": "N-04",
+  "status": "dat",
+  "durationMs": 4524,
+  "tokens": 7023,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n04-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          40
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183406-280f",
+      "inputHash": "ab3eb06a356d6c152bde4b139c5fff3865bbfe9f757c765226306399cc56760f",
+      "feedback": [
+        {
+          "id": "v1-n04-a",
+          "label": "gop-y",
+          "sender": "ng-4a30287b",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "nhip-nhanh-cham",
+          "summary": "Câu kết cuối hơi cụt, không tạo sự liên kết với nội dung tiếp theo.",
+          "category": "nhip-nhanh-cham",
+          "feedbackIds": [
+            "v1-n04-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              40
+            ],
+            "basis": "Câu kết cuối hơi cụt, nên nối sang video sau."
+          },
+          "stances": [
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-n04-a"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học cảm thấy câu kết không đủ mạch lạc để dẫn dắt sang video tiếp theo.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "thap",
+            "reason": "Câu kết không rõ ràng có thể làm người xem không hiểu rõ nội dung tiếp theo."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nối câu kết với video tiếp theo",
+              "rationale": "Cải thiện sự liên kết giữa các video.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến và cách chúng đã phát triển."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm một câu chuyển tiếp",
+              "rationale": "Giúp người xem dễ dàng chuyển tiếp sang video tiếp theo.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến. Hãy cùng theo dõi để khám phá thêm!"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-40-40",
+          "type": "vung",
+          "title": "Câu kết cuối hơi cụt, không tạo sự liên kết với nội dung tiếp theo.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            40
+          ],
+          "tuGiay": 244.2,
+          "denGiay": 251.2,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "nhip-nhanh-cham",
+              "summary": "Câu kết cuối hơi cụt, không tạo sự liên kết với nội dung tiếp theo.",
+              "category": "nhip-nhanh-cham",
+              "feedbackIds": [
+                "v1-n04-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  40
+                ],
+                "basis": "Câu kết cuối hơi cụt, nên nối sang video sau."
+              },
+              "stances": [
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-n04-a"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học cảm thấy câu kết không đủ mạch lạc để dẫn dắt sang video tiếp theo.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "thap",
+                "reason": "Câu kết không rõ ràng có thể làm người xem không hiểu rõ nội dung tiếp theo."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Nối câu kết với video tiếp theo",
+                  "rationale": "Cải thiện sự liên kết giữa các video.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến và cách chúng đã phát triển."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thêm một câu chuyển tiếp",
+                  "rationale": "Giúp người xem dễ dàng chuyển tiếp sang video tiếp theo.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến. Hãy cùng theo dõi để khám phá thêm!"
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nối câu kết với video tiếp theo",
+              "rationale": "Cải thiện sự liên kết giữa các video.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến và cách chúng đã phát triển."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm một câu chuyển tiếp",
+              "rationale": "Giúp người xem dễ dàng chuyển tiếp sang video tiếp theo.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến. Hãy cùng theo dõi để khám phá thêm!"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

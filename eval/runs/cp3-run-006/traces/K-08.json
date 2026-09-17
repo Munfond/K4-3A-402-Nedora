@@ -1,0 +1,154 @@
+{
+  "caseId": "K-08",
+  "status": "dat",
+  "durationMs": 12860,
+  "tokens": 7490,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": true,
+      "message": "Có giả thuyết nguyên nhân hoặc điểm chưa chắc chắn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183850-ed9e",
+      "inputHash": "1a31faa61bbf8bc78da2ce4c860853565a84616c67910e9609f99b40277f2cf4",
+      "feedback": [
+        {
+          "id": "v1-k08-a",
+          "label": "gop-y",
+          "sender": "ng-f2e104cf",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "issue-on-screen-text-legibility",
+          "summary": "Một số chữ trên màn hình có thể nhỏ, gây khó đọc cho người học.",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-k08-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học cho biết chữ trên màn hình có đoạn nhỏ nhưng không nhớ chính xác lúc nào; chưa đủ căn cứ để gán vào câu cụ thể trong kịch bản."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Không xác định được đoạn video hoặc câu kịch bản bị ảnh hưởng.",
+            "Hệ thống chỉ có kịch bản văn bản, không xem được kích thước chữ, độ tương phản và bố cục thực tế trong video.",
+            "Cần kiểm tra liệu vấn đề xảy ra với một màn hình cụ thể hay nhiều đoạn."
+          ],
+          "causeHypothesis": {
+            "text": "Có thể một số dòng chữ dài hoặc nhiều thành phần trên cùng màn hình khiến cỡ chữ bị thu nhỏ; cần kiểm tra bản dựng thực tế để xác nhận.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Chữ nhỏ có thể làm người học bỏ sót thông tin trực quan, nhưng hiện chưa biết phạm vi ảnh hưởng."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Một số chữ trên màn hình có thể nhỏ, gây khó đọc cho người học.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "issue-on-screen-text-legibility",
+              "summary": "Một số chữ trên màn hình có thể nhỏ, gây khó đọc cho người học.",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-k08-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học cho biết chữ trên màn hình có đoạn nhỏ nhưng không nhớ chính xác lúc nào; chưa đủ căn cứ để gán vào câu cụ thể trong kịch bản."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Không xác định được đoạn video hoặc câu kịch bản bị ảnh hưởng.",
+                "Hệ thống chỉ có kịch bản văn bản, không xem được kích thước chữ, độ tương phản và bố cục thực tế trong video.",
+                "Cần kiểm tra liệu vấn đề xảy ra với một màn hình cụ thể hay nhiều đoạn."
+              ],
+              "causeHypothesis": {
+                "text": "Có thể một số dòng chữ dài hoặc nhiều thành phần trên cùng màn hình khiến cỡ chữ bị thu nhỏ; cần kiểm tra bản dựng thực tế để xác nhận.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Chữ nhỏ có thể làm người học bỏ sót thông tin trực quan, nhưng hiện chưa biết phạm vi ảnh hưởng."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "OPTION_EMPTY",
+            "level": "loi",
+            "message": "Phương án is-1-A không có patch và không có unsupportedOperation, bỏ qua",
+            "target": "is-1-A"
+          },
+          {
+            "code": "OPTION_EMPTY",
+            "level": "loi",
+            "message": "Phương án is-1-B không có patch và không có unsupportedOperation, bỏ qua",
+            "target": "is-1-B"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

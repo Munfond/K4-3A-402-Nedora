@@ -1,0 +1,167 @@
+{
+  "caseId": "K-02",
+  "status": "dat",
+  "durationMs": 8,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k02-a,v1-k02-b,v1-k02-c]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          20,
+          21,
+          22,
+          23
+        ]
+      }
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-7a9c",
+      "inputHash": "fd234e109bdea443dd63aac9c3b37dc5c691463cb2a4bc055ffaefacb227966e",
+      "feedback": [
+        {
+          "id": "v1-k02-a",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-b",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-c",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "K02-one-sender",
+          "summary": "Mock issue K02-one-sender",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k02-a",
+            "v1-k02-b",
+            "v1-k02-c"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              20,
+              21,
+              22,
+              23
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 3,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-20-23",
+          "type": "vung",
+          "title": "Mock issue K02-one-sender",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            20,
+            21,
+            22,
+            23
+          ],
+          "tuGiay": 121.5,
+          "denGiay": 146.8,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "K02-one-sender",
+              "summary": "Mock issue K02-one-sender",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k02-a",
+                "v1-k02-b",
+                "v1-k02-c"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 3,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 3,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

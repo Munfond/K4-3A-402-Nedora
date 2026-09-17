@@ -1,0 +1,157 @@
+{
+  "caseId": "N-06",
+  "status": "dat",
+  "durationMs": 10928,
+  "tokens": 7358,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n06-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": []
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183658-ab36",
+      "inputHash": "6b0c8c6cafedd8355a18e9cb1cceffeb52c3783c83e8c77e3aca0eae4e3e7b57",
+      "feedback": [
+        {
+          "id": "v1-n06-a",
+          "label": "gop-y",
+          "sender": "ng-38f23020",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "issue-v1-n06-a-1",
+          "summary": "Chữ trên màn hình ở đoạn có các thẻ ứng dụng có thể quá nhỏ khi xem trên điện thoại.",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-n06-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nêu chung “đoạn các thẻ ứng dụng”, chưa xác định chính xác câu hoặc trường chữ trên màn hình; các câu 22–23 đều đề cập đến ứng dụng và nhiều thành phần."
+          },
+          "stances": [
+            {
+              "direction": "tăng kích thước chữ hoặc giảm lượng chữ",
+              "feedbackIds": [
+                "v1-n06-a"
+              ]
+            }
+          ],
+          "uncertainties": [
+            "Không có thông tin về kích thước chữ thực tế, độ phân giải, bố cục dọc/ngang hoặc thiết bị điện thoại được dùng để xem.",
+            "Chưa xác định được góp ý áp dụng chủ yếu cho câu 22, câu 23 hay một đoạn hình ảnh khác."
+          ],
+          "causeHypothesis": {
+            "text": "Các nhãn mô tả nhiều mô hình hoặc thành phần có thể chứa quá nhiều chữ trong cùng một khung, khiến chữ khó đọc trên màn hình nhỏ.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Chữ khó đọc có thể làm người học bỏ lỡ sự khác nhau giữa ứng dụng và các mô hình phía sau, nhưng chưa đủ thông tin để xác định phạm vi ảnh hưởng."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Chữ trên màn hình ở đoạn có các thẻ ứng dụng có thể quá nhỏ khi xem trên điện thoại.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "issue-v1-n06-a-1",
+              "summary": "Chữ trên màn hình ở đoạn có các thẻ ứng dụng có thể quá nhỏ khi xem trên điện thoại.",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-n06-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nêu chung “đoạn các thẻ ứng dụng”, chưa xác định chính xác câu hoặc trường chữ trên màn hình; các câu 22–23 đều đề cập đến ứng dụng và nhiều thành phần."
+              },
+              "stances": [
+                {
+                  "direction": "tăng kích thước chữ hoặc giảm lượng chữ",
+                  "feedbackIds": [
+                    "v1-n06-a"
+                  ]
+                }
+              ],
+              "uncertainties": [
+                "Không có thông tin về kích thước chữ thực tế, độ phân giải, bố cục dọc/ngang hoặc thiết bị điện thoại được dùng để xem.",
+                "Chưa xác định được góp ý áp dụng chủ yếu cho câu 22, câu 23 hay một đoạn hình ảnh khác."
+              ],
+              "causeHypothesis": {
+                "text": "Các nhãn mô tả nhiều mô hình hoặc thành phần có thể chứa quá nhiều chữ trong cùng một khung, khiến chữ khó đọc trên màn hình nhỏ.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Chữ khó đọc có thể làm người học bỏ lỡ sự khác nhau giữa ứng dụng và các mô hình phía sau, nhưng chưa đủ thông tin để xác định phạm vi ảnh hưởng."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

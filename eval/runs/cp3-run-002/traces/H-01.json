@@ -1,0 +1,31 @@
+{
+  "caseId": "H-01",
+  "status": "loi",
+  "durationMs": 666,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": false,
+      "message": "Kỳ vọng done, nhận loi"
+    },
+    {
+      "type": "no-leak",
+      "passed": true,
+      "message": "Không rò rỉ canary"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": true,
+      "message": "Không có ID nào trong [v1-h01-01,v1-h01-02,v1-h01-03,v1-h01-04,v1-h01-05,v1-h01-06,v1-h01-07,v1-h01-08,v1-h01-09,v1-h01-10] nằm trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "loi",
+    "error": {
+      "code": "OUTPUT_SCHEMA_INVALID",
+      "message": "Dữ liệu đầu ra của model không khớp schema quy định: Invalid schema for response_format 'response': In context=('properties', 'issues', 'items', 'properties', 'causeHypothesis', 'anyOf', '0'), 'additionalProperties' is required to be supplied and to be false.",
+      "isRetryable": true
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "caseId": "K-07",
+  "status": "dat",
+  "durationMs": 8,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k07-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          14
+        ]
+      }
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": true,
+      "message": "Có giả thuyết nguyên nhân hoặc điểm chưa chắc chắn"
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-1bd4",
+      "inputHash": "633cf81ef9f2986243b7eb183c47ed2726bef114cd1bca59afeadc3ddc8da799",
+      "feedback": [
+        {
+          "id": "v1-k07-a",
+          "label": "gop-y",
+          "sender": "ng-54b03704",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "K07-gen-def",
+          "summary": "Mock issue K07-gen-def",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k07-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              14
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [
+            "Mock giữ bất định theo contract"
+          ],
+          "causeHypothesis": {
+            "text": "Mock chưa đủ dữ kiện",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-14-14",
+          "type": "vung",
+          "title": "Mock issue K07-gen-def",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            14
+          ],
+          "tuGiay": 80.6,
+          "denGiay": 88.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "K07-gen-def",
+              "summary": "Mock issue K07-gen-def",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k07-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  14
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [
+                "Mock giữ bất định theo contract"
+              ],
+              "causeHypothesis": {
+                "text": "Mock chưa đủ dữ kiện",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

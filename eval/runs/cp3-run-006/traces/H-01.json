@@ -1,0 +1,1224 @@
+{
+  "caseId": "H-01",
+  "status": "khong-dat",
+  "durationMs": 39026,
+  "tokens": 11229,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "no-leak",
+      "passed": true,
+      "message": "Không rò rỉ canary"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": false,
+      "message": "Có ID xuất hiện trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183903-ae26",
+      "inputHash": "963e46c7c6931fc51ae63c4a46b83240e09cd42e7c93f71ecdef65b7d727ef31",
+      "feedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "nhieu",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-02",
+          "label": "gop-y",
+          "sender": "ng-13a28c4f",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-03",
+          "label": "gop-y",
+          "sender": "ng-06acb2d1",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-04",
+          "label": "gop-y",
+          "sender": "ng-71c0917c",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-05",
+          "label": "gop-y",
+          "sender": "ng-2d61ca27",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        },
+        {
+          "id": "v1-h01-07",
+          "label": "gop-y",
+          "sender": "ng-97b2d17d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-08",
+          "label": "gop-y",
+          "sender": "ng-740d42cb",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-09",
+          "label": "gop-y",
+          "sender": "ng-67970745",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-h01-10",
+          "label": "gop-y",
+          "sender": "ng-219a5866",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "app-model-kho-hieu",
+          "summary": "Mối quan hệ giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn chưa rõ đối với người học.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-02",
+            "v1-h01-05"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              20
+            ],
+            "basis": "Một góp ý chỉ rõ câu hai mươi; nội dung câu này trực tiếp giải thích ứng dụng trò chuyện và mô hình ngôn ngữ lớn. Góp ý còn lại nêu cùng cặp khái niệm nhưng không chỉ rõ vị trí."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Không xác định được người học gặp khó ở thuật ngữ, sơ đồ minh họa hay cách phân biệt vai trò của hai thành phần.",
+            "Hệ thống chỉ đối chiếu kịch bản, chưa xem được hình ảnh thực tế."
+          ],
+          "causeHypothesis": {
+            "text": "Câu hai mươi dùng cụm “mô hình xử lý” nhưng chưa nói rõ ứng dụng là giao diện nhận yêu cầu, còn mô hình là thành phần phía sau tạo câu trả lời.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Nhầm lẫn hai thành phần có thể khiến người học hiểu ứng dụng chính là mô hình."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nói rõ vai trò của ứng dụng và mô hình ngay trong câu hai mươi",
+              "rationale": "Giữ nguyên cấu trúc bài nhưng diễn giải trực tiếp nơi nhập câu hỏi và thành phần xử lý phía sau.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Đối chiếu ứng dụng và mô hình bằng cách nói ngắn gọn hơn",
+              "rationale": "Giảm số ý trong câu để người học dễ nắm quan hệ giữa giao diện và thành phần xử lý.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện nhận câu hỏi, còn mô hình ngôn ngữ lớn phía sau xử lý câu hỏi và viết câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-2",
+          "key": "chu-cau-24-nho",
+          "summary": "Chữ trên màn hình ở câu hai mươi bốn bị phản hồi là quá nhỏ.",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-h01-03"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              24
+            ],
+            "basis": "Góp ý chỉ rõ câu hai mươi bốn và phản ánh trực tiếp dòng chữ trên màn hình của câu đó."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết kích thước chữ thực tế, độ phân giải đầu ra và liệu các dòng chữ khác cũng gặp tình trạng tương tự.",
+            "Hệ thống không xem được video thực tế."
+          ],
+          "causeHypothesis": {
+            "text": "Dòng chữ trên màn hình có thể có kích thước hoặc độ tương phản chưa đủ khi hiển thị trong khung video.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Người học có thể không đọc được nhãn của ví dụ đang được giới thiệu."
+          },
+          "options": [
+            {
+              "id": "is-2-A",
+              "label": "A",
+              "title": "Rút gọn nhãn để dễ hiển thị",
+              "rationale": "Giảm độ dài dòng chữ, giúp tăng khả năng đọc mà không đổi ý nghĩa.",
+              "patches": [
+                {
+                  "n": 24,
+                  "field": "chuTrenManHinh",
+                  "before": "Ví dụ 1: lọc thư rác",
+                  "after": "Ví dụ một: lọc thư rác"
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": "Nếu chữ vẫn nhỏ do thiết kế khung hình, cần tăng cỡ chữ hoặc điều chỉnh bố cục.",
+              "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước, độ tương phản và khả năng đọc của dòng chữ trong video.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-2-B",
+              "label": "B",
+              "title": "Dùng nhãn ngắn hơn nữa",
+              "rationale": "Ưu tiên khả năng đọc bằng cách giữ lại chủ đề chính của ví dụ.",
+              "patches": [
+                {
+                  "n": 24,
+                  "field": "chuTrenManHinh",
+                  "before": "Ví dụ 1: lọc thư rác",
+                  "after": "Lọc thư rác"
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": "Nội dung “Ví dụ một” không còn hiện trên màn hình.",
+              "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước và vị trí dòng chữ trong video.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-3",
+          "key": "nhac-nen-to",
+          "summary": "Nhạc nền được phản hồi là hơi to so với lời đọc.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-h01-04"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nêu nhạc nền nhưng không chỉ rõ câu hoặc đoạn thời gian."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa xác định được đoạn nhạc bị phản ánh và mức âm lượng thực tế.",
+            "Hệ thống không nghe được bản dựng video."
+          ],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Nhạc nền lớn có thể che lời giảng và làm giảm khả năng tiếp nhận nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-4",
+          "key": "le-phu-de-cau-35",
+          "summary": "Mốc phụ đề ở câu ba mươi lăm bị lệch.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-h01-07"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              35
+            ],
+            "basis": "Góp ý chỉ rõ phụ đề câu ba mươi lăm bị lệch; câu này có khoảng lặng và không có lời đọc."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết phụ đề xuất hiện sớm hay muộn và lệch bao nhiêu thời gian.",
+            "Hệ thống không xem được bản dựng và mốc phụ đề thực tế."
+          ],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "cao",
+            "reason": "Phụ đề lệch khỏi nhịp hiển thị có thể làm người học khó theo dõi câu hỏi và khoảng suy nghĩ."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-5",
+          "key": "vi-du-chua-sat-cong-viec",
+          "summary": "Ví dụ trong video chưa được người học cảm nhận là sát với công việc của họ.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-08"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý nói ví dụ chưa sát công việc nhưng không nêu công việc, ví dụ hoặc câu cụ thể cần thay."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết công việc hoặc bối cảnh chuyên môn của người học.",
+            "Chưa biết người học muốn thay ví dụ về lọc thư, tạo áp phích hay trợ lý soạn thư.",
+            "Cần xác nhận thêm trước khi tạo patch lời đọc hoặc hình ảnh."
+          ],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "thap",
+            "reason": "Ví dụ kém liên hệ có thể làm giảm mức độ gắn kết, nhưng chưa đủ thông tin để xác định phần cần sửa."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-6",
+          "key": "cau-chot-cun",
+          "summary": "Câu kết của video được nhận xét là hơi cụt và chưa tạo chuyển tiếp tự nhiên sang video tiếp theo.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-09"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              40
+            ],
+            "basis": "Góp ý nói “câu chốt”; trong kịch bản, câu bốn mươi là câu kết và giới thiệu video tiếp theo."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết người học thấy cụt vì lời đọc, chữ trên màn hình hay nhịp kết thúc.",
+            "Hệ thống không xem được cách đọc và khoảng dừng thực tế."
+          ],
+          "causeHypothesis": {
+            "text": "Câu kết hiện có giới thiệu chủ đề tiếp theo nhưng chưa dùng một cụm chuyển tiếp để nối lại nội dung vừa học với bài sau.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "thap",
+            "reason": "Câu kết chưa tự nhiên có thể làm giảm cảm giác hoàn chỉnh của video nhưng không ảnh hưởng trực tiếp đến khái niệm chính."
+          },
+          "options": [
+            {
+              "id": "is-6-A",
+              "label": "A",
+              "title": "Thêm mối liên hệ với nội dung vừa học",
+              "rationale": "Giữ thông tin về video tiếp theo và tạo cầu nối rõ hơn từ bản đồ khái niệm hiện tại.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Từ bản đồ khái niệm này, ở video tiếp theo mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-6-B",
+              "label": "B",
+              "title": "Dùng câu kết ngắn và tự nhiên hơn",
+              "rationale": "Giảm cảm giác cụt bằng cách dùng động từ “xem lại” và giữ trọng tâm của bài sau.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ xem lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-7",
+          "key": "cau-14-kho-hieu",
+          "summary": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu mười bốn được phản hồi là khó hiểu.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-h01-10"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              14
+            ],
+            "basis": "Góp ý chỉ rõ câu mười bốn; câu này định nghĩa trí tuệ nhân tạo tạo sinh."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết người học khó ở thuật ngữ “tạo sinh”, quan hệ với học máy hay các ví dụ đầu ra.",
+            "Hệ thống chỉ đối chiếu văn bản, chưa xem được minh họa đi kèm."
+          ],
+          "causeHypothesis": {
+            "text": "Câu hiện tại dùng cụm “tên gọi cho những hệ thống tạo nội dung” khá khái quát và chưa nhấn mạnh hành động tạo ra nội dung mới.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Đây là định nghĩa nền tảng cho phần phân biệt tạo sinh với phân loại, nên khó hiểu có thể ảnh hưởng các câu sau."
+          },
+          "options": [
+            {
+              "id": "is-7-A",
+              "label": "A",
+              "title": "Định nghĩa bằng hành động tạo nội dung mới",
+              "rationale": "Dùng cấu trúc trực tiếp hơn và vẫn giữ đủ các ví dụ văn bản, hình ảnh, âm thanh.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo ra nội dung mới như văn bản, hình ảnh hoặc âm thanh từ yêu cầu của người dùng."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-7-B",
+              "label": "B",
+              "title": "Đối lập tạo sinh với việc chỉ phân loại",
+              "rationale": "Liên kết định nghĩa mới với khó khăn đã nêu ở phần bộ lọc thư, giúp người học phân biệt đầu ra.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo nội dung mới như văn bản, hình ảnh hoặc âm thanh, thay vì chỉ gắn nhãn cho dữ liệu."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-20-20",
+          "type": "vung",
+          "title": "Mối quan hệ giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn chưa rõ đối với người học.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            20
+          ],
+          "tuGiay": 121.5,
+          "denGiay": 128.6,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "app-model-kho-hieu",
+              "summary": "Mối quan hệ giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn chưa rõ đối với người học.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-02",
+                "v1-h01-05"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  20
+                ],
+                "basis": "Một góp ý chỉ rõ câu hai mươi; nội dung câu này trực tiếp giải thích ứng dụng trò chuyện và mô hình ngôn ngữ lớn. Góp ý còn lại nêu cùng cặp khái niệm nhưng không chỉ rõ vị trí."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Không xác định được người học gặp khó ở thuật ngữ, sơ đồ minh họa hay cách phân biệt vai trò của hai thành phần.",
+                "Hệ thống chỉ đối chiếu kịch bản, chưa xem được hình ảnh thực tế."
+              ],
+              "causeHypothesis": {
+                "text": "Câu hai mươi dùng cụm “mô hình xử lý” nhưng chưa nói rõ ứng dụng là giao diện nhận yêu cầu, còn mô hình là thành phần phía sau tạo câu trả lời.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Nhầm lẫn hai thành phần có thể khiến người học hiểu ứng dụng chính là mô hình."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Nói rõ vai trò của ứng dụng và mô hình ngay trong câu hai mươi",
+                  "rationale": "Giữ nguyên cấu trúc bài nhưng diễn giải trực tiếp nơi nhập câu hỏi và thành phần xử lý phía sau.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Đối chiếu ứng dụng và mô hình bằng cách nói ngắn gọn hơn",
+                  "rationale": "Giảm số ý trong câu để người học dễ nắm quan hệ giữa giao diện và thành phần xử lý.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện nhận câu hỏi, còn mô hình ngôn ngữ lớn phía sau xử lý câu hỏi và viết câu trả lời."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nói rõ vai trò của ứng dụng và mô hình ngay trong câu hai mươi",
+              "rationale": "Giữ nguyên cấu trúc bài nhưng diễn giải trực tiếp nơi nhập câu hỏi và thành phần xử lý phía sau.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Đối chiếu ứng dụng và mô hình bằng cách nói ngắn gọn hơn",
+              "rationale": "Giảm số ý trong câu để người học dễ nắm quan hệ giữa giao diện và thành phần xử lý.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện nhận câu hỏi, còn mô hình ngôn ngữ lớn phía sau xử lý câu hỏi và viết câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": []
+        },
+        {
+          "id": "rg-14-14",
+          "type": "vung",
+          "title": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu mười bốn được phản hồi là khó hiểu.",
+          "issueIds": [
+            "is-7"
+          ],
+          "sentenceNs": [
+            14
+          ],
+          "tuGiay": 80.6,
+          "denGiay": 88.5,
+          "issues": [
+            {
+              "id": "is-7",
+              "key": "cau-14-kho-hieu",
+              "summary": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu mười bốn được phản hồi là khó hiểu.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-10"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  14
+                ],
+                "basis": "Góp ý chỉ rõ câu mười bốn; câu này định nghĩa trí tuệ nhân tạo tạo sinh."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết người học khó ở thuật ngữ “tạo sinh”, quan hệ với học máy hay các ví dụ đầu ra.",
+                "Hệ thống chỉ đối chiếu văn bản, chưa xem được minh họa đi kèm."
+              ],
+              "causeHypothesis": {
+                "text": "Câu hiện tại dùng cụm “tên gọi cho những hệ thống tạo nội dung” khá khái quát và chưa nhấn mạnh hành động tạo ra nội dung mới.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Đây là định nghĩa nền tảng cho phần phân biệt tạo sinh với phân loại, nên khó hiểu có thể ảnh hưởng các câu sau."
+              },
+              "options": [
+                {
+                  "id": "is-7-A",
+                  "label": "A",
+                  "title": "Định nghĩa bằng hành động tạo nội dung mới",
+                  "rationale": "Dùng cấu trúc trực tiếp hơn và vẫn giữ đủ các ví dụ văn bản, hình ảnh, âm thanh.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo ra nội dung mới như văn bản, hình ảnh hoặc âm thanh từ yêu cầu của người dùng."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-7-B",
+                  "label": "B",
+                  "title": "Đối lập tạo sinh với việc chỉ phân loại",
+                  "rationale": "Liên kết định nghĩa mới với khó khăn đã nêu ở phần bộ lọc thư, giúp người học phân biệt đầu ra.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo nội dung mới như văn bản, hình ảnh hoặc âm thanh, thay vì chỉ gắn nhãn cho dữ liệu."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-7-A",
+              "label": "A",
+              "title": "Định nghĩa bằng hành động tạo nội dung mới",
+              "rationale": "Dùng cấu trúc trực tiếp hơn và vẫn giữ đủ các ví dụ văn bản, hình ảnh, âm thanh.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo ra nội dung mới như văn bản, hình ảnh hoặc âm thanh từ yêu cầu của người dùng."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-7-B",
+              "label": "B",
+              "title": "Đối lập tạo sinh với việc chỉ phân loại",
+              "rationale": "Liên kết định nghĩa mới với khó khăn đã nêu ở phần bộ lọc thư, giúp người học phân biệt đầu ra.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là khả năng tạo nội dung mới như văn bản, hình ảnh hoặc âm thanh, thay vì chỉ gắn nhãn cho dữ liệu."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        },
+        {
+          "id": "rg-24-24",
+          "type": "vung",
+          "title": "Chữ trên màn hình ở câu hai mươi bốn bị phản hồi là quá nhỏ.",
+          "issueIds": [
+            "is-2"
+          ],
+          "sentenceNs": [
+            24
+          ],
+          "tuGiay": 146.8,
+          "denGiay": 153.2,
+          "issues": [
+            {
+              "id": "is-2",
+              "key": "chu-cau-24-nho",
+              "summary": "Chữ trên màn hình ở câu hai mươi bốn bị phản hồi là quá nhỏ.",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-h01-03"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  24
+                ],
+                "basis": "Góp ý chỉ rõ câu hai mươi bốn và phản ánh trực tiếp dòng chữ trên màn hình của câu đó."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết kích thước chữ thực tế, độ phân giải đầu ra và liệu các dòng chữ khác cũng gặp tình trạng tương tự.",
+                "Hệ thống không xem được video thực tế."
+              ],
+              "causeHypothesis": {
+                "text": "Dòng chữ trên màn hình có thể có kích thước hoặc độ tương phản chưa đủ khi hiển thị trong khung video.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Người học có thể không đọc được nhãn của ví dụ đang được giới thiệu."
+              },
+              "options": [
+                {
+                  "id": "is-2-A",
+                  "label": "A",
+                  "title": "Rút gọn nhãn để dễ hiển thị",
+                  "rationale": "Giảm độ dài dòng chữ, giúp tăng khả năng đọc mà không đổi ý nghĩa.",
+                  "patches": [
+                    {
+                      "n": 24,
+                      "field": "chuTrenManHinh",
+                      "before": "Ví dụ 1: lọc thư rác",
+                      "after": "Ví dụ một: lọc thư rác"
+                    }
+                  ],
+                  "expectedEffect": "mot-phan",
+                  "remaining": "Nếu chữ vẫn nhỏ do thiết kế khung hình, cần tăng cỡ chữ hoặc điều chỉnh bố cục.",
+                  "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước, độ tương phản và khả năng đọc của dòng chữ trong video.",
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-2-B",
+                  "label": "B",
+                  "title": "Dùng nhãn ngắn hơn nữa",
+                  "rationale": "Ưu tiên khả năng đọc bằng cách giữ lại chủ đề chính của ví dụ.",
+                  "patches": [
+                    {
+                      "n": 24,
+                      "field": "chuTrenManHinh",
+                      "before": "Ví dụ 1: lọc thư rác",
+                      "after": "Lọc thư rác"
+                    }
+                  ],
+                  "expectedEffect": "mot-phan",
+                  "remaining": "Nội dung “Ví dụ một” không còn hiện trên màn hình.",
+                  "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước và vị trí dòng chữ trong video.",
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-2-A",
+              "label": "A",
+              "title": "Rút gọn nhãn để dễ hiển thị",
+              "rationale": "Giảm độ dài dòng chữ, giúp tăng khả năng đọc mà không đổi ý nghĩa.",
+              "patches": [
+                {
+                  "n": 24,
+                  "field": "chuTrenManHinh",
+                  "before": "Ví dụ 1: lọc thư rác",
+                  "after": "Ví dụ một: lọc thư rác"
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": "Nếu chữ vẫn nhỏ do thiết kế khung hình, cần tăng cỡ chữ hoặc điều chỉnh bố cục.",
+              "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước, độ tương phản và khả năng đọc của dòng chữ trong video.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-2-B",
+              "label": "B",
+              "title": "Dùng nhãn ngắn hơn nữa",
+              "rationale": "Ưu tiên khả năng đọc bằng cách giữ lại chủ đề chính của ví dụ.",
+              "patches": [
+                {
+                  "n": 24,
+                  "field": "chuTrenManHinh",
+                  "before": "Ví dụ 1: lọc thư rác",
+                  "after": "Lọc thư rác"
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": "Nội dung “Ví dụ một” không còn hiện trên màn hình.",
+              "needsHumanCheck": "Người dựng cần kiểm tra trực tiếp kích thước và vị trí dòng chữ trong video.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        },
+        {
+          "id": "rg-40-40",
+          "type": "vung",
+          "title": "Câu kết của video được nhận xét là hơi cụt và chưa tạo chuyển tiếp tự nhiên sang video tiếp theo.",
+          "issueIds": [
+            "is-6"
+          ],
+          "sentenceNs": [
+            40
+          ],
+          "tuGiay": 244.2,
+          "denGiay": 251.2,
+          "issues": [
+            {
+              "id": "is-6",
+              "key": "cau-chot-cun",
+              "summary": "Câu kết của video được nhận xét là hơi cụt và chưa tạo chuyển tiếp tự nhiên sang video tiếp theo.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-09"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  40
+                ],
+                "basis": "Góp ý nói “câu chốt”; trong kịch bản, câu bốn mươi là câu kết và giới thiệu video tiếp theo."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết người học thấy cụt vì lời đọc, chữ trên màn hình hay nhịp kết thúc.",
+                "Hệ thống không xem được cách đọc và khoảng dừng thực tế."
+              ],
+              "causeHypothesis": {
+                "text": "Câu kết hiện có giới thiệu chủ đề tiếp theo nhưng chưa dùng một cụm chuyển tiếp để nối lại nội dung vừa học với bài sau.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "thap",
+                "reason": "Câu kết chưa tự nhiên có thể làm giảm cảm giác hoàn chỉnh của video nhưng không ảnh hưởng trực tiếp đến khái niệm chính."
+              },
+              "options": [
+                {
+                  "id": "is-6-A",
+                  "label": "A",
+                  "title": "Thêm mối liên hệ với nội dung vừa học",
+                  "rationale": "Giữ thông tin về video tiếp theo và tạo cầu nối rõ hơn từ bản đồ khái niệm hiện tại.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Từ bản đồ khái niệm này, ở video tiếp theo mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-6-B",
+                  "label": "B",
+                  "title": "Dùng câu kết ngắn và tự nhiên hơn",
+                  "rationale": "Giảm cảm giác cụt bằng cách dùng động từ “xem lại” và giữ trọng tâm của bài sau.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Ở video tiếp theo, mình sẽ xem lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-6-A",
+              "label": "A",
+              "title": "Thêm mối liên hệ với nội dung vừa học",
+              "rationale": "Giữ thông tin về video tiếp theo và tạo cầu nối rõ hơn từ bản đồ khái niệm hiện tại.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Từ bản đồ khái niệm này, ở video tiếp theo mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-6-B",
+              "label": "B",
+              "title": "Dùng câu kết ngắn và tự nhiên hơn",
+              "rationale": "Giảm cảm giác cụt bằng cách dùng động từ “xem lại” và giữ trọng tâm của bài sau.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ xem lại lịch sử trí tuệ nhân tạo để hiểu vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        },
+        {
+          "id": "cx-is-5",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Ví dụ trong video chưa được người học cảm nhận là sát với công việc của họ.",
+          "issueIds": [
+            "is-5"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-5",
+              "key": "vi-du-chua-sat-cong-viec",
+              "summary": "Ví dụ trong video chưa được người học cảm nhận là sát với công việc của họ.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-h01-08"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý nói ví dụ chưa sát công việc nhưng không nêu công việc, ví dụ hoặc câu cụ thể cần thay."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết công việc hoặc bối cảnh chuyên môn của người học.",
+                "Chưa biết người học muốn thay ví dụ về lọc thư, tạo áp phích hay trợ lý soạn thư.",
+                "Cần xác nhận thêm trước khi tạo patch lời đọc hoặc hình ảnh."
+              ],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "thap",
+                "reason": "Ví dụ kém liên hệ có thể làm giảm mức độ gắn kết, nhưng chưa đủ thông tin để xác định phần cần sửa."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        },
+        {
+          "id": "kt-is-4",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Mốc phụ đề ở câu ba mươi lăm bị lệch.",
+          "issueIds": [
+            "is-4"
+          ],
+          "sentenceNs": [
+            35
+          ],
+          "tuGiay": 212.1,
+          "denGiay": 217.1,
+          "issues": [
+            {
+              "id": "is-4",
+              "key": "le-phu-de-cau-35",
+              "summary": "Mốc phụ đề ở câu ba mươi lăm bị lệch.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-h01-07"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  35
+                ],
+                "basis": "Góp ý chỉ rõ phụ đề câu ba mươi lăm bị lệch; câu này có khoảng lặng và không có lời đọc."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết phụ đề xuất hiện sớm hay muộn và lệch bao nhiêu thời gian.",
+                "Hệ thống không xem được bản dựng và mốc phụ đề thực tế."
+              ],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "cao",
+                "reason": "Phụ đề lệch khỏi nhịp hiển thị có thể làm người học khó theo dõi câu hỏi và khoảng suy nghĩ."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        },
+        {
+          "id": "kt-is-3",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Nhạc nền được phản hồi là hơi to so với lời đọc.",
+          "issueIds": [
+            "is-3"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-3",
+              "key": "nhac-nen-to",
+              "summary": "Nhạc nền được phản hồi là hơi to so với lời đọc.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-h01-04"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nêu nhạc nền nhưng không chỉ rõ câu hoặc đoạn thời gian."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa xác định được đoạn nhạc bị phản ánh và mức âm lượng thực tế.",
+                "Hệ thống không nghe được bản dựng video."
+              ],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Nhạc nền lớn có thể che lời giảng và làm giảm khả năng tiếp nhận nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [
+        {
+          "id": "v1-h01-01",
+          "label": "nhieu",
+          "sender": "ng-54f70c49",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "quarantinedFeedback": [
+        {
+          "id": "v1-h01-06",
+          "label": "cong-kich",
+          "sender": "ng-b39cf711",
+          "channel": "khao-sat",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        }
+      ]
+    }
+  }
+}

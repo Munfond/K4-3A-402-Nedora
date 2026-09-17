@@ -1,0 +1,285 @@
+{
+  "caseId": "K-07",
+  "status": "dat",
+  "durationMs": 3851,
+  "tokens": 7049,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k07-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          14
+        ]
+      }
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": true,
+      "message": "Có giả thuyết nguyên nhân hoặc điểm chưa chắc chắn"
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183449-99c3",
+      "inputHash": "633cf81ef9f2986243b7eb183c47ed2726bef114cd1bca59afeadc3ddc8da799",
+      "feedback": [
+        {
+          "id": "v1-k07-a",
+          "label": "gop-y",
+          "sender": "ng-54b03704",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "1",
+          "summary": "Câu 14 có thể gây khó hiểu do chứa quá nhiều ví dụ về trí tuệ nhân tạo tạo sinh.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k07-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              14
+            ],
+            "basis": "Người học cho rằng câu 14 nhồi quá nhiều ví dụ."
+          },
+          "stances": [
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-k07-a"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học có thể không rõ ràng về định nghĩa tạo sinh do nhiều ví dụ trong câu.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Khó khăn trong việc hiểu định nghĩa tạo sinh có thể ảnh hưởng đến việc tiếp thu kiến thức."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm số lượng ví dụ trong câu 14",
+              "rationale": "Giúp định nghĩa tạo sinh rõ ràng hơn.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm giải thích ngắn gọn về tạo sinh",
+              "rationale": "Cung cấp thêm thông tin để làm rõ định nghĩa.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, như văn bản, hình ảnh hoặc âm thanh, mà không chỉ đơn thuần là phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-14-14",
+          "type": "vung",
+          "title": "Câu 14 có thể gây khó hiểu do chứa quá nhiều ví dụ về trí tuệ nhân tạo tạo sinh.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            14
+          ],
+          "tuGiay": 80.6,
+          "denGiay": 88.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "1",
+              "summary": "Câu 14 có thể gây khó hiểu do chứa quá nhiều ví dụ về trí tuệ nhân tạo tạo sinh.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k07-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  14
+                ],
+                "basis": "Người học cho rằng câu 14 nhồi quá nhiều ví dụ."
+              },
+              "stances": [
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-k07-a"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học có thể không rõ ràng về định nghĩa tạo sinh do nhiều ví dụ trong câu.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Khó khăn trong việc hiểu định nghĩa tạo sinh có thể ảnh hưởng đến việc tiếp thu kiến thức."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giảm số lượng ví dụ trong câu 14",
+                  "rationale": "Giúp định nghĩa tạo sinh rõ ràng hơn.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thêm giải thích ngắn gọn về tạo sinh",
+                  "rationale": "Cung cấp thêm thông tin để làm rõ định nghĩa.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, như văn bản, hình ảnh hoặc âm thanh, mà không chỉ đơn thuần là phân loại."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm số lượng ví dụ trong câu 14",
+              "rationale": "Giúp định nghĩa tạo sinh rõ ràng hơn.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm giải thích ngắn gọn về tạo sinh",
+              "rationale": "Cung cấp thêm thông tin để làm rõ định nghĩa.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, như văn bản, hình ảnh hoặc âm thanh, mà không chỉ đơn thuần là phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

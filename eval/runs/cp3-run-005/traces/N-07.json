@@ -1,0 +1,61 @@
+{
+  "caseId": "N-07",
+  "status": "dat",
+  "durationMs": 1614,
+  "tokens": 6587,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "label",
+      "passed": true,
+      "message": "Nhãn khen khớp kỳ vọng"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": true,
+      "message": "Không có ID nào trong [v1-n07-a] nằm trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183419-e5bb",
+      "inputHash": "0fa596a7b2dfbe6a3b67eb1d65ca987e0cf93fb3bd738a3614713cfa08cb6849",
+      "feedback": [
+        {
+          "id": "v1-n07-a",
+          "label": "khen",
+          "sender": "ng-a356eac8",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [],
+      "cases": [],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [
+        {
+          "id": "v1-n07-a",
+          "label": "khen",
+          "sender": "ng-a356eac8",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "quarantinedFeedback": []
+    }
+  }
+}

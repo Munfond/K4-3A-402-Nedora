@@ -1,0 +1,272 @@
+{
+  "caseId": "N-04",
+  "status": "dat",
+  "durationMs": 13648,
+  "tokens": 7797,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n04-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          40
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183624-3f75",
+      "inputHash": "ab3eb06a356d6c152bde4b139c5fff3865bbfe9f757c765226306399cc56760f",
+      "feedback": [
+        {
+          "id": "v1-n04-a",
+          "label": "gop-y",
+          "sender": "ng-4a30287b",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "transition-final-to-next",
+          "summary": "Câu kết chưa tạo được cầu nối đủ rõ từ nội dung vừa học sang chủ đề lịch sử ở video tiếp theo.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n04-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              40
+            ],
+            "basis": "Góp ý nhắc đến câu kết cuối và việc nối sang video sau; câu bốn mươi là câu kết của kịch bản và đã đề cập video tiếp theo."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Không xem được video thực tế nên chưa xác định được độ cụt do cách đọc, khoảng dừng hay chỉ do nội dung lời đọc.",
+            "Chưa rõ người góp ý muốn nhấn mạnh phần tóm tắt bài hiện tại hay lý do chuyển sang chủ đề lịch sử."
+          ],
+          "causeHypothesis": {
+            "text": "Câu hiện tại chỉ thông báo chủ đề video sau mà chưa liên kết trực tiếp chủ đề đó với bản đồ khái niệm vừa trình bày.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Việc chuyển sang video sau có thể vẫn hiểu được, nhưng mạch bài và động lực xem tiếp chưa thật liền mạch."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nêu rõ lý do cần xem lịch sử",
+              "rationale": "Tạo quan hệ nguyên nhân và kết quả giữa các khái niệm vừa học với lịch sử phát triển của trí tuệ nhân tạo.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu những bước phát triển nào đã đưa các công cụ này đến gần cuộc sống hôm nay."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Dùng bản đồ hiện tại làm điểm xuất phát",
+              "rationale": "Liên kết trực tiếp phần tổng kết của bài với hành trình tìm hiểu lịch sử, giúp lời chuyển tiếp tự nhiên hơn.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Từ bản đồ vừa hoàn tất, video tiếp theo sẽ lần theo lịch sử trí tuệ nhân tạo để giải thích vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-40-40",
+          "type": "vung",
+          "title": "Câu kết chưa tạo được cầu nối đủ rõ từ nội dung vừa học sang chủ đề lịch sử ở video tiếp theo.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            40
+          ],
+          "tuGiay": 244.2,
+          "denGiay": 251.2,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "transition-final-to-next",
+              "summary": "Câu kết chưa tạo được cầu nối đủ rõ từ nội dung vừa học sang chủ đề lịch sử ở video tiếp theo.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n04-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  40
+                ],
+                "basis": "Góp ý nhắc đến câu kết cuối và việc nối sang video sau; câu bốn mươi là câu kết của kịch bản và đã đề cập video tiếp theo."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Không xem được video thực tế nên chưa xác định được độ cụt do cách đọc, khoảng dừng hay chỉ do nội dung lời đọc.",
+                "Chưa rõ người góp ý muốn nhấn mạnh phần tóm tắt bài hiện tại hay lý do chuyển sang chủ đề lịch sử."
+              ],
+              "causeHypothesis": {
+                "text": "Câu hiện tại chỉ thông báo chủ đề video sau mà chưa liên kết trực tiếp chủ đề đó với bản đồ khái niệm vừa trình bày.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Việc chuyển sang video sau có thể vẫn hiểu được, nhưng mạch bài và động lực xem tiếp chưa thật liền mạch."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Nêu rõ lý do cần xem lịch sử",
+                  "rationale": "Tạo quan hệ nguyên nhân và kết quả giữa các khái niệm vừa học với lịch sử phát triển của trí tuệ nhân tạo.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu những bước phát triển nào đã đưa các công cụ này đến gần cuộc sống hôm nay."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Dùng bản đồ hiện tại làm điểm xuất phát",
+                  "rationale": "Liên kết trực tiếp phần tổng kết của bài với hành trình tìm hiểu lịch sử, giúp lời chuyển tiếp tự nhiên hơn.",
+                  "patches": [
+                    {
+                      "n": 40,
+                      "field": "loi",
+                      "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                      "after": "Từ bản đồ vừa hoàn tất, video tiếp theo sẽ lần theo lịch sử trí tuệ nhân tạo để giải thích vì sao các công cụ này ngày càng phổ biến."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nêu rõ lý do cần xem lịch sử",
+              "rationale": "Tạo quan hệ nguyên nhân và kết quả giữa các khái niệm vừa học với lịch sử phát triển của trí tuệ nhân tạo.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử trí tuệ nhân tạo để hiểu những bước phát triển nào đã đưa các công cụ này đến gần cuộc sống hôm nay."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Dùng bản đồ hiện tại làm điểm xuất phát",
+              "rationale": "Liên kết trực tiếp phần tổng kết của bài với hành trình tìm hiểu lịch sử, giúp lời chuyển tiếp tự nhiên hơn.",
+              "patches": [
+                {
+                  "n": 40,
+                  "field": "loi",
+                  "before": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+                  "after": "Từ bản đồ vừa hoàn tất, video tiếp theo sẽ lần theo lịch sử trí tuệ nhân tạo để giải thích vì sao các công cụ này ngày càng phổ biến."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

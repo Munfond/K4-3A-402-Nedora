@@ -1,0 +1,141 @@
+{
+  "caseId": "N-08",
+  "status": "dat",
+  "durationMs": 6,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n08-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          31,
+          32
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-3aa9",
+      "inputHash": "4562077ca24cd1cabc2e2fb68b7a0326e0acef643ac35fcbdf427550f6ea5427",
+      "feedback": [
+        {
+          "id": "v1-n08-a",
+          "label": "gop-y",
+          "sender": "ng-a22a2353",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "N08-task-change",
+          "summary": "Mock issue N08-task-change",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n08-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              31,
+              32
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-31-32",
+          "type": "vung",
+          "title": "Mock issue N08-task-change",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            31,
+            32
+          ],
+          "tuGiay": 187.1,
+          "denGiay": 202.1,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "N08-task-change",
+              "summary": "Mock issue N08-task-change",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n08-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  31,
+                  32
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

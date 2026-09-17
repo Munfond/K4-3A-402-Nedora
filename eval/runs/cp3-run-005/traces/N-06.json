@@ -1,0 +1,279 @@
+{
+  "caseId": "N-06",
+  "status": "khong-dat",
+  "durationMs": 3934,
+  "tokens": 7024,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n06-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          30
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": false,
+      "message": "Định vị không khớp kỳ vọng"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183415-feb2",
+      "inputHash": "6b0c8c6cafedd8355a18e9cb1cceffeb52c3783c83e8c77e3aca0eae4e3e7b57",
+      "feedback": [
+        {
+          "id": "v1-n06-a",
+          "label": "gop-y",
+          "sender": "ng-38f23020",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-n06-a",
+          "summary": "Chữ trên màn hình quá nhỏ, khó đọc trên điện thoại.",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-n06-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              30
+            ],
+            "basis": "Người học phản hồi rằng chữ trên màn hình ở đoạn các thẻ ứng dụng quá nhỏ trên điện thoại."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học có thể đang sử dụng điện thoại với màn hình nhỏ.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Khó khăn trong việc đọc nội dung có thể ảnh hưởng đến trải nghiệm học tập."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Tăng kích thước chữ trên màn hình",
+              "rationale": "Giúp người học dễ dàng đọc nội dung hơn trên điện thoại.",
+              "patches": [
+                {
+                  "n": 30,
+                  "field": "chuTrenManHinh",
+                  "before": "Mô hình ngôn ngữ lớn tạo văn bản",
+                  "after": "Mô hình ngôn ngữ lớn tạo văn bản (kích thước chữ lớn hơn)"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Chữ trên màn hình vượt quá 40 ký tự (57)"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi bố cục hiển thị",
+              "rationale": "Cải thiện khả năng đọc bằng cách thay đổi cách bố trí các thẻ ứng dụng.",
+              "patches": [
+                {
+                  "n": 30,
+                  "field": "yDoHinh",
+                  "before": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, rồi tới các vùng học máy và trí tuệ nhân tạo; không đưa mọi mô hình ngôn ngữ vào vùng tạo sinh.",
+                  "after": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, với bố cục dễ đọc hơn."
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-30-30",
+          "type": "vung",
+          "title": "Chữ trên màn hình quá nhỏ, khó đọc trên điện thoại.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            30
+          ],
+          "tuGiay": 181.5,
+          "denGiay": 187.1,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-n06-a",
+              "summary": "Chữ trên màn hình quá nhỏ, khó đọc trên điện thoại.",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-n06-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  30
+                ],
+                "basis": "Người học phản hồi rằng chữ trên màn hình ở đoạn các thẻ ứng dụng quá nhỏ trên điện thoại."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học có thể đang sử dụng điện thoại với màn hình nhỏ.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Khó khăn trong việc đọc nội dung có thể ảnh hưởng đến trải nghiệm học tập."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Tăng kích thước chữ trên màn hình",
+                  "rationale": "Giúp người học dễ dàng đọc nội dung hơn trên điện thoại.",
+                  "patches": [
+                    {
+                      "n": 30,
+                      "field": "chuTrenManHinh",
+                      "before": "Mô hình ngôn ngữ lớn tạo văn bản",
+                      "after": "Mô hình ngôn ngữ lớn tạo văn bản (kích thước chữ lớn hơn)"
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Chữ trên màn hình vượt quá 40 ký tự (57)"
+                  ]
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thay đổi bố cục hiển thị",
+                  "rationale": "Cải thiện khả năng đọc bằng cách thay đổi cách bố trí các thẻ ứng dụng.",
+                  "patches": [
+                    {
+                      "n": 30,
+                      "field": "yDoHinh",
+                      "before": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, rồi tới các vùng học máy và trí tuệ nhân tạo; không đưa mọi mô hình ngôn ngữ vào vùng tạo sinh.",
+                      "after": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, với bố cục dễ đọc hơn."
+                    }
+                  ],
+                  "expectedEffect": "mot-phan",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Tăng kích thước chữ trên màn hình",
+              "rationale": "Giúp người học dễ dàng đọc nội dung hơn trên điện thoại.",
+              "patches": [
+                {
+                  "n": 30,
+                  "field": "chuTrenManHinh",
+                  "before": "Mô hình ngôn ngữ lớn tạo văn bản",
+                  "after": "Mô hình ngôn ngữ lớn tạo văn bản (kích thước chữ lớn hơn)"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Chữ trên màn hình vượt quá 40 ký tự (57)"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi bố cục hiển thị",
+              "rationale": "Cải thiện khả năng đọc bằng cách thay đổi cách bố trí các thẻ ứng dụng.",
+              "patches": [
+                {
+                  "n": 30,
+                  "field": "yDoHinh",
+                  "before": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, rồi tới các vùng học máy và trí tuệ nhân tạo; không đưa mọi mô hình ngôn ngữ vào vùng tạo sinh.",
+                  "after": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, với bố cục dễ đọc hơn."
+                }
+              ],
+              "expectedEffect": "mot-phan",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "SCREEN_TEXT_TOO_LONG",
+            "level": "loi",
+            "message": "Chữ trên màn hình câu 30 dài 57 ký tự (vượt mức 40 ký tự)",
+            "target": "is-1-A"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": false
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

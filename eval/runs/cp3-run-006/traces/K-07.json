@@ -1,0 +1,275 @@
+{
+  "caseId": "K-07",
+  "status": "dat",
+  "durationMs": 12062,
+  "tokens": 7572,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k07-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          14
+        ]
+      }
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": true,
+      "message": "Có giả thuyết nguyên nhân hoặc điểm chưa chắc chắn"
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183838-ff61",
+      "inputHash": "633cf81ef9f2986243b7eb183c47ed2726bef114cd1bca59afeadc3ddc8da799",
+      "feedback": [
+        {
+          "id": "v1-k07-a",
+          "label": "gop-y",
+          "sender": "ng-54b03704",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-k07-a-i1",
+          "summary": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu 14 có thể khiến người học khó nắm ý chính vì đưa nhiều loại nội dung làm ví dụ trong cùng một câu.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k07-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              14
+            ],
+            "basis": "Góp ý chỉ rõ câu 14 và nhận xét câu này nhồi quá nhiều ví dụ."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Hệ thống chỉ đối chiếu được kịch bản văn bản, chưa xem hoặc nghe được video thực tế để đánh giá nhịp đọc và mức độ quá tải khi trình bày."
+          ],
+          "causeHypothesis": {
+            "text": "Câu định nghĩa đưa đồng thời văn bản, hình ảnh và âm thanh làm ví dụ, khiến trọng tâm khái niệm bị phân tán.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Đây là khái niệm nền tảng của phần tạo sinh; cách diễn đạt chưa rõ có thể khiến người học phải hỏi lại định nghĩa."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giữ định nghĩa và rút gọn ví dụ",
+              "rationale": "Giữ cấu trúc giải thích hiện tại nhưng giảm số ví dụ để người học tập trung vào ý chính là tạo nội dung mới.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống có thể tạo ra nội dung mới, chẳng hạn văn bản hoặc hình ảnh."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Định nghĩa bằng cách đối chiếu với phân loại",
+              "rationale": "Làm rõ bản chất của tạo sinh bằng sự đối lập trực tiếp với nhiệm vụ phân loại, thay vì liệt kê nhiều loại nội dung.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo ra nội dung mới thay vì chỉ gán nhãn cho dữ liệu có sẵn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-14-14",
+          "type": "vung",
+          "title": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu 14 có thể khiến người học khó nắm ý chính vì đưa nhiều loại nội dung làm ví dụ trong cùng một câu.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            14
+          ],
+          "tuGiay": 80.6,
+          "denGiay": 88.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-k07-a-i1",
+              "summary": "Định nghĩa về trí tuệ nhân tạo tạo sinh ở câu 14 có thể khiến người học khó nắm ý chính vì đưa nhiều loại nội dung làm ví dụ trong cùng một câu.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k07-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  14
+                ],
+                "basis": "Góp ý chỉ rõ câu 14 và nhận xét câu này nhồi quá nhiều ví dụ."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Hệ thống chỉ đối chiếu được kịch bản văn bản, chưa xem hoặc nghe được video thực tế để đánh giá nhịp đọc và mức độ quá tải khi trình bày."
+              ],
+              "causeHypothesis": {
+                "text": "Câu định nghĩa đưa đồng thời văn bản, hình ảnh và âm thanh làm ví dụ, khiến trọng tâm khái niệm bị phân tán.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Đây là khái niệm nền tảng của phần tạo sinh; cách diễn đạt chưa rõ có thể khiến người học phải hỏi lại định nghĩa."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giữ định nghĩa và rút gọn ví dụ",
+                  "rationale": "Giữ cấu trúc giải thích hiện tại nhưng giảm số ví dụ để người học tập trung vào ý chính là tạo nội dung mới.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống có thể tạo ra nội dung mới, chẳng hạn văn bản hoặc hình ảnh."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Định nghĩa bằng cách đối chiếu với phân loại",
+                  "rationale": "Làm rõ bản chất của tạo sinh bằng sự đối lập trực tiếp với nhiệm vụ phân loại, thay vì liệt kê nhiều loại nội dung.",
+                  "patches": [
+                    {
+                      "n": 14,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                      "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo ra nội dung mới thay vì chỉ gán nhãn cho dữ liệu có sẵn."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giữ định nghĩa và rút gọn ví dụ",
+              "rationale": "Giữ cấu trúc giải thích hiện tại nhưng giảm số ví dụ để người học tập trung vào ý chính là tạo nội dung mới.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống có thể tạo ra nội dung mới, chẳng hạn văn bản hoặc hình ảnh."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Định nghĩa bằng cách đối chiếu với phân loại",
+              "rationale": "Làm rõ bản chất của tạo sinh bằng sự đối lập trực tiếp với nhiệm vụ phân loại, thay vì liệt kê nhiều loại nội dung.",
+              "patches": [
+                {
+                  "n": 14,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+                  "after": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo ra nội dung mới thay vì chỉ gán nhãn cho dữ liệu có sẵn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

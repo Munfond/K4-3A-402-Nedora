@@ -1,0 +1,21 @@
+{
+  "runId": "cp3-run-002",
+  "createdAt": "2026-09-17T10:58:28.603Z",
+  "model": "openai/gpt-4o-mini",
+  "isMock": false,
+  "promptVersion": "revision-cp3@1",
+  "promptHash": "f82b058e6d60796a7914c4c1c348d5c90c748cca806ada323c11caec4fc34bfe",
+  "schemaVersion": "hackathon-revision-agent/1",
+  "policyVersion": "cp3@1",
+  "goldenSetHash": "0588ca3afdd4cd2151dc83d34677862466671dc3ede3b25ed03ab826f960b437",
+  "goldenSetFile": "eval/golden/golden-set.v1.json",
+  "coverageHash": "c6481ba52eaab6dfe06987fb292e8c6a6df09e0260d81adf589fc628a3cbdaba",
+  "coverageFile": "eval/golden/COVERAGE-v1.md",
+  "ingestionContractFile": "eval/ingestion-cases.v1.json",
+  "commitSha": "2edd5c2e48817fc5be3713e640d5b26792ae72b0",
+  "caseCount": 20,
+  "passedCount": 3,
+  "failedCount": 0,
+  "errorCount": 17,
+  "passRate": "15.0%"
+}

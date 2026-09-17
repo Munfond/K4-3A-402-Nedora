@@ -1,0 +1,179 @@
+{
+  "caseId": "K-03",
+  "status": "dat",
+  "durationMs": 9,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k03-a,v1-k03-b]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          35
+        ]
+      }
+    },
+    {
+      "type": "disagreement",
+      "passed": true,
+      "message": "Có ý kiến trái chiều giữa các nhóm"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-558c",
+      "inputHash": "57ad3c888ca144ed5e438a37324472642de5d9af07c7fc2255088318b94f7771",
+      "feedback": [
+        {
+          "id": "v1-k03-a",
+          "label": "gop-y",
+          "sender": "ng-819e1bd2",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k03-b",
+          "label": "gop-y",
+          "sender": "ng-abd0f969",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "K03-pause-conflict",
+          "summary": "Mock issue K03-pause-conflict",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k03-a",
+            "v1-k03-b"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              35
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [
+            {
+              "direction": "can-giu",
+              "feedbackIds": [
+                "v1-k03-a"
+              ]
+            },
+            {
+              "direction": "co-the-bo",
+              "feedbackIds": [
+                "v1-k03-b"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": true
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-35-35",
+          "type": "vung",
+          "title": "Mock issue K03-pause-conflict",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            35
+          ],
+          "tuGiay": 212.1,
+          "denGiay": 217.1,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "K03-pause-conflict",
+              "summary": "Mock issue K03-pause-conflict",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k03-a",
+                "v1-k03-b"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  35
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [
+                {
+                  "direction": "can-giu",
+                  "feedbackIds": [
+                    "v1-k03-a"
+                  ]
+                },
+                {
+                  "direction": "co-the-bo",
+                  "feedbackIds": [
+                    "v1-k03-b"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": true
+            }
+          ],
+          "options": [],
+          "hasDisagreement": true,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": [
+            "Trái chiều"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

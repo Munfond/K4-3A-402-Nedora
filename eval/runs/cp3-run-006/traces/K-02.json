@@ -1,0 +1,433 @@
+{
+  "caseId": "K-02",
+  "status": "dat",
+  "durationMs": 16410,
+  "tokens": 8215,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k02-a,v1-k02-b,v1-k02-c]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          20,
+          21,
+          39
+        ]
+      }
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183736-9b30",
+      "inputHash": "fd234e109bdea443dd63aac9c3b37dc5c691463cb2a4bc055ffaefacb227966e",
+      "feedback": [
+        {
+          "id": "v1-k02-a",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-b",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-c",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "app-va-mo-hinh-chua-ro",
+          "summary": "Người học chưa phân biệt rõ ứng dụng trò chuyện là giao diện hoặc lớp sử dụng, còn mô hình là thành phần phía sau xử lý thông tin và tạo đầu ra.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k02-a",
+            "v1-k02-b",
+            "v1-k02-c"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              20,
+              21,
+              39
+            ],
+            "basis": "Các góp ý đều nhắc trực tiếp đến sự khác nhau giữa app chat và mô hình; kịch bản giải thích chủ yếu ở câu hai mươi, câu hai mươi mốt và câu ba mươi chín."
+          },
+          "stances": [
+            {
+              "direction": "can-lam-ro-ranh-gioi-ung-dung-va-mo-hinh",
+              "feedbackIds": [
+                "v1-k02-a",
+                "v1-k02-b",
+                "v1-k02-c"
+              ]
+            }
+          ],
+          "uncertainties": [
+            "Chỉ có thể đối chiếu lời đọc và chữ trên màn hình trong kịch bản, chưa xác nhận được cách minh họa trực quan trong video hiện tại.",
+            "Chưa biết người học cần ví dụ đời thường hay sơ đồ luồng xử lý để hiểu rõ hơn."
+          ],
+          "causeHypothesis": {
+            "text": "Kịch bản đã mô tả ứng dụng và mô hình ở các câu liên tiếp nhưng chưa đưa ra một định nghĩa đối lập, ngắn gọn ngay tại lần đầu giới thiệu.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Nhầm lẫn này ảnh hưởng đến việc hiểu mối quan hệ giữa ứng dụng trò chuyện, mô hình ngôn ngữ lớn và các công cụ tạo sinh, nhưng không làm sai toàn bộ phần phân biệt khái niệm."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Định nghĩa trực tiếp bằng luồng nhập và xử lý",
+              "rationale": "Nêu rõ vai trò của hai thành phần ngay khi giới thiệu ứng dụng trò chuyện, đồng thời nhấn mạnh người học tương tác với ứng dụng chứ không trực tiếp với mô hình.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                },
+                {
+                  "n": 20,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                  "after": "Ứng dụng nhận · Mô hình xử lý"
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn tương tác với ứng dụng, còn mô hình phía sau nhận thông tin từ ứng dụng để xử lý và gửi câu trả lời trở lại."
+                },
+                {
+                  "n": 21,
+                  "field": "chuTrenManHinh",
+                  "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                  "after": "Ứng dụng nhận · Mô hình xử lý"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Giải thích theo hai lớp của cùng một hệ thống",
+              "rationale": "Tập trung vào quan hệ lớp bên ngoài và thành phần bên trong, giúp người học hiểu rằng một ứng dụng có thể kết nối với nhiều mô hình khác nhau.",
+              "patches": [
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng là lớp người dùng nhìn thấy và có thể kết nối với nhiều mô hình khác nhau để thực hiện các công việc khác nhau."
+                },
+                {
+                  "n": 22,
+                  "field": "chuTrenManHinh",
+                  "before": "Một ứng dụng, nhiều thành phần",
+                  "after": "Một ứng dụng · Nhiều mô hình"
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì vậy, tên ứng dụng bạn đang mở chỉ cho biết lớp công cụ bạn đang dùng, không nhất thiết cho biết mô hình nào đang xử lý ở bên trong."
+                },
+                {
+                  "n": 23,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng có thể dùng nhiều mô hình",
+                  "after": "Ứng dụng không phải tên mô hình"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 3,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Người học chưa phân biệt rõ ứng dụng trò chuyện là giao diện hoặc lớp sử dụng, còn mô hình là thành phần phía sau xử lý thông tin và tạo đầu ra.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            20,
+            21,
+            39
+          ],
+          "tuGiay": 121.5,
+          "denGiay": 244.2,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "app-va-mo-hinh-chua-ro",
+              "summary": "Người học chưa phân biệt rõ ứng dụng trò chuyện là giao diện hoặc lớp sử dụng, còn mô hình là thành phần phía sau xử lý thông tin và tạo đầu ra.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k02-a",
+                "v1-k02-b",
+                "v1-k02-c"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  20,
+                  21,
+                  39
+                ],
+                "basis": "Các góp ý đều nhắc trực tiếp đến sự khác nhau giữa app chat và mô hình; kịch bản giải thích chủ yếu ở câu hai mươi, câu hai mươi mốt và câu ba mươi chín."
+              },
+              "stances": [
+                {
+                  "direction": "can-lam-ro-ranh-gioi-ung-dung-va-mo-hinh",
+                  "feedbackIds": [
+                    "v1-k02-a",
+                    "v1-k02-b",
+                    "v1-k02-c"
+                  ]
+                }
+              ],
+              "uncertainties": [
+                "Chỉ có thể đối chiếu lời đọc và chữ trên màn hình trong kịch bản, chưa xác nhận được cách minh họa trực quan trong video hiện tại.",
+                "Chưa biết người học cần ví dụ đời thường hay sơ đồ luồng xử lý để hiểu rõ hơn."
+              ],
+              "causeHypothesis": {
+                "text": "Kịch bản đã mô tả ứng dụng và mô hình ở các câu liên tiếp nhưng chưa đưa ra một định nghĩa đối lập, ngắn gọn ngay tại lần đầu giới thiệu.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Nhầm lẫn này ảnh hưởng đến việc hiểu mối quan hệ giữa ứng dụng trò chuyện, mô hình ngôn ngữ lớn và các công cụ tạo sinh, nhưng không làm sai toàn bộ phần phân biệt khái niệm."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Định nghĩa trực tiếp bằng luồng nhập và xử lý",
+                  "rationale": "Nêu rõ vai trò của hai thành phần ngay khi giới thiệu ứng dụng trò chuyện, đồng thời nhấn mạnh người học tương tác với ứng dụng chứ không trực tiếp với mô hình.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                    },
+                    {
+                      "n": 20,
+                      "field": "chuTrenManHinh",
+                      "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                      "after": "Ứng dụng nhận · Mô hình xử lý"
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Bạn tương tác với ứng dụng, còn mô hình phía sau nhận thông tin từ ứng dụng để xử lý và gửi câu trả lời trở lại."
+                    },
+                    {
+                      "n": 21,
+                      "field": "chuTrenManHinh",
+                      "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                      "after": "Ứng dụng nhận · Mô hình xử lý"
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Giải thích theo hai lớp của cùng một hệ thống",
+                  "rationale": "Tập trung vào quan hệ lớp bên ngoài và thành phần bên trong, giúp người học hiểu rằng một ứng dụng có thể kết nối với nhiều mô hình khác nhau.",
+                  "patches": [
+                    {
+                      "n": 22,
+                      "field": "loi",
+                      "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                      "after": "Một ứng dụng là lớp người dùng nhìn thấy và có thể kết nối với nhiều mô hình khác nhau để thực hiện các công việc khác nhau."
+                    },
+                    {
+                      "n": 22,
+                      "field": "chuTrenManHinh",
+                      "before": "Một ứng dụng, nhiều thành phần",
+                      "after": "Một ứng dụng · Nhiều mô hình"
+                    },
+                    {
+                      "n": 23,
+                      "field": "loi",
+                      "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                      "after": "Vì vậy, tên ứng dụng bạn đang mở chỉ cho biết lớp công cụ bạn đang dùng, không nhất thiết cho biết mô hình nào đang xử lý ở bên trong."
+                    },
+                    {
+                      "n": 23,
+                      "field": "chuTrenManHinh",
+                      "before": "Ứng dụng có thể dùng nhiều mô hình",
+                      "after": "Ứng dụng không phải tên mô hình"
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 3,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Định nghĩa trực tiếp bằng luồng nhập và xử lý",
+              "rationale": "Nêu rõ vai trò của hai thành phần ngay khi giới thiệu ứng dụng trò chuyện, đồng thời nhấn mạnh người học tương tác với ứng dụng chứ không trực tiếp với mô hình.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau xử lý câu hỏi và tạo câu trả lời."
+                },
+                {
+                  "n": 20,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                  "after": "Ứng dụng nhận · Mô hình xử lý"
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn tương tác với ứng dụng, còn mô hình phía sau nhận thông tin từ ứng dụng để xử lý và gửi câu trả lời trở lại."
+                },
+                {
+                  "n": 21,
+                  "field": "chuTrenManHinh",
+                  "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                  "after": "Ứng dụng nhận · Mô hình xử lý"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Giải thích theo hai lớp của cùng một hệ thống",
+              "rationale": "Tập trung vào quan hệ lớp bên ngoài và thành phần bên trong, giúp người học hiểu rằng một ứng dụng có thể kết nối với nhiều mô hình khác nhau.",
+              "patches": [
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng là lớp người dùng nhìn thấy và có thể kết nối với nhiều mô hình khác nhau để thực hiện các công việc khác nhau."
+                },
+                {
+                  "n": 22,
+                  "field": "chuTrenManHinh",
+                  "before": "Một ứng dụng, nhiều thành phần",
+                  "after": "Một ứng dụng · Nhiều mô hình"
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì vậy, tên ứng dụng bạn đang mở chỉ cho biết lớp công cụ bạn đang dùng, không nhất thiết cho biết mô hình nào đang xử lý ở bên trong."
+                },
+                {
+                  "n": 23,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng có thể dùng nhiều mô hình",
+                  "after": "Ứng dụng không phải tên mô hình"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 3,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "LOCATION_DOWNGRADED",
+            "level": "ghi-nhan",
+            "message": "Vị trí trải dài 20 câu (> 5 câu), hạ về 'can-xac-nhan'",
+            "target": "app-va-mo-hinh-chua-ro"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

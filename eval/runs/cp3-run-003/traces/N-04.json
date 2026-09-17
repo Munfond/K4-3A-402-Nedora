@@ -1,0 +1,141 @@
+{
+  "caseId": "N-04",
+  "status": "dat",
+  "durationMs": 7,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n04-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          39,
+          40
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-1d73",
+      "inputHash": "ab3eb06a356d6c152bde4b139c5fff3865bbfe9f757c765226306399cc56760f",
+      "feedback": [
+        {
+          "id": "v1-n04-a",
+          "label": "gop-y",
+          "sender": "ng-4a30287b",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "N04-closing",
+          "summary": "Mock issue N04-closing",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n04-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              39,
+              40
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-39-40",
+          "type": "vung",
+          "title": "Mock issue N04-closing",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            39,
+            40
+          ],
+          "tuGiay": 237.2,
+          "denGiay": 251.2,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "N04-closing",
+              "summary": "Mock issue N04-closing",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n04-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  39,
+                  40
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

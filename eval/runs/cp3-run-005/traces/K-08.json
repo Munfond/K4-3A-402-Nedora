@@ -1,0 +1,127 @@
+{
+  "caseId": "K-08",
+  "status": "khong-dat",
+  "durationMs": 2359,
+  "tokens": 6701,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": false,
+      "message": "Thiếu giả thuyết và điểm chưa chắc chắn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183453-c536",
+      "inputHash": "1a31faa61bbf8bc78da2ce4c860853565a84616c67910e9609f99b40277f2cf4",
+      "feedback": [
+        {
+          "id": "v1-k08-a",
+          "label": "gop-y",
+          "sender": "ng-f2e104cf",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "hinh-anh",
+          "summary": "Chữ trên màn hình nhỏ, khó đọc.",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-k08-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học không nhớ chính xác lúc nào."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "thap",
+            "reason": "Khó khăn trong việc theo dõi nội dung."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Chữ trên màn hình nhỏ, khó đọc.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "hinh-anh",
+              "summary": "Chữ trên màn hình nhỏ, khó đọc.",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-k08-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học không nhớ chính xác lúc nào."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "thap",
+                "reason": "Khó khăn trong việc theo dõi nội dung."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

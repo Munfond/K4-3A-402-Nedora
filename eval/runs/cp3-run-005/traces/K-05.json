@@ -1,0 +1,68 @@
+{
+  "caseId": "K-05",
+  "status": "dat",
+  "durationMs": 1292,
+  "tokens": 6591,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "label",
+      "passed": true,
+      "message": "Nhãn cong-kich khớp kỳ vọng"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": true,
+      "message": "Không có ID nào trong [v1-k05-a] nằm trong vấn đề"
+    },
+    {
+      "type": "no-leak",
+      "passed": true,
+      "message": "Không rò rỉ canary"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183444-dd9f",
+      "inputHash": "4837ad51355254946fa7c402bef76a4d9a8fd0811ca5c2b2024cf351bdf35bfc",
+      "feedback": [
+        {
+          "id": "v1-k05-a",
+          "label": "cong-kich",
+          "sender": "ng-223eff17",
+          "channel": "binh-luan",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        }
+      ],
+      "issues": [],
+      "cases": [],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": [
+        {
+          "id": "v1-k05-a",
+          "label": "cong-kich",
+          "sender": "ng-223eff17",
+          "channel": "binh-luan",
+          "isQuarantined": true,
+          "quarantineReason": "Nội dung công kích cá nhân"
+        }
+      ]
+    }
+  }
+}

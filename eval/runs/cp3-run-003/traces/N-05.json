@@ -1,0 +1,154 @@
+{
+  "caseId": "N-05",
+  "status": "dat",
+  "durationMs": 8,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n05-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          7,
+          8,
+          17
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-577e",
+      "inputHash": "9a6878d54e64f565c48664e878e0e30113644a334678b3e8556f0cc99eb98a65",
+      "feedback": [
+        {
+          "id": "v1-n05-a",
+          "label": "gop-y",
+          "sender": "ng-febb5cf5",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "N05-example",
+          "summary": "Mock issue N05-example",
+          "category": "noi-dung-sai",
+          "feedbackIds": [
+            "v1-n05-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              7,
+              8,
+              17
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Mock issue N05-example",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            7,
+            8,
+            17
+          ],
+          "tuGiay": 40.6,
+          "denGiay": 108.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "N05-example",
+              "summary": "Mock issue N05-example",
+              "category": "noi-dung-sai",
+              "feedbackIds": [
+                "v1-n05-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  7,
+                  8,
+                  17
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "LOCATION_DOWNGRADED",
+            "level": "ghi-nhan",
+            "message": "Vị trí trải dài 11 câu (> 5 câu), hạ về 'can-xac-nhan'",
+            "target": "N05-example"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

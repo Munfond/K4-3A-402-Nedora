@@ -1,0 +1,327 @@
+{
+  "caseId": "N-01",
+  "status": "khong-dat",
+  "durationMs": 9979,
+  "tokens": 7319,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": false,
+      "message": "Không tìm thấy vấn đề thỏa mãn"
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 2"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183345-9f77",
+      "inputHash": "e7bafbe3e2f1a16e7e3a8ddb81940cb833254e720d9f2063a448cf022d3d39d2",
+      "feedback": [
+        {
+          "id": "v1-n01-a",
+          "label": "gop-y",
+          "sender": "ng-78ed1a0e",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-n01-b",
+          "label": "gop-y",
+          "sender": "ng-6222ed55",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "1",
+          "summary": "Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình phía sau.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n01-a",
+            "v1-n01-b"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học lẫn lộn ứng dụng trò chuyện với mô hình phía sau."
+          },
+          "stances": [
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-n01-a"
+              ]
+            },
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-n01-b"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học chưa hiểu rõ về chức năng của ứng dụng và mô hình.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Người học có thể không hiểu nội dung chính của video."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ hơn về ứng dụng và mô hình",
+              "rationale": "Cần làm rõ sự khác biệt giữa ứng dụng trò chuyện và mô hình phía sau để người học dễ hiểu hơn.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là giao diện mà bạn tương tác, trong khi mô hình ngôn ngữ lớn là phần xử lý thông tin để tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn gõ câu hỏi trong khung trò chuyện, và mô hình ngôn ngữ lớn phía sau sẽ xử lý thông tin để tạo ra câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ minh họa",
+              "rationale": "Cung cấp ví dụ cụ thể để làm rõ sự khác biệt giữa ứng dụng và mô hình.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện nhận câu hỏi của bạn, ví dụ như hỏi về thời tiết, và mô hình ngôn ngữ lớn sẽ xử lý thông tin để tạo câu trả lời như \"Hôm nay trời nắng\"."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn gõ câu hỏi trong khung trò chuyện, ví dụ như \"Tôi nên mặc gì hôm nay?\", và mô hình sẽ trả lời dựa trên thông tin đã học."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình phía sau.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "1",
+              "summary": "Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình phía sau.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n01-a",
+                "v1-n01-b"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học lẫn lộn ứng dụng trò chuyện với mô hình phía sau."
+              },
+              "stances": [
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-n01-a"
+                  ]
+                },
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-n01-b"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học chưa hiểu rõ về chức năng của ứng dụng và mô hình.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Người học có thể không hiểu nội dung chính của video."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giải thích rõ hơn về ứng dụng và mô hình",
+                  "rationale": "Cần làm rõ sự khác biệt giữa ứng dụng trò chuyện và mô hình phía sau để người học dễ hiểu hơn.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện là giao diện mà bạn tương tác, trong khi mô hình ngôn ngữ lớn là phần xử lý thông tin để tạo câu trả lời."
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Bạn gõ câu hỏi trong khung trò chuyện, và mô hình ngôn ngữ lớn phía sau sẽ xử lý thông tin để tạo ra câu trả lời."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thêm ví dụ minh họa",
+                  "rationale": "Cung cấp ví dụ cụ thể để làm rõ sự khác biệt giữa ứng dụng và mô hình.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện nhận câu hỏi của bạn, ví dụ như hỏi về thời tiết, và mô hình ngôn ngữ lớn sẽ xử lý thông tin để tạo câu trả lời như \"Hôm nay trời nắng\"."
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Bạn gõ câu hỏi trong khung trò chuyện, ví dụ như \"Tôi nên mặc gì hôm nay?\", và mô hình sẽ trả lời dựa trên thông tin đã học."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ hơn về ứng dụng và mô hình",
+              "rationale": "Cần làm rõ sự khác biệt giữa ứng dụng trò chuyện và mô hình phía sau để người học dễ hiểu hơn.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là giao diện mà bạn tương tác, trong khi mô hình ngôn ngữ lớn là phần xử lý thông tin để tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn gõ câu hỏi trong khung trò chuyện, và mô hình ngôn ngữ lớn phía sau sẽ xử lý thông tin để tạo ra câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ minh họa",
+              "rationale": "Cung cấp ví dụ cụ thể để làm rõ sự khác biệt giữa ứng dụng và mô hình.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện nhận câu hỏi của bạn, ví dụ như hỏi về thời tiết, và mô hình ngôn ngữ lớn sẽ xử lý thông tin để tạo câu trả lời như \"Hôm nay trời nắng\"."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn gõ câu hỏi trong khung trò chuyện, ví dụ như \"Tôi nên mặc gì hôm nay?\", và mô hình sẽ trả lời dựa trên thông tin đã học."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

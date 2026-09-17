@@ -1,0 +1,292 @@
+{
+  "caseId": "K-03",
+  "status": "dat",
+  "durationMs": 4796,
+  "tokens": 7148,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-k03-a,v1-k03-b]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          35
+        ]
+      }
+    },
+    {
+      "type": "disagreement",
+      "passed": true,
+      "message": "Có ý kiến trái chiều giữa các nhóm"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183435-7932",
+      "inputHash": "57ad3c888ca144ed5e438a37324472642de5d9af07c7fc2255088318b94f7771",
+      "feedback": [
+        {
+          "id": "v1-k03-a",
+          "label": "gop-y",
+          "sender": "ng-819e1bd2",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k03-b",
+          "label": "gop-y",
+          "sender": "ng-abd0f969",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "nhip-nhanh-cham",
+          "summary": "Khoảng dừng 5 giây không phù hợp với nhu cầu của người học.",
+          "category": "nhip-nhanh-cham",
+          "feedbackIds": [
+            "v1-k03-a",
+            "v1-k03-b"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              35
+            ],
+            "basis": "Người học có ý kiến trái chiều về khoảng dừng 5 giây."
+          },
+          "stances": [
+            {
+              "direction": "tăng",
+              "feedbackIds": [
+                "v1-k03-a"
+              ]
+            },
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-k03-b"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học có thể có nhu cầu khác nhau về thời gian suy nghĩ.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Khoảng dừng không phù hợp có thể ảnh hưởng đến khả năng tiếp thu thông tin của người học."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Tăng khoảng dừng lên 7 giây",
+              "rationale": "Để người học có thêm thời gian suy nghĩ.",
+              "patches": [],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Câu 35 là khoảng lặng dừng giây"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Giảm khoảng dừng xuống 3 giây",
+              "rationale": "Để tránh cảm giác sốt ruột cho người học.",
+              "patches": [],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Câu 35 là khoảng lặng dừng giây"
+              ]
+            }
+          ],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": true
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Khoảng dừng 5 giây không phù hợp với nhu cầu của người học.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            35
+          ],
+          "tuGiay": 212.1,
+          "denGiay": 217.1,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "nhip-nhanh-cham",
+              "summary": "Khoảng dừng 5 giây không phù hợp với nhu cầu của người học.",
+              "category": "nhip-nhanh-cham",
+              "feedbackIds": [
+                "v1-k03-a",
+                "v1-k03-b"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  35
+                ],
+                "basis": "Người học có ý kiến trái chiều về khoảng dừng 5 giây."
+              },
+              "stances": [
+                {
+                  "direction": "tăng",
+                  "feedbackIds": [
+                    "v1-k03-a"
+                  ]
+                },
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-k03-b"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học có thể có nhu cầu khác nhau về thời gian suy nghĩ.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Khoảng dừng không phù hợp có thể ảnh hưởng đến khả năng tiếp thu thông tin của người học."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Tăng khoảng dừng lên 7 giây",
+                  "rationale": "Để người học có thêm thời gian suy nghĩ.",
+                  "patches": [],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Câu 35 là khoảng lặng dừng giây"
+                  ]
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Giảm khoảng dừng xuống 3 giây",
+                  "rationale": "Để tránh cảm giác sốt ruột cho người học.",
+                  "patches": [],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Câu 35 là khoảng lặng dừng giây"
+                  ]
+                }
+              ],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": true
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Tăng khoảng dừng lên 7 giây",
+              "rationale": "Để người học có thêm thời gian suy nghĩ.",
+              "patches": [],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Câu 35 là khoảng lặng dừng giây"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Giảm khoảng dừng xuống 3 giây",
+              "rationale": "Để tránh cảm giác sốt ruột cho người học.",
+              "patches": [],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Câu 35 là khoảng lặng dừng giây"
+              ]
+            }
+          ],
+          "hasDisagreement": true,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": [
+            "Cần xác nhận vị trí",
+            "Trái chiều"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "PATCH_FIELD_NOT_ALLOWED",
+            "level": "loi",
+            "message": "Câu 35 là câu khoảng lặng dừng giây, không được sửa 'loi'",
+            "target": "is-1-A"
+          },
+          {
+            "code": "PATCH_FIELD_NOT_ALLOWED",
+            "level": "loi",
+            "message": "Câu 35 là câu khoảng lặng dừng giây, không được sửa 'loi'",
+            "target": "is-1-B"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": false
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

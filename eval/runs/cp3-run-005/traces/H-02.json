@@ -1,0 +1,135 @@
+{
+  "caseId": "H-02",
+  "status": "dat",
+  "durationMs": 0,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "validation-codes",
+      "passed": true,
+      "message": "Đầy đủ mã lỗi kiểm tra"
+    },
+    {
+      "type": "option-status",
+      "passed": true,
+      "message": "Trạng thái phương án = khong-hop-le"
+    },
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "val-H-02",
+      "inputHash": "",
+      "feedback": [
+        {
+          "id": "contract-fixture-feedback",
+          "label": "gop-y",
+          "sender": "ng-fixture",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "fixture-invalid",
+          "summary": "Fixture invalid output",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "contract-fixture-feedback"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "fixture"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "fixture"
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Fixture invalid option",
+              "rationale": "Fixture",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "stale",
+                  "after": "moi 123"
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 20 không khớp kịch bản",
+                "Lời câu 20 rỗng hoặc chứa chữ số"
+              ]
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [],
+      "validation": {
+        "findings": [
+          {
+            "code": "UNKNOWN_FEEDBACK_ID",
+            "level": "loi",
+            "message": "Vấn đề trích ID góp ý không tồn tại: gy-999",
+            "target": "gy-999"
+          },
+          {
+            "code": "SENTENCE_NOT_FOUND",
+            "level": "loi",
+            "message": "Câu 41 không tồn tại trong kịch bản",
+            "target": "41"
+          },
+          {
+            "code": "LOCATION_DOWNGRADED",
+            "level": "ghi-nhan",
+            "message": "Vị trí hạ về 'can-xac-nhan' do danh sách câu hợp lệ rỗng",
+            "target": "fixture-invalid"
+          },
+          {
+            "code": "PATCH_STALE",
+            "level": "loi",
+            "message": "Giá trị 'before' của câu 20 không khớp nội dung kịch bản gốc",
+            "target": "is-1-A"
+          },
+          {
+            "code": "LOI_INVALID",
+            "level": "loi",
+            "message": "Lời đọc mới câu 20 không hợp lệ (rỗng hoặc chứa chữ số)",
+            "target": "is-1-A"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": false,
+          "evidenceOk": true,
+          "locationsOk": false,
+          "patchesOk": false
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

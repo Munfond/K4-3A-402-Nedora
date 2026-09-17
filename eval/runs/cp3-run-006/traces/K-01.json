@@ -1,0 +1,198 @@
+{
+  "caseId": "K-01",
+  "status": "dat",
+  "durationMs": 11190,
+  "tokens": 7356,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    },
+    {
+      "type": "cause-or-uncertainty",
+      "passed": true,
+      "message": "Có giả thuyết nguyên nhân hoặc điểm chưa chắc chắn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183724-36e5",
+      "inputHash": "85d5f7a2da3f6c4e75901709c13dcd396c385cce60a5b3800af231b547a31a8a",
+      "feedback": [
+        {
+          "id": "v1-k01-a",
+          "label": "gop-y",
+          "sender": "ng-7ef88bda",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-k01-a-pace",
+          "summary": "Người học cảm thấy phần giữa khó theo kịp khi nghe, có thể do nhịp đọc nhanh hoặc chuyển ý dồn dập.",
+          "category": "nhip-nhanh-cham",
+          "feedbackIds": [
+            "v1-k01-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nói “đoạn giữa” và “nghe không kịp”, không chỉ rõ câu nào."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Không thể xác định nhịp đọc thực tế chỉ từ kịch bản văn bản.",
+            "Chưa rõ người học gặp khó khăn ở tốc độ đọc, khoảng dừng hay mật độ chuyển ý.",
+            "Cần xác nhận đoạn thời gian hoặc câu cụ thể trong video."
+          ],
+          "causeHypothesis": {
+            "text": "Các câu ở phần giữa trình bày liên tiếp nhiều khái niệm và quan hệ giữa ứng dụng, mô hình ngôn ngữ lớn, học máy và tạo sinh, có thể khiến người học khó theo dõi nếu nhịp đọc nhanh.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Khó theo kịp có thể làm người học bỏ lỡ quan hệ giữa các khái niệm chính, nhưng phạm vi ảnh hưởng chưa được định vị rõ."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Xác nhận đoạn bị nhanh rồi điều chỉnh nhịp đọc và khoảng dừng",
+              "rationale": "Phù hợp trực tiếp với triệu chứng “nghe không kịp”, nhưng cần người dựng kiểm tra video để xác định đoạn và thay đổi thời lượng đọc hoặc dừng.",
+              "patches": [],
+              "expectedEffect": "mot-phan",
+              "remaining": "Chưa xác định được câu hoặc mốc thời gian cần chỉnh; chưa xử lý chắc chắn cảm giác “rối” nếu nguyên nhân là cách giải thích hoặc hình ảnh.",
+              "needsHumanCheck": "Cần xem và nghe lại đoạn giữa, xác định mốc thời gian người học bị hụt thông tin, sau đó kiểm tra nhịp đọc và khoảng dừng.",
+              "unsupportedOperation": {
+                "kind": "doi-khoang-dung",
+                "description": "Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+              },
+              "status": "ngoai-pham-vi",
+              "statusReasons": [
+                "Cần thao tác doi-khoang-dung: Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+              ]
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Người học cảm thấy phần giữa khó theo kịp khi nghe, có thể do nhịp đọc nhanh hoặc chuyển ý dồn dập.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-k01-a-pace",
+              "summary": "Người học cảm thấy phần giữa khó theo kịp khi nghe, có thể do nhịp đọc nhanh hoặc chuyển ý dồn dập.",
+              "category": "nhip-nhanh-cham",
+              "feedbackIds": [
+                "v1-k01-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nói “đoạn giữa” và “nghe không kịp”, không chỉ rõ câu nào."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Không thể xác định nhịp đọc thực tế chỉ từ kịch bản văn bản.",
+                "Chưa rõ người học gặp khó khăn ở tốc độ đọc, khoảng dừng hay mật độ chuyển ý.",
+                "Cần xác nhận đoạn thời gian hoặc câu cụ thể trong video."
+              ],
+              "causeHypothesis": {
+                "text": "Các câu ở phần giữa trình bày liên tiếp nhiều khái niệm và quan hệ giữa ứng dụng, mô hình ngôn ngữ lớn, học máy và tạo sinh, có thể khiến người học khó theo dõi nếu nhịp đọc nhanh.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Khó theo kịp có thể làm người học bỏ lỡ quan hệ giữa các khái niệm chính, nhưng phạm vi ảnh hưởng chưa được định vị rõ."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Xác nhận đoạn bị nhanh rồi điều chỉnh nhịp đọc và khoảng dừng",
+                  "rationale": "Phù hợp trực tiếp với triệu chứng “nghe không kịp”, nhưng cần người dựng kiểm tra video để xác định đoạn và thay đổi thời lượng đọc hoặc dừng.",
+                  "patches": [],
+                  "expectedEffect": "mot-phan",
+                  "remaining": "Chưa xác định được câu hoặc mốc thời gian cần chỉnh; chưa xử lý chắc chắn cảm giác “rối” nếu nguyên nhân là cách giải thích hoặc hình ảnh.",
+                  "needsHumanCheck": "Cần xem và nghe lại đoạn giữa, xác định mốc thời gian người học bị hụt thông tin, sau đó kiểm tra nhịp đọc và khoảng dừng.",
+                  "unsupportedOperation": {
+                    "kind": "doi-khoang-dung",
+                    "description": "Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+                  },
+                  "status": "ngoai-pham-vi",
+                  "statusReasons": [
+                    "Cần thao tác doi-khoang-dung: Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+                  ]
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Xác nhận đoạn bị nhanh rồi điều chỉnh nhịp đọc và khoảng dừng",
+              "rationale": "Phù hợp trực tiếp với triệu chứng “nghe không kịp”, nhưng cần người dựng kiểm tra video để xác định đoạn và thay đổi thời lượng đọc hoặc dừng.",
+              "patches": [],
+              "expectedEffect": "mot-phan",
+              "remaining": "Chưa xác định được câu hoặc mốc thời gian cần chỉnh; chưa xử lý chắc chắn cảm giác “rối” nếu nguyên nhân là cách giải thích hoặc hình ảnh.",
+              "needsHumanCheck": "Cần xem và nghe lại đoạn giữa, xác định mốc thời gian người học bị hụt thông tin, sau đó kiểm tra nhịp đọc và khoảng dừng.",
+              "unsupportedOperation": {
+                "kind": "doi-khoang-dung",
+                "description": "Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+              },
+              "status": "ngoai-pham-vi",
+              "statusReasons": [
+                "Cần thao tác doi-khoang-dung: Điều chỉnh tốc độ đọc hoặc thêm, kéo dài khoảng dừng trong đoạn được xác nhận; hệ thống không có đủ dữ liệu để tự sửa trực tiếp."
+              ]
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

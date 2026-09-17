@@ -1,0 +1,21 @@
+{
+  "runId": "cp3-run-003",
+  "createdAt": "2026-09-17T11:24:03.132Z",
+  "model": "mock-agent",
+  "isMock": true,
+  "promptVersion": "revision-cp3@1",
+  "promptHash": "f82b058e6d60796a7914c4c1c348d5c90c748cca806ada323c11caec4fc34bfe",
+  "schemaVersion": "hackathon-revision-agent/1",
+  "policyVersion": "cp3@1",
+  "goldenSetHash": "0588ca3afdd4cd2151dc83d34677862466671dc3ede3b25ed03ab826f960b437",
+  "goldenSetFile": "eval/golden/golden-set.v1.json",
+  "coverageHash": "c6481ba52eaab6dfe06987fb292e8c6a6df09e0260d81adf589fc628a3cbdaba",
+  "coverageFile": "eval/golden/COVERAGE-v1.md",
+  "ingestionContractFile": "eval/ingestion-cases.v1.json",
+  "commitSha": "5177e1c63d7717e13ccf519f2452817f21776f1a",
+  "caseCount": 20,
+  "passedCount": 20,
+  "failedCount": 0,
+  "errorCount": 0,
+  "passRate": "100.0%"
+}

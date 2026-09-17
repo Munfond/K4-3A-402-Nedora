@@ -1,0 +1,31 @@
+{
+  "caseId": "N-07",
+  "status": "loi",
+  "durationMs": 695,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": false,
+      "message": "Kỳ vọng done, nhận loi"
+    },
+    {
+      "type": "label",
+      "passed": false,
+      "message": "Góp ý v1-n07-a: kỳ vọng [khen,nhieu,gop-y], thực tế không tìm thấy"
+    },
+    {
+      "type": "not-in-issue",
+      "passed": true,
+      "message": "Không có ID nào trong [v1-n07-a] nằm trong vấn đề"
+    }
+  ],
+  "executionContext": {
+    "status": "loi",
+    "error": {
+      "code": "OUTPUT_SCHEMA_INVALID",
+      "message": "Dữ liệu đầu ra của model không khớp schema quy định: Invalid schema for response_format 'response': In context=('properties', 'issues', 'items', 'properties', 'causeHypothesis', 'anyOf', '0'), 'additionalProperties' is required to be supplied and to be false.",
+      "isRetryable": true
+    }
+  }
+}

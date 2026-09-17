@@ -1,0 +1,288 @@
+{
+  "caseId": "N-08",
+  "status": "dat",
+  "durationMs": 12646,
+  "tokens": 7731,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n08-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          31
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183712-e01a",
+      "inputHash": "4562077ca24cd1cabc2e2fb68b7a0326e0acef643ac35fcbdf427550f6ea5427",
+      "feedback": [
+        {
+          "id": "v1-n08-a",
+          "label": "gop-y",
+          "sender": "ng-a22a2353",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "issue-v1-n08-a-01",
+          "summary": "Người học khó theo kịp khi câu 31 nói mô hình vẫn giữ nguyên tên nhưng nhiệm vụ đã thay đổi.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n08-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              31
+            ],
+            "basis": "Góp ý chỉ rõ câu 31 là nơi gây khó theo kịp."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chỉ có kịch bản văn bản, chưa xác nhận được cách nhấn giọng hoặc hình minh họa thực tế ở câu 31."
+          ],
+          "causeHypothesis": {
+            "text": "Câu hiện tại chuyển từ nhiệm vụ soạn thư sang phân loại nhưng chưa tách rõ hai ý: tên mô hình giữ nguyên và công việc thay đổi.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Có thể khiến người học nhầm rằng đổi nhiệm vụ đồng nghĩa với đổi mô hình."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nói rõ sự tách biệt giữa mô hình và nhiệm vụ",
+              "rationale": "Làm nổi bật ngay trong lời đọc rằng tên mô hình không đổi, chỉ nhiệm vụ và đầu ra thay đổi.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Dù vẫn là mô hình ngôn ngữ lớn, khi đổi yêu cầu sang phân loại thư thì công việc và đầu ra của nó đã thay đổi."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Tách trực quan tên mô hình và công việc",
+              "rationale": "Giữ lời đọc hiện tại nhưng làm sơ đồ cho thấy rõ hai trường thông tin độc lập: mô hình không đổi, còn nhiệm vụ chuyển sang phân loại thư.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "chuTrenManHinh",
+                  "before": "Cùng mô hình · Đổi công việc",
+                  "after": "Tên mô hình giữ nguyên · Việc đổi khác"
+                },
+                {
+                  "n": 31,
+                  "field": "yDoHinh",
+                  "before": "Đổi yêu cầu từ soạn thư sang phân loại; giữ nguyên hộp mô hình ngôn ngữ lớn, thay kiểu đầu ra.",
+                  "after": "Chia màn hình thành hai dòng: “Mô hình: mô hình ngôn ngữ lớn” giữ nguyên và “Công việc: soạn thư → phân loại thư” đổi rõ ràng; thay đầu ra văn bản bằng nhãn phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần người dựng kiểm tra trong video rằng hai dòng mô hình và công việc được hiển thị đủ lớn, đúng thời điểm và dễ phân biệt.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-31-31",
+          "type": "vung",
+          "title": "Người học khó theo kịp khi câu 31 nói mô hình vẫn giữ nguyên tên nhưng nhiệm vụ đã thay đổi.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            31
+          ],
+          "tuGiay": 187.1,
+          "denGiay": 194.3,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "issue-v1-n08-a-01",
+              "summary": "Người học khó theo kịp khi câu 31 nói mô hình vẫn giữ nguyên tên nhưng nhiệm vụ đã thay đổi.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n08-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  31
+                ],
+                "basis": "Góp ý chỉ rõ câu 31 là nơi gây khó theo kịp."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chỉ có kịch bản văn bản, chưa xác nhận được cách nhấn giọng hoặc hình minh họa thực tế ở câu 31."
+              ],
+              "causeHypothesis": {
+                "text": "Câu hiện tại chuyển từ nhiệm vụ soạn thư sang phân loại nhưng chưa tách rõ hai ý: tên mô hình giữ nguyên và công việc thay đổi.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Có thể khiến người học nhầm rằng đổi nhiệm vụ đồng nghĩa với đổi mô hình."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Nói rõ sự tách biệt giữa mô hình và nhiệm vụ",
+                  "rationale": "Làm nổi bật ngay trong lời đọc rằng tên mô hình không đổi, chỉ nhiệm vụ và đầu ra thay đổi.",
+                  "patches": [
+                    {
+                      "n": 31,
+                      "field": "loi",
+                      "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                      "after": "Dù vẫn là mô hình ngôn ngữ lớn, khi đổi yêu cầu sang phân loại thư thì công việc và đầu ra của nó đã thay đổi."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Tách trực quan tên mô hình và công việc",
+                  "rationale": "Giữ lời đọc hiện tại nhưng làm sơ đồ cho thấy rõ hai trường thông tin độc lập: mô hình không đổi, còn nhiệm vụ chuyển sang phân loại thư.",
+                  "patches": [
+                    {
+                      "n": 31,
+                      "field": "chuTrenManHinh",
+                      "before": "Cùng mô hình · Đổi công việc",
+                      "after": "Tên mô hình giữ nguyên · Việc đổi khác"
+                    },
+                    {
+                      "n": 31,
+                      "field": "yDoHinh",
+                      "before": "Đổi yêu cầu từ soạn thư sang phân loại; giữ nguyên hộp mô hình ngôn ngữ lớn, thay kiểu đầu ra.",
+                      "after": "Chia màn hình thành hai dòng: “Mô hình: mô hình ngôn ngữ lớn” giữ nguyên và “Công việc: soạn thư → phân loại thư” đổi rõ ràng; thay đầu ra văn bản bằng nhãn phân loại."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": "Cần người dựng kiểm tra trong video rằng hai dòng mô hình và công việc được hiển thị đủ lớn, đúng thời điểm và dễ phân biệt.",
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Nói rõ sự tách biệt giữa mô hình và nhiệm vụ",
+              "rationale": "Làm nổi bật ngay trong lời đọc rằng tên mô hình không đổi, chỉ nhiệm vụ và đầu ra thay đổi.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Dù vẫn là mô hình ngôn ngữ lớn, khi đổi yêu cầu sang phân loại thư thì công việc và đầu ra của nó đã thay đổi."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Tách trực quan tên mô hình và công việc",
+              "rationale": "Giữ lời đọc hiện tại nhưng làm sơ đồ cho thấy rõ hai trường thông tin độc lập: mô hình không đổi, còn nhiệm vụ chuyển sang phân loại thư.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "chuTrenManHinh",
+                  "before": "Cùng mô hình · Đổi công việc",
+                  "after": "Tên mô hình giữ nguyên · Việc đổi khác"
+                },
+                {
+                  "n": 31,
+                  "field": "yDoHinh",
+                  "before": "Đổi yêu cầu từ soạn thư sang phân loại; giữ nguyên hộp mô hình ngôn ngữ lớn, thay kiểu đầu ra.",
+                  "after": "Chia màn hình thành hai dòng: “Mô hình: mô hình ngôn ngữ lớn” giữ nguyên và “Công việc: soạn thư → phân loại thư” đổi rõ ràng; thay đầu ra văn bản bằng nhãn phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần người dựng kiểm tra trong video rằng hai dòng mô hình và công việc được hiển thị đủ lớn, đúng thời điểm và dễ phân biệt.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

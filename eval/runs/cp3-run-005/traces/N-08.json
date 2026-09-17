@@ -1,0 +1,280 @@
+{
+  "caseId": "N-08",
+  "status": "dat",
+  "durationMs": 5341,
+  "tokens": 7056,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n08-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          31
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183420-5cf6",
+      "inputHash": "4562077ca24cd1cabc2e2fb68b7a0326e0acef643ac35fcbdf427550f6ea5427",
+      "feedback": [
+        {
+          "id": "v1-n08-a",
+          "label": "gop-y",
+          "sender": "ng-a22a2353",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-n31",
+          "summary": "Người học khó theo dõi khi đổi nhiệm vụ nhưng giữ tên mô hình.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n08-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              31
+            ],
+            "basis": "Câu 31 đổi nhiệm vụ nhưng giữ tên mô hình làm em khó theo kịp."
+          },
+          "stances": [
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-n08-a"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học không rõ ràng về sự thay đổi nhiệm vụ trong khi tên mô hình không thay đổi.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Khó khăn trong việc theo dõi nội dung."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ hơn về sự thay đổi nhiệm vụ",
+              "rationale": "Cần làm rõ sự khác biệt giữa nhiệm vụ phân loại và nhiệm vụ tạo nội dung.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên, nhưng công việc mà nó thực hiện đã thay đổi từ việc tạo nội dung sang phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi tên mô hình khi đổi nhiệm vụ",
+              "rationale": "Giúp người học dễ dàng nhận biết sự thay đổi trong nhiệm vụ của mô hình.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình sẽ được đổi thành 'Mô hình phân loại thư' để phản ánh công việc mới."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-31-31",
+          "type": "vung",
+          "title": "Người học khó theo dõi khi đổi nhiệm vụ nhưng giữ tên mô hình.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            31
+          ],
+          "tuGiay": 187.1,
+          "denGiay": 194.3,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-n31",
+              "summary": "Người học khó theo dõi khi đổi nhiệm vụ nhưng giữ tên mô hình.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n08-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  31
+                ],
+                "basis": "Câu 31 đổi nhiệm vụ nhưng giữ tên mô hình làm em khó theo kịp."
+              },
+              "stances": [
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-n08-a"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học không rõ ràng về sự thay đổi nhiệm vụ trong khi tên mô hình không thay đổi.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Khó khăn trong việc theo dõi nội dung."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giải thích rõ hơn về sự thay đổi nhiệm vụ",
+                  "rationale": "Cần làm rõ sự khác biệt giữa nhiệm vụ phân loại và nhiệm vụ tạo nội dung.",
+                  "patches": [
+                    {
+                      "n": 31,
+                      "field": "loi",
+                      "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                      "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên, nhưng công việc mà nó thực hiện đã thay đổi từ việc tạo nội dung sang phân loại."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thay đổi tên mô hình khi đổi nhiệm vụ",
+                  "rationale": "Giúp người học dễ dàng nhận biết sự thay đổi trong nhiệm vụ của mô hình.",
+                  "patches": [
+                    {
+                      "n": 31,
+                      "field": "loi",
+                      "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                      "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình sẽ được đổi thành 'Mô hình phân loại thư' để phản ánh công việc mới."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ hơn về sự thay đổi nhiệm vụ",
+              "rationale": "Cần làm rõ sự khác biệt giữa nhiệm vụ phân loại và nhiệm vụ tạo nội dung.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên, nhưng công việc mà nó thực hiện đã thay đổi từ việc tạo nội dung sang phân loại."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi tên mô hình khi đổi nhiệm vụ",
+              "rationale": "Giúp người học dễ dàng nhận biết sự thay đổi trong nhiệm vụ của mô hình.",
+              "patches": [
+                {
+                  "n": 31,
+                  "field": "loi",
+                  "before": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+                  "after": "Nếu giao cho mô hình nhiệm vụ phân loại thư, tên mô hình sẽ được đổi thành 'Mô hình phân loại thư' để phản ánh công việc mới."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

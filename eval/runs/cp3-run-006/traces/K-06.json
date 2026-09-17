@@ -1,0 +1,382 @@
+{
+  "caseId": "K-06",
+  "status": "khong-dat",
+  "durationMs": 19926,
+  "tokens": 8370,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "split-observation",
+      "passed": true,
+      "message": "Đã tách 2 observation"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": false,
+      "message": "Phát hiện patch sửa lời trên vấn đề kỹ thuật"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183818-ebca",
+      "inputHash": "f89ee8d2340d057f44e805e9a83c9ab648cf16ba62beda5ed341a11eba392e48",
+      "feedback": [
+        {
+          "id": "v1-k06-a",
+          "label": "gop-y",
+          "sender": "ng-0613883d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-k06-audio",
+          "summary": "Nhạc nền tại khoảng phút hai có thể át tiếng lời đọc, làm giảm khả năng nghe rõ nội dung.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-k06-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nêu 'phút 2'; dữ liệu chưa có mốc thời lượng tương ứng với số câu trong kịch bản."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Hệ thống chỉ có kịch bản văn bản, không nghe được bản phối âm thanh thực tế.",
+            "Chưa xác định được chính xác câu nào nằm tại phút hai."
+          ],
+          "causeHypothesis": {
+            "text": "Mức âm lượng nhạc nền có thể đang cao hơn mức phù hợp so với lời đọc.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Âm thanh nền át lời đọc có thể khiến người học bỏ lỡ nội dung chính."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-2",
+          "key": "v1-k06-app-model",
+          "summary": "Mối quan hệ giữa ứng dụng trò chuyện và mô hình xử lý phía sau còn khó hiểu.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k06-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nói chung về 'đoạn app và mô hình', chưa chỉ rõ câu; các câu 20 đến 23 và 39 là những vị trí có nội dung liên quan để đối chiếu."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết người học vướng ở khái niệm ứng dụng, mô hình, luồng dữ liệu hay phần minh họa trên màn hình.",
+            "Hệ thống không xem được hình ảnh thực tế để kiểm tra đường nối giữa ứng dụng và mô hình."
+          ],
+          "causeHypothesis": {
+            "text": "Phần giải thích có nhiều thành phần và quan hệ nối tiếp giữa ứng dụng, mô hình ngôn ngữ lớn và các công cụ khác, nên vai trò của từng thành phần có thể chưa được phân tách đủ rõ.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Nếu không phân biệt được nơi nhập liệu với thành phần xử lý, người học dễ nhầm ứng dụng với mô hình."
+          },
+          "options": [
+            {
+              "id": "is-2-A",
+              "label": "A",
+              "title": "Nêu rõ luồng ứng dụng gửi yêu cầu đến mô hình",
+              "rationale": "Làm rõ vai trò và hướng truyền thông tin bằng cách diễn đạt trực tiếp ở phần giới thiệu ứng dụng trò chuyện.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi nhận câu hỏi, còn mô hình ngôn ngữ lớn là thành phần xử lý để tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn nhập câu hỏi vào ứng dụng, ứng dụng gửi thông tin đến mô hình và nhận câu trả lời để hiển thị lại cho bạn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-2-B",
+              "label": "B",
+              "title": "Dùng đối chiếu theo nhiệm vụ để phân biệt các thành phần",
+              "rationale": "Tập trung vào việc một ứng dụng có thể kết nối nhiều mô hình khác nhau, từ đó tránh đồng nhất tên ứng dụng với tên mô hình.",
+              "patches": [
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng có thể nối lần lượt với mô hình viết văn bản, mô hình tạo ảnh hoặc công cụ khác tùy nhiệm vụ."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì vậy, tên ứng dụng chỉ cho biết nơi bạn thao tác, không tự cho biết mô hình nào đang xử lý bên trong."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-2",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Mối quan hệ giữa ứng dụng trò chuyện và mô hình xử lý phía sau còn khó hiểu.",
+          "issueIds": [
+            "is-2"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-2",
+              "key": "v1-k06-app-model",
+              "summary": "Mối quan hệ giữa ứng dụng trò chuyện và mô hình xử lý phía sau còn khó hiểu.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k06-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nói chung về 'đoạn app và mô hình', chưa chỉ rõ câu; các câu 20 đến 23 và 39 là những vị trí có nội dung liên quan để đối chiếu."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết người học vướng ở khái niệm ứng dụng, mô hình, luồng dữ liệu hay phần minh họa trên màn hình.",
+                "Hệ thống không xem được hình ảnh thực tế để kiểm tra đường nối giữa ứng dụng và mô hình."
+              ],
+              "causeHypothesis": {
+                "text": "Phần giải thích có nhiều thành phần và quan hệ nối tiếp giữa ứng dụng, mô hình ngôn ngữ lớn và các công cụ khác, nên vai trò của từng thành phần có thể chưa được phân tách đủ rõ.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Nếu không phân biệt được nơi nhập liệu với thành phần xử lý, người học dễ nhầm ứng dụng với mô hình."
+              },
+              "options": [
+                {
+                  "id": "is-2-A",
+                  "label": "A",
+                  "title": "Nêu rõ luồng ứng dụng gửi yêu cầu đến mô hình",
+                  "rationale": "Làm rõ vai trò và hướng truyền thông tin bằng cách diễn đạt trực tiếp ở phần giới thiệu ứng dụng trò chuyện.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện là nơi nhận câu hỏi, còn mô hình ngôn ngữ lớn là thành phần xử lý để tạo câu trả lời."
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Bạn nhập câu hỏi vào ứng dụng, ứng dụng gửi thông tin đến mô hình và nhận câu trả lời để hiển thị lại cho bạn."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-2-B",
+                  "label": "B",
+                  "title": "Dùng đối chiếu theo nhiệm vụ để phân biệt các thành phần",
+                  "rationale": "Tập trung vào việc một ứng dụng có thể kết nối nhiều mô hình khác nhau, từ đó tránh đồng nhất tên ứng dụng với tên mô hình.",
+                  "patches": [
+                    {
+                      "n": 22,
+                      "field": "loi",
+                      "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                      "after": "Một ứng dụng có thể nối lần lượt với mô hình viết văn bản, mô hình tạo ảnh hoặc công cụ khác tùy nhiệm vụ."
+                    },
+                    {
+                      "n": 23,
+                      "field": "loi",
+                      "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                      "after": "Vì vậy, tên ứng dụng chỉ cho biết nơi bạn thao tác, không tự cho biết mô hình nào đang xử lý bên trong."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-2-A",
+              "label": "A",
+              "title": "Nêu rõ luồng ứng dụng gửi yêu cầu đến mô hình",
+              "rationale": "Làm rõ vai trò và hướng truyền thông tin bằng cách diễn đạt trực tiếp ở phần giới thiệu ứng dụng trò chuyện.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi nhận câu hỏi, còn mô hình ngôn ngữ lớn là thành phần xử lý để tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn nhập câu hỏi vào ứng dụng, ứng dụng gửi thông tin đến mô hình và nhận câu trả lời để hiển thị lại cho bạn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-2-B",
+              "label": "B",
+              "title": "Dùng đối chiếu theo nhiệm vụ để phân biệt các thành phần",
+              "rationale": "Tập trung vào việc một ứng dụng có thể kết nối nhiều mô hình khác nhau, từ đó tránh đồng nhất tên ứng dụng với tên mô hình.",
+              "patches": [
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng có thể nối lần lượt với mô hình viết văn bản, mô hình tạo ảnh hoặc công cụ khác tùy nhiệm vụ."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì vậy, tên ứng dụng chỉ cho biết nơi bạn thao tác, không tự cho biết mô hình nào đang xử lý bên trong."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        },
+        {
+          "id": "kt-is-1",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Nhạc nền tại khoảng phút hai có thể át tiếng lời đọc, làm giảm khả năng nghe rõ nội dung.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-k06-audio",
+              "summary": "Nhạc nền tại khoảng phút hai có thể át tiếng lời đọc, làm giảm khả năng nghe rõ nội dung.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-k06-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nêu 'phút 2'; dữ liệu chưa có mốc thời lượng tương ứng với số câu trong kịch bản."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Hệ thống chỉ có kịch bản văn bản, không nghe được bản phối âm thanh thực tế.",
+                "Chưa xác định được chính xác câu nào nằm tại phút hai."
+              ],
+              "causeHypothesis": {
+                "text": "Mức âm lượng nhạc nền có thể đang cao hơn mức phù hợp so với lời đọc.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Âm thanh nền át lời đọc có thể khiến người học bỏ lỡ nội dung chính."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

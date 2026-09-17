@@ -1,0 +1,36 @@
+{
+  "caseId": "K-03",
+  "status": "loi",
+  "durationMs": 648,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": false,
+      "message": "Kỳ vọng done, nhận loi"
+    },
+    {
+      "type": "in-issue",
+      "passed": false,
+      "message": "Không tìm thấy vấn đề thỏa mãn"
+    },
+    {
+      "type": "disagreement",
+      "passed": false,
+      "message": "Không tìm thấy vấn đề"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "loi",
+    "error": {
+      "code": "OUTPUT_SCHEMA_INVALID",
+      "message": "Dữ liệu đầu ra của model không khớp schema quy định: Invalid schema for response_format 'response': In context=('properties', 'issues', 'items', 'properties', 'causeHypothesis', 'anyOf', '0'), 'additionalProperties' is required to be supplied and to be false.",
+      "isRetryable": true
+    }
+  }
+}

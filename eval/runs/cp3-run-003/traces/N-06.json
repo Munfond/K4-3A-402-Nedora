@@ -1,0 +1,154 @@
+{
+  "caseId": "N-06",
+  "status": "dat",
+  "durationMs": 6,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n06-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          24,
+          27,
+          29
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-d851",
+      "inputHash": "6b0c8c6cafedd8355a18e9cb1cceffeb52c3783c83e8c77e3aca0eae4e3e7b57",
+      "feedback": [
+        {
+          "id": "v1-n06-a",
+          "label": "gop-y",
+          "sender": "ng-38f23020",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "N06-screen-text",
+          "summary": "Mock issue N06-screen-text",
+          "category": "hinh-anh",
+          "feedbackIds": [
+            "v1-n06-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              24,
+              27,
+              29
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Mock issue N06-screen-text",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            24,
+            27,
+            29
+          ],
+          "tuGiay": 146.8,
+          "denGiay": 181.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "N06-screen-text",
+              "summary": "Mock issue N06-screen-text",
+              "category": "hinh-anh",
+              "feedbackIds": [
+                "v1-n06-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  24,
+                  27,
+                  29
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "LOCATION_DOWNGRADED",
+            "level": "ghi-nhan",
+            "message": "Vị trí trải dài 6 câu (> 5 câu), hạ về 'can-xac-nhan'",
+            "target": "N06-screen-text"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

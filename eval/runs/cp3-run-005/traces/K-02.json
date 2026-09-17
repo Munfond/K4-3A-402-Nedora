@@ -1,0 +1,328 @@
+{
+  "caseId": "K-02",
+  "status": "khong-dat",
+  "durationMs": 7325,
+  "tokens": 7287,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": false,
+      "message": "Không tìm thấy vấn đề thỏa mãn"
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 1"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183428-f9b0",
+      "inputHash": "fd234e109bdea443dd63aac9c3b37dc5c691463cb2a4bc055ffaefacb227966e",
+      "feedback": [
+        {
+          "id": "v1-k02-a",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-b",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "tin-nhan",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-k02-c",
+          "label": "gop-y",
+          "sender": "ng-a8c24b9d",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "app-mau-hinh",
+          "summary": "Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k02-a",
+            "v1-k02-b",
+            "v1-k02-c"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học đặt câu hỏi về sự khác biệt giữa ứng dụng và mô hình."
+          },
+          "stances": [
+            {
+              "direction": "tăng",
+              "feedbackIds": [
+                "v1-k02-a",
+                "v1-k02-b"
+              ]
+            },
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-k02-c"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học chưa được giải thích rõ về sự khác nhau giữa ứng dụng và mô hình.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Người học không hiểu rõ khái niệm cơ bản, ảnh hưởng đến việc tiếp thu kiến thức."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ sự khác nhau giữa ứng dụng và mô hình",
+              "rationale": "Cung cấp định nghĩa và ví dụ cụ thể cho từng khái niệm.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                  "after": "Trí tuệ nhân tạo là lĩnh vực rộng, trong đó ứng dụng trò chuyện là một phần mềm sử dụng mô hình ngôn ngữ lớn để xử lý và tạo câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ minh họa cho ứng dụng và mô hình",
+              "rationale": "Giúp người học dễ hình dung hơn về sự khác biệt.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                  "after": "Ví dụ, ứng dụng trò chuyện như ChatGPT sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời, trong khi mô hình ngôn ngữ lớn là thuật toán học từ dữ liệu để hiểu và sinh văn bản."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản"
+              ]
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 3,
+          "sendersVerified": true,
+          "hasDisagreement": true
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "app-mau-hinh",
+              "summary": "Người học không phân biệt được giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k02-a",
+                "v1-k02-b",
+                "v1-k02-c"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học đặt câu hỏi về sự khác biệt giữa ứng dụng và mô hình."
+              },
+              "stances": [
+                {
+                  "direction": "tăng",
+                  "feedbackIds": [
+                    "v1-k02-a",
+                    "v1-k02-b"
+                  ]
+                },
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-k02-c"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học chưa được giải thích rõ về sự khác nhau giữa ứng dụng và mô hình.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Người học không hiểu rõ khái niệm cơ bản, ảnh hưởng đến việc tiếp thu kiến thức."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giải thích rõ sự khác nhau giữa ứng dụng và mô hình",
+                  "rationale": "Cung cấp định nghĩa và ví dụ cụ thể cho từng khái niệm.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                      "after": "Trí tuệ nhân tạo là lĩnh vực rộng, trong đó ứng dụng trò chuyện là một phần mềm sử dụng mô hình ngôn ngữ lớn để xử lý và tạo câu trả lời."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Giá trị 'before' câu 1 không khớp kịch bản"
+                  ]
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thêm ví dụ minh họa cho ứng dụng và mô hình",
+                  "rationale": "Giúp người học dễ hình dung hơn về sự khác biệt.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                      "after": "Ví dụ, ứng dụng trò chuyện như ChatGPT sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời, trong khi mô hình ngôn ngữ lớn là thuật toán học từ dữ liệu để hiểu và sinh văn bản."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Giá trị 'before' câu 1 không khớp kịch bản"
+                  ]
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 3,
+              "sendersVerified": true,
+              "hasDisagreement": true
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giải thích rõ sự khác nhau giữa ứng dụng và mô hình",
+              "rationale": "Cung cấp định nghĩa và ví dụ cụ thể cho từng khái niệm.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                  "after": "Trí tuệ nhân tạo là lĩnh vực rộng, trong đó ứng dụng trò chuyện là một phần mềm sử dụng mô hình ngôn ngữ lớn để xử lý và tạo câu trả lời."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thêm ví dụ minh họa cho ứng dụng và mô hình",
+              "rationale": "Giúp người học dễ hình dung hơn về sự khác biệt.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+                  "after": "Ví dụ, ứng dụng trò chuyện như ChatGPT sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời, trong khi mô hình ngôn ngữ lớn là thuật toán học từ dữ liệu để hiểu và sinh văn bản."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản"
+              ]
+            }
+          ],
+          "hasDisagreement": true,
+          "independentSenders": 1,
+          "mentions": 3,
+          "flags": [
+            "Cần xác nhận vị trí",
+            "Trái chiều"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "PATCH_STALE",
+            "level": "loi",
+            "message": "Giá trị 'before' của câu 1 không khớp nội dung kịch bản gốc",
+            "target": "is-1-A"
+          },
+          {
+            "code": "PATCH_STALE",
+            "level": "loi",
+            "message": "Giá trị 'before' của câu 1 không khớp nội dung kịch bản gốc",
+            "target": "is-1-B"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": false
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

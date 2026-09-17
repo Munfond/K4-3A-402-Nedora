@@ -1,0 +1,311 @@
+{
+  "caseId": "K-06",
+  "status": "khong-dat",
+  "durationMs": 3515,
+  "tokens": 6953,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "split-observation",
+      "passed": false,
+      "message": "Kỳ vọng 2 observation, nhận 1"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183446-db6b",
+      "inputHash": "f89ee8d2340d057f44e805e9a83c9ab648cf16ba62beda5ed341a11eba392e48",
+      "feedback": [
+        {
+          "id": "v1-k06-a",
+          "label": "gop-y",
+          "sender": "ng-0613883d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "1",
+          "summary": "Âm thanh nền át tiếng trong video.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-k06-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Người học phản hồi về nhạc nền át tiếng."
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học không nghe rõ nội dung do nhạc nền quá lớn.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Người học không thể hiểu nội dung quan trọng."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm âm lượng nhạc nền ở phút 2",
+              "rationale": "Giảm âm lượng nhạc nền để không át tiếng nói.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                  "after": "Âm thanh nền ở phút 2 cần được giảm âm lượng để không át tiếng nói."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản",
+                "Lời câu 1 rỗng hoặc chứa chữ số"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi nhạc nền",
+              "rationale": "Thay nhạc nền bằng một bản nhạc nhẹ hơn.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                  "after": "Nhạc nền ở phút 2 cần được thay bằng một bản nhạc nhẹ hơn để không át tiếng nói."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản",
+                "Lời câu 1 rỗng hoặc chứa chữ số"
+              ]
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "kt-is-1",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Âm thanh nền át tiếng trong video.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "1",
+              "summary": "Âm thanh nền át tiếng trong video.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-k06-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Người học phản hồi về nhạc nền át tiếng."
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học không nghe rõ nội dung do nhạc nền quá lớn.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Người học không thể hiểu nội dung quan trọng."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giảm âm lượng nhạc nền ở phút 2",
+                  "rationale": "Giảm âm lượng nhạc nền để không át tiếng nói.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                      "after": "Âm thanh nền ở phút 2 cần được giảm âm lượng để không át tiếng nói."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Giá trị 'before' câu 1 không khớp kịch bản",
+                    "Lời câu 1 rỗng hoặc chứa chữ số"
+                  ]
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thay đổi nhạc nền",
+                  "rationale": "Thay nhạc nền bằng một bản nhạc nhẹ hơn.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                      "after": "Nhạc nền ở phút 2 cần được thay bằng một bản nhạc nhẹ hơn để không át tiếng nói."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "khong-hop-le",
+                  "statusReasons": [
+                    "Giá trị 'before' câu 1 không khớp kịch bản",
+                    "Lời câu 1 rỗng hoặc chứa chữ số"
+                  ]
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm âm lượng nhạc nền ở phút 2",
+              "rationale": "Giảm âm lượng nhạc nền để không át tiếng nói.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                  "after": "Âm thanh nền ở phút 2 cần được giảm âm lượng để không át tiếng nói."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản",
+                "Lời câu 1 rỗng hoặc chứa chữ số"
+              ]
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi nhạc nền",
+              "rationale": "Thay nhạc nền bằng một bản nhạc nhẹ hơn.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Nhạc nền phút 2 át tiếng, với đoạn app và mô hình cũng khó hiểu.",
+                  "after": "Nhạc nền ở phút 2 cần được thay bằng một bản nhạc nhẹ hơn để không át tiếng nói."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "khong-hop-le",
+              "statusReasons": [
+                "Giá trị 'before' câu 1 không khớp kịch bản",
+                "Lời câu 1 rỗng hoặc chứa chữ số"
+              ]
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "PATCH_STALE",
+            "level": "loi",
+            "message": "Giá trị 'before' của câu 1 không khớp nội dung kịch bản gốc",
+            "target": "is-1-A"
+          },
+          {
+            "code": "LOI_INVALID",
+            "level": "loi",
+            "message": "Lời đọc mới câu 1 không hợp lệ (rỗng hoặc chứa chữ số)",
+            "target": "is-1-A"
+          },
+          {
+            "code": "TECH_ISSUE_LOI_PATCH",
+            "level": "canh-bao",
+            "message": "Vấn đề kỹ thuật nhưng lại đề xuất sửa lời đọc câu 1",
+            "target": "is-1-A"
+          },
+          {
+            "code": "PATCH_STALE",
+            "level": "loi",
+            "message": "Giá trị 'before' của câu 1 không khớp nội dung kịch bản gốc",
+            "target": "is-1-B"
+          },
+          {
+            "code": "LOI_INVALID",
+            "level": "loi",
+            "message": "Lời đọc mới câu 1 không hợp lệ (rỗng hoặc chứa chữ số)",
+            "target": "is-1-B"
+          },
+          {
+            "code": "TECH_ISSUE_LOI_PATCH",
+            "level": "canh-bao",
+            "message": "Vấn đề kỹ thuật nhưng lại đề xuất sửa lời đọc câu 1",
+            "target": "is-1-B"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": false
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

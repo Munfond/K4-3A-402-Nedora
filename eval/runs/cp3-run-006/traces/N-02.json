@@ -1,0 +1,162 @@
+{
+  "caseId": "N-02",
+  "status": "dat",
+  "durationMs": 6675,
+  "tokens": 6972,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n02-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": []
+      }
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Định vị thỏa mãn"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183612-07ef",
+      "inputHash": "7fde1451514dd67fe79ce8f04923dd9c4b6d63f1cd15f0c99b4e120eea05e1bd",
+      "feedback": [
+        {
+          "id": "v1-n02-a",
+          "label": "gop-y",
+          "sender": "ng-51e5c9ee",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "am-thanh-nhac-nen-at-giong",
+          "summary": "Nhạc nền át giọng đọc ở khoảng phút thứ hai, làm giảm khả năng nghe rõ nội dung.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-n02-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [],
+            "basis": "Góp ý chỉ nêu khoảng phút thứ hai, không chỉ rõ câu nào trong kịch bản."
+          },
+          "stances": [
+            {
+              "direction": "giảm âm lượng nhạc nền hoặc tăng độ rõ/đ",
+              "feedbackIds": [
+                "v1-n02-a"
+              ]
+            }
+          ],
+          "uncertainties": [
+            "Không có dữ liệu âm thanh thực tế để xác định mức độ lấn át hoặc câu bị ảnh hưởng.",
+            "Mốc khoảng phút thứ hai chưa được ánh xạ sang số câu trong kịch bản."
+          ],
+          "causeHypothesis": {
+            "text": "Có thể mức âm lượng nhạc nền đang cao so với giọng đọc tại đoạn được phản ánh.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Âm thanh không rõ có thể khiến người học bỏ lỡ lời giảng, nhưng phạm vi ảnh hưởng hiện chỉ được xác định ở một đoạn."
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "kt-is-1",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Nhạc nền át giọng đọc ở khoảng phút thứ hai, làm giảm khả năng nghe rõ nội dung.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [],
+          "tuGiay": 0,
+          "denGiay": 251,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "am-thanh-nhac-nen-at-giong",
+              "summary": "Nhạc nền át giọng đọc ở khoảng phút thứ hai, làm giảm khả năng nghe rõ nội dung.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-n02-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [],
+                "basis": "Góp ý chỉ nêu khoảng phút thứ hai, không chỉ rõ câu nào trong kịch bản."
+              },
+              "stances": [
+                {
+                  "direction": "giảm âm lượng nhạc nền hoặc tăng độ rõ/đ",
+                  "feedbackIds": [
+                    "v1-n02-a"
+                  ]
+                }
+              ],
+              "uncertainties": [
+                "Không có dữ liệu âm thanh thực tế để xác định mức độ lấn át hoặc câu bị ảnh hưởng.",
+                "Mốc khoảng phút thứ hai chưa được ánh xạ sang số câu trong kịch bản."
+              ],
+              "causeHypothesis": {
+                "text": "Có thể mức âm lượng nhạc nền đang cao so với giọng đọc tại đoạn được phản ánh.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Âm thanh không rõ có thể khiến người học bỏ lỡ lời giảng, nhưng phạm vi ảnh hưởng hiện chỉ được xác định ở một đoạn."
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

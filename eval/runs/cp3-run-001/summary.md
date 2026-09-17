@@ -1,10 +1,11 @@
 # Báo cáo kết quả Golden Set (cp3-run-001)
 
-- **Thời điểm chạy:** 2026-09-17T05:16:15.098Z
+- **Thời điểm chạy:** 2026-09-17T09:01:03.794Z
 - **Mô hình:** `mock-agent` *(Chạy giả lập --mock)*
 - **Prompt hash:** `f82b058e6d60796a...` (phiên bản `revision-cp3@1`)
-- **Golden set:** `eval/golden-set.v1.json` (SHA-256: `972fa7089acc93f3...`)
-- **Git commit:** `9f5938f00690e61fa13048d70bbae6a9f31efaa0`
+- **Golden set:** `eval/golden/golden-set.v1.json` (SHA-256: `0588ca3afdd4cd21...`)
+- **Coverage contract:** `eval/golden/COVERAGE-v1.md` (SHA-256: `c6481ba52eaab6df...`)
+- **Git commit:** `2edd5c2e48817fc5be3713e640d5b26792ae72b0`
 
 ## 1. Tổng quan số đo
 
@@ -41,25 +42,25 @@
 
 | Case ID | Tầng | Loại | Kết quả | Thời gian | Token | Số tiêu chí đạt |
 |---|---|---|---|---|---|---|
-| `N-01` | thuong | pipeline | ✅ ĐẠT | 38ms | - | 3 / 3 |
-| `N-02` | thuong | pipeline | ✅ ĐẠT | 9ms | - | 3 / 3 |
-| `N-03` | thuong | pipeline | ✅ ĐẠT | 8ms | - | 2 / 2 |
-| `N-04` | thuong | pipeline | ✅ ĐẠT | 7ms | - | 2 / 2 |
-| `N-05` | thuong | pipeline | ✅ ĐẠT | 8ms | - | 3 / 3 |
-| `N-06` | thuong | pipeline | ✅ ĐẠT | 6ms | - | 4 / 4 |
-| `N-07` | thuong | pipeline | ✅ ĐẠT | 6ms | - | 2 / 2 |
-| `N-08` | thuong | pipeline | ✅ ĐẠT | 6ms | - | 4 / 4 |
-| `K-01` | kho | pipeline | ✅ ĐẠT | 7ms | - | 2 / 2 |
+| `N-01` | thuong | pipeline | ✅ ĐẠT | 25ms | - | 3 / 3 |
+| `N-02` | thuong | pipeline | ✅ ĐẠT | 6ms | - | 4 / 4 |
+| `N-03` | thuong | pipeline | ✅ ĐẠT | 5ms | - | 3 / 3 |
+| `N-04` | thuong | pipeline | ✅ ĐẠT | 5ms | - | 3 / 3 |
+| `N-05` | thuong | pipeline | ✅ ĐẠT | 7ms | - | 3 / 3 |
+| `N-06` | thuong | pipeline | ✅ ĐẠT | 5ms | - | 3 / 3 |
+| `N-07` | thuong | pipeline | ✅ ĐẠT | 19ms | - | 3 / 3 |
+| `N-08` | thuong | pipeline | ✅ ĐẠT | 6ms | - | 3 / 3 |
+| `K-01` | kho | pipeline | ✅ ĐẠT | 6ms | - | 3 / 3 |
 | `K-02` | kho | pipeline | ✅ ĐẠT | 6ms | - | 3 / 3 |
-| `K-03` | kho | pipeline | ✅ ĐẠT | 8ms | - | 3 / 3 |
-| `K-04` | kho | pipeline | ✅ ĐẠT | 10ms | - | 6 / 6 |
-| `K-05` | kho | pipeline | ✅ ĐẠT | 7ms | - | 4 / 4 |
-| `K-06` | kho | pipeline | ✅ ĐẠT | 8ms | - | 4 / 4 |
-| `K-07` | kho | pipeline | ✅ ĐẠT | 6ms | - | 3 / 3 |
+| `K-03` | kho | pipeline | ✅ ĐẠT | 7ms | - | 4 / 4 |
+| `K-04` | kho | pipeline | ✅ ĐẠT | 8ms | - | 5 / 5 |
+| `K-05` | kho | pipeline | ✅ ĐẠT | 6ms | - | 4 / 4 |
+| `K-06` | kho | pipeline | ✅ ĐẠT | 5ms | - | 3 / 3 |
+| `K-07` | kho | pipeline | ✅ ĐẠT | 6ms | - | 4 / 4 |
 | `K-08` | kho | pipeline | ✅ ĐẠT | 6ms | - | 3 / 3 |
-| `H-01` | hiem | validator | ✅ ĐẠT | 2ms | - | 2 / 2 |
-| `H-02` | hiem | pipeline | ✅ ĐẠT | 7ms | - | 2 / 2 |
-| `H-03` | hiem | engine | ✅ ĐẠT | 5ms | - | 3 / 3 |
+| `H-01` | hiem | pipeline | ✅ ĐẠT | 7ms | - | 3 / 3 |
+| `H-02` | hiem | validator | ✅ ĐẠT | 1ms | - | 3 / 3 |
+| `H-03` | hiem | engine | ✅ ĐẠT | 3ms | - | 3 / 3 |
 | `H-04` | hiem | engine | ✅ ĐẠT | 0ms | - | 3 / 3 |
 
 ## 5. Tuyên bố trung thực trạng thái Rubric R4 (C3-EVAL-09)

@@ -1,0 +1,224 @@
+{
+  "caseId": "K-06",
+  "status": "dat",
+  "durationMs": 6,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "split-observation",
+      "passed": true,
+      "message": "Đã tách 2 observation"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-182403-f386",
+      "inputHash": "f89ee8d2340d057f44e805e9a83c9ab648cf16ba62beda5ed341a11eba392e48",
+      "feedback": [
+        {
+          "id": "v1-k06-a",
+          "label": "gop-y",
+          "sender": "ng-0613883d",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "K06-audio",
+          "summary": "Mock issue K06-audio",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-k06-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              18,
+              19,
+              20
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        },
+        {
+          "id": "is-2",
+          "key": "K06-app-model",
+          "summary": "Mock issue K06-app-model",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-k06-a"
+          ],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [
+              20,
+              21,
+              22,
+              23
+            ],
+            "basis": "Mock theo expected golden contract"
+          },
+          "stances": [],
+          "uncertainties": [],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Mock"
+          },
+          "options": [],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-20-23",
+          "type": "vung",
+          "title": "Mock issue K06-app-model",
+          "issueIds": [
+            "is-2"
+          ],
+          "sentenceNs": [
+            20,
+            21,
+            22,
+            23
+          ],
+          "tuGiay": 121.5,
+          "denGiay": 146.8,
+          "issues": [
+            {
+              "id": "is-2",
+              "key": "K06-app-model",
+              "summary": "Mock issue K06-app-model",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-k06-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": []
+        },
+        {
+          "id": "kt-is-1",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Mock issue K06-audio",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            18,
+            19,
+            20
+          ],
+          "tuGiay": 108.5,
+          "denGiay": 128.6,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "K06-audio",
+              "summary": "Mock issue K06-audio",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-k06-a"
+              ],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [
+                  18,
+                  19,
+                  20
+                ],
+                "basis": "Mock theo expected golden contract"
+              },
+              "stances": [],
+              "uncertainties": [],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Mock"
+              },
+              "options": [],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

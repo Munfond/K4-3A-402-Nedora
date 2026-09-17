@@ -1,0 +1,437 @@
+{
+  "caseId": "N-05",
+  "status": "khong-dat",
+  "durationMs": 20732,
+  "tokens": 8584,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n05-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          1,
+          7,
+          17,
+          27
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": false,
+      "message": "Định vị không khớp kỳ vọng"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183638-8ce5",
+      "inputHash": "9a6878d54e64f565c48664e878e0e30113644a334678b3e8556f0cc99eb98a65",
+      "feedback": [
+        {
+          "id": "v1-n05-a",
+          "label": "gop-y",
+          "sender": "ng-febb5cf5",
+          "channel": "khao-sat",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "ex-01",
+          "summary": "Các ví dụ về lọc thư rác và tạo áp phích có thể xa bối cảnh công việc của người học, nên khó hình dung sự khác nhau giữa phân loại và tạo sinh.",
+          "category": "kho-hieu",
+          "feedbackIds": [
+            "v1-n05-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              1,
+              7,
+              17,
+              27
+            ],
+            "basis": "Góp ý nêu trực tiếp hai ví dụ “thư rác” và “áp phích”; các ví dụ này xuất hiện lần lượt ở phần mở đầu, ví dụ học máy và ví dụ tạo sinh."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chưa biết cụ thể công việc hoặc lĩnh vực của người học để chọn ví dụ phù hợp nhất.",
+            "Hệ thống chỉ đối chiếu kịch bản văn bản, chưa xác nhận cách các ví dụ được thể hiện thực tế trong video."
+          ],
+          "causeHypothesis": {
+            "text": "Các ví dụ hiện tại mang tính minh họa chung nhưng chưa gắn với bối cảnh nghề nghiệp hoặc sinh hoạt quen thuộc của người học.",
+            "source": "ai-doi-chieu"
+          },
+          "impact": {
+            "level": "vua",
+            "reason": "Ví dụ xa lạ có thể làm giảm khả năng liên hệ, dù các khái niệm chính vẫn được giải thích trực tiếp."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Đổi sang ví dụ công việc và sinh hoạt cộng đồng",
+              "rationale": "Giữ nguyên cấu trúc phân loại và tạo sinh, nhưng thay thư rác bằng yêu cầu hỗ trợ và thay áp phích bằng thông báo sinh hoạt cộng đồng gần gũi hơn.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                  "after": "Một công cụ phân loại yêu cầu hỗ trợ của khách hàng, còn một trợ lý viết giúp bạn lời mời tham gia buổi sinh hoạt cộng đồng."
+                },
+                {
+                  "n": 7,
+                  "field": "loi",
+                  "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                  "after": "Chẳng hạn, ta đưa vào nhiều yêu cầu hỗ trợ đã được đánh dấu là cần xử lý gấp hoặc có thể xử lý sau."
+                },
+                {
+                  "n": 17,
+                  "field": "loi",
+                  "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                  "after": "Một công cụ thiết kế thông báo cho buổi sinh hoạt cộng đồng từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                },
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo thông báo cho buổi sinh hoạt cộng đồng từ một đoạn mô tả."
+                },
+                {
+                  "n": 28,
+                  "field": "loi",
+                  "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                  "after": "Tạo thông báo bằng hình ảnh là một việc tạo sinh, nhưng nhìn sản phẩm chưa cho biết công cụ đã dùng những mô hình nào."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Đổi sang ví dụ bán hàng và truyền thông nội bộ",
+              "rationale": "Dùng các tình huống như phân loại phản hồi của khách hàng và tạo hình ảnh giới thiệu sản phẩm, phù hợp với nhiều công việc thực tế và vẫn làm rõ sự khác nhau giữa đầu ra phân loại và đầu ra nội dung mới.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                  "after": "Một công cụ phân loại phản hồi của khách hàng, còn một trợ lý viết giúp bạn nội dung giới thiệu sản phẩm mới."
+                },
+                {
+                  "n": 7,
+                  "field": "loi",
+                  "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                  "after": "Chẳng hạn, ta đưa vào nhiều phản hồi của khách hàng đã được đánh dấu là hài lòng hoặc cần hỗ trợ thêm."
+                },
+                {
+                  "n": 17,
+                  "field": "loi",
+                  "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                  "after": "Một công cụ tạo hình ảnh giới thiệu sản phẩm từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                },
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo hình ảnh giới thiệu sản phẩm từ một đoạn mô tả."
+                },
+                {
+                  "n": 28,
+                  "field": "loi",
+                  "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                  "after": "Tạo hình ảnh giới thiệu sản phẩm là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "cx-is-1",
+          "type": "can-xac-nhan",
+          "title": "Cần xác nhận: Các ví dụ về lọc thư rác và tạo áp phích có thể xa bối cảnh công việc của người học, nên khó hình dung sự khác nhau giữa phân loại và tạo sinh.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            1,
+            7,
+            17,
+            27
+          ],
+          "tuGiay": 0,
+          "denGiay": 169.5,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "ex-01",
+              "summary": "Các ví dụ về lọc thư rác và tạo áp phích có thể xa bối cảnh công việc của người học, nên khó hình dung sự khác nhau giữa phân loại và tạo sinh.",
+              "category": "kho-hieu",
+              "feedbackIds": [
+                "v1-n05-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  1,
+                  7,
+                  17,
+                  27
+                ],
+                "basis": "Góp ý nêu trực tiếp hai ví dụ “thư rác” và “áp phích”; các ví dụ này xuất hiện lần lượt ở phần mở đầu, ví dụ học máy và ví dụ tạo sinh."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chưa biết cụ thể công việc hoặc lĩnh vực của người học để chọn ví dụ phù hợp nhất.",
+                "Hệ thống chỉ đối chiếu kịch bản văn bản, chưa xác nhận cách các ví dụ được thể hiện thực tế trong video."
+              ],
+              "causeHypothesis": {
+                "text": "Các ví dụ hiện tại mang tính minh họa chung nhưng chưa gắn với bối cảnh nghề nghiệp hoặc sinh hoạt quen thuộc của người học.",
+                "source": "ai-doi-chieu"
+              },
+              "impact": {
+                "level": "vua",
+                "reason": "Ví dụ xa lạ có thể làm giảm khả năng liên hệ, dù các khái niệm chính vẫn được giải thích trực tiếp."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Đổi sang ví dụ công việc và sinh hoạt cộng đồng",
+                  "rationale": "Giữ nguyên cấu trúc phân loại và tạo sinh, nhưng thay thư rác bằng yêu cầu hỗ trợ và thay áp phích bằng thông báo sinh hoạt cộng đồng gần gũi hơn.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                      "after": "Một công cụ phân loại yêu cầu hỗ trợ của khách hàng, còn một trợ lý viết giúp bạn lời mời tham gia buổi sinh hoạt cộng đồng."
+                    },
+                    {
+                      "n": 7,
+                      "field": "loi",
+                      "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                      "after": "Chẳng hạn, ta đưa vào nhiều yêu cầu hỗ trợ đã được đánh dấu là cần xử lý gấp hoặc có thể xử lý sau."
+                    },
+                    {
+                      "n": 17,
+                      "field": "loi",
+                      "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                      "after": "Một công cụ thiết kế thông báo cho buổi sinh hoạt cộng đồng từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                    },
+                    {
+                      "n": 27,
+                      "field": "loi",
+                      "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                      "after": "Thẻ thứ hai là công cụ tạo thông báo cho buổi sinh hoạt cộng đồng từ một đoạn mô tả."
+                    },
+                    {
+                      "n": 28,
+                      "field": "loi",
+                      "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                      "after": "Tạo thông báo bằng hình ảnh là một việc tạo sinh, nhưng nhìn sản phẩm chưa cho biết công cụ đã dùng những mô hình nào."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Đổi sang ví dụ bán hàng và truyền thông nội bộ",
+                  "rationale": "Dùng các tình huống như phân loại phản hồi của khách hàng và tạo hình ảnh giới thiệu sản phẩm, phù hợp với nhiều công việc thực tế và vẫn làm rõ sự khác nhau giữa đầu ra phân loại và đầu ra nội dung mới.",
+                  "patches": [
+                    {
+                      "n": 1,
+                      "field": "loi",
+                      "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                      "after": "Một công cụ phân loại phản hồi của khách hàng, còn một trợ lý viết giúp bạn nội dung giới thiệu sản phẩm mới."
+                    },
+                    {
+                      "n": 7,
+                      "field": "loi",
+                      "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                      "after": "Chẳng hạn, ta đưa vào nhiều phản hồi của khách hàng đã được đánh dấu là hài lòng hoặc cần hỗ trợ thêm."
+                    },
+                    {
+                      "n": 17,
+                      "field": "loi",
+                      "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                      "after": "Một công cụ tạo hình ảnh giới thiệu sản phẩm từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                    },
+                    {
+                      "n": 27,
+                      "field": "loi",
+                      "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                      "after": "Thẻ thứ hai là công cụ tạo hình ảnh giới thiệu sản phẩm từ một đoạn mô tả."
+                    },
+                    {
+                      "n": 28,
+                      "field": "loi",
+                      "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                      "after": "Tạo hình ảnh giới thiệu sản phẩm là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Đổi sang ví dụ công việc và sinh hoạt cộng đồng",
+              "rationale": "Giữ nguyên cấu trúc phân loại và tạo sinh, nhưng thay thư rác bằng yêu cầu hỗ trợ và thay áp phích bằng thông báo sinh hoạt cộng đồng gần gũi hơn.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                  "after": "Một công cụ phân loại yêu cầu hỗ trợ của khách hàng, còn một trợ lý viết giúp bạn lời mời tham gia buổi sinh hoạt cộng đồng."
+                },
+                {
+                  "n": 7,
+                  "field": "loi",
+                  "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                  "after": "Chẳng hạn, ta đưa vào nhiều yêu cầu hỗ trợ đã được đánh dấu là cần xử lý gấp hoặc có thể xử lý sau."
+                },
+                {
+                  "n": 17,
+                  "field": "loi",
+                  "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                  "after": "Một công cụ thiết kế thông báo cho buổi sinh hoạt cộng đồng từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                },
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo thông báo cho buổi sinh hoạt cộng đồng từ một đoạn mô tả."
+                },
+                {
+                  "n": 28,
+                  "field": "loi",
+                  "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                  "after": "Tạo thông báo bằng hình ảnh là một việc tạo sinh, nhưng nhìn sản phẩm chưa cho biết công cụ đã dùng những mô hình nào."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Đổi sang ví dụ bán hàng và truyền thông nội bộ",
+              "rationale": "Dùng các tình huống như phân loại phản hồi của khách hàng và tạo hình ảnh giới thiệu sản phẩm, phù hợp với nhiều công việc thực tế và vẫn làm rõ sự khác nhau giữa đầu ra phân loại và đầu ra nội dung mới.",
+              "patches": [
+                {
+                  "n": 1,
+                  "field": "loi",
+                  "before": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+                  "after": "Một công cụ phân loại phản hồi của khách hàng, còn một trợ lý viết giúp bạn nội dung giới thiệu sản phẩm mới."
+                },
+                {
+                  "n": 7,
+                  "field": "loi",
+                  "before": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+                  "after": "Chẳng hạn, ta đưa vào nhiều phản hồi của khách hàng đã được đánh dấu là hài lòng hoặc cần hỗ trợ thêm."
+                },
+                {
+                  "n": 17,
+                  "field": "loi",
+                  "before": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+                  "after": "Một công cụ tạo hình ảnh giới thiệu sản phẩm từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng."
+                },
+                {
+                  "n": 27,
+                  "field": "loi",
+                  "before": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+                  "after": "Thẻ thứ hai là công cụ tạo hình ảnh giới thiệu sản phẩm từ một đoạn mô tả."
+                },
+                {
+                  "n": 28,
+                  "field": "loi",
+                  "before": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+                  "after": "Tạo hình ảnh giới thiệu sản phẩm là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Cần xác nhận vị trí"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "LOCATION_DOWNGRADED",
+            "level": "ghi-nhan",
+            "message": "Vị trí trải dài 27 câu (> 5 câu), hạ về 'can-xac-nhan'",
+            "target": "ex-01"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

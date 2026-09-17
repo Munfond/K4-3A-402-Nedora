@@ -1,0 +1,300 @@
+{
+  "caseId": "N-02",
+  "status": "khong-dat",
+  "durationMs": 6276,
+  "tokens": 7148,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n02-a]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [
+          2
+        ]
+      }
+    },
+    {
+      "type": "location",
+      "passed": false,
+      "message": "Định vị không khớp kỳ vọng"
+    },
+    {
+      "type": "no-loi-patch",
+      "passed": true,
+      "message": "Không có patch sửa lời nào hợp lệ"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-183355-cc6c",
+      "inputHash": "7fde1451514dd67fe79ce8f04923dd9c4b6d63f1cd15f0c99b4e120eea05e1bd",
+      "feedback": [
+        {
+          "id": "v1-n02-a",
+          "label": "gop-y",
+          "sender": "ng-51e5c9ee",
+          "channel": "binh-luan",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "v1-n02-a",
+          "summary": "Âm thanh nền quá lớn, làm át giọng đọc.",
+          "category": "loi-ky-thuat",
+          "feedbackIds": [
+            "v1-n02-a"
+          ],
+          "location": {
+            "status": "can-xac-nhan",
+            "sentenceNs": [
+              2
+            ],
+            "basis": "Người học đề cập đến nhạc nền át giọng đọc ở khoảng phút thứ hai."
+          },
+          "stances": [
+            {
+              "direction": "giảm",
+              "feedbackIds": [
+                "v1-n02-a"
+              ]
+            }
+          ],
+          "uncertainties": [],
+          "causeHypothesis": {
+            "text": "Người học có thể không nghe rõ giọng đọc do âm thanh nền lớn.",
+            "source": "nguoi-gop-y"
+          },
+          "impact": {
+            "level": "cao",
+            "reason": "Người học không thể theo dõi nội dung do âm thanh không rõ ràng."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm âm lượng nhạc nền",
+              "rationale": "Giảm âm lượng nhạc nền để giọng đọc rõ hơn.",
+              "patches": [
+                {
+                  "n": 2,
+                  "field": "yDoHinh",
+                  "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                  "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi nhạc nền",
+              "rationale": "Thay đổi nhạc nền để không làm át giọng đọc.",
+              "patches": [
+                {
+                  "n": 2,
+                  "field": "yDoHinh",
+                  "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                  "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "independentSenders": 1,
+          "mentions": 1,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "kt-is-1",
+          "type": "ky-thuat",
+          "title": "Kỹ thuật: Âm thanh nền quá lớn, làm át giọng đọc.",
+          "issueIds": [
+            "is-1"
+          ],
+          "sentenceNs": [
+            2
+          ],
+          "tuGiay": 6.8,
+          "denGiay": 13,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "v1-n02-a",
+              "summary": "Âm thanh nền quá lớn, làm át giọng đọc.",
+              "category": "loi-ky-thuat",
+              "feedbackIds": [
+                "v1-n02-a"
+              ],
+              "location": {
+                "status": "can-xac-nhan",
+                "sentenceNs": [
+                  2
+                ],
+                "basis": "Người học đề cập đến nhạc nền át giọng đọc ở khoảng phút thứ hai."
+              },
+              "stances": [
+                {
+                  "direction": "giảm",
+                  "feedbackIds": [
+                    "v1-n02-a"
+                  ]
+                }
+              ],
+              "uncertainties": [],
+              "causeHypothesis": {
+                "text": "Người học có thể không nghe rõ giọng đọc do âm thanh nền lớn.",
+                "source": "nguoi-gop-y"
+              },
+              "impact": {
+                "level": "cao",
+                "reason": "Người học không thể theo dõi nội dung do âm thanh không rõ ràng."
+              },
+              "options": [
+                {
+                  "id": "is-1-A",
+                  "label": "A",
+                  "title": "Giảm âm lượng nhạc nền",
+                  "rationale": "Giảm âm lượng nhạc nền để giọng đọc rõ hơn.",
+                  "patches": [
+                    {
+                      "n": 2,
+                      "field": "yDoHinh",
+                      "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                      "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                },
+                {
+                  "id": "is-1-B",
+                  "label": "B",
+                  "title": "Thay đổi nhạc nền",
+                  "rationale": "Thay đổi nhạc nền để không làm át giọng đọc.",
+                  "patches": [
+                    {
+                      "n": 2,
+                      "field": "yDoHinh",
+                      "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                      "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": null,
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": []
+                }
+              ],
+              "independentSenders": 1,
+              "mentions": 1,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Giảm âm lượng nhạc nền",
+              "rationale": "Giảm âm lượng nhạc nền để giọng đọc rõ hơn.",
+              "patches": [
+                {
+                  "n": 2,
+                  "field": "yDoHinh",
+                  "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                  "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Thay đổi nhạc nền",
+              "rationale": "Thay đổi nhạc nền để không làm át giọng đọc.",
+              "patches": [
+                {
+                  "n": 2,
+                  "field": "yDoHinh",
+                  "before": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+                  "after": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": null,
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": []
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 1,
+          "mentions": 1,
+          "flags": [
+            "Kỹ thuật"
+          ]
+        }
+      ],
+      "validation": {
+        "findings": [
+          {
+            "code": "PATCH_NO_CHANGE",
+            "level": "ghi-nhan",
+            "message": "Patch câu 2 có after giống hệt before, bỏ patch",
+            "target": "is-1-A"
+          },
+          {
+            "code": "PATCH_NO_CHANGE",
+            "level": "ghi-nhan",
+            "message": "Patch câu 2 có after giống hệt before, bỏ patch",
+            "target": "is-1-B"
+          }
+        ],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

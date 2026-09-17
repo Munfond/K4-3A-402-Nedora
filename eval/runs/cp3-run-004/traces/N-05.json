@@ -1,0 +1,30 @@
+{
+  "caseId": "N-05",
+  "status": "loi",
+  "durationMs": 5,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": false,
+      "message": "Kỳ vọng done, nhận loi"
+    },
+    {
+      "type": "in-issue",
+      "passed": false,
+      "message": "Không tìm thấy vấn đề thỏa mãn"
+    },
+    {
+      "type": "location",
+      "passed": true,
+      "message": "Góp ý không thuộc vấn đề nào, mặc định can-xac-nhan"
+    }
+  ],
+  "executionContext": {
+    "status": "loi",
+    "error": {
+      "code": "MODEL_NOT_CONFIGURED",
+      "message": "Không có khóa dùng được cho model openai/gpt-4o-mini: cần AI_GATEWAY_API_KEY, hoặc OPENAI_API_KEY với model openai/…"
+    }
+  }
+}

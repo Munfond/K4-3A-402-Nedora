@@ -1,15 +1,11 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { Output, generateText, gateway, type LanguageModel } from "ai";
 import {
+  getPromptHash,
   PROMPT_VERSION,
   REVISION_SYSTEM_PROMPT,
-  getPromptHash,
 } from "./prompt";
-import {
-  RevisionAgentOutput,
-  type AgentFeedbackItem,
-  type AgentIssue,
-} from "./schema";
+import { RevisionAgentOutput } from "./schema";
 
 export * from "./schema";
 export * from "./prompt";
