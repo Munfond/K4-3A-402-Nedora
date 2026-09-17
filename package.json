@@ -1,0 +1,41 @@
+{
+  "name": "@feedback/root",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vercel-labs/oss-gtm-feedback.git"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "format": "biome format --write",
+    "lint": "biome check",
+    "prepare": "husky",
+    "db:seed": "pnpm --filter www db:seed",
+    "db:push": "pnpm --filter www db:push"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "turbo": "^2.6.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.2",
+      "@types/react-dom": "19.2.1",
+      "react-is": "^19.0.0",
+      "@auth/core": "0.41.1",
+      "@ai-sdk/provider": "3.0.0-beta.31"
+    },
+    "onlyBuiltDependencies": [
+      "@vercel/speed-insights"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": [
+      "biome format --write"
+    ]
+  },
+  "packageManager": "pnpm@10.0.0"
+}

@@ -1,0 +1,26 @@
+{
+  "caseId": "H-04",
+  "status": "dat",
+  "durationMs": 0,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "conflict",
+      "passed": true,
+      "message": "Phát hiện xung đột tại (23, loi)"
+    },
+    {
+      "type": "draft-field",
+      "passed": true,
+      "message": "Trường loi câu 23 giữ nguyên"
+    },
+    {
+      "type": "export-status",
+      "passed": true,
+      "message": "Chặn xuất do xung đột thành công"
+    }
+  ],
+  "executionContext": {
+    "status": "xong"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@feedback/config",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Shared configuration helpers for the GTM Feedback project",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./url": "./src/url.ts",
+    "./logger": "./src/logger.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [
+        ".next/**",
+        "!**/.next/cache/**",
+        ".nitro/**",
+        ".output/**",
+        "dist/**"
+      ],
+      "env": [
+        "SLACK_BOT_TOKEN",
+        "SLACK_SIGNING_SECRET",
+        "AI_GATEWAY_API_KEY",
+        "NGROK_AUTH_TOKEN",
+        "SLACK_APP_VERIFICATION",
+        "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
+        "POSTGRES_URL",
+        "POSTGRES_PRISMA_URL",
+        "POSTGRES_URL_NON_POOLING",
+        "POSTGRES_URL_NO_SSL",
+        "POSTGRES_HOST",
+        "POSTGRES_USER",
+        "POSTGRES_PASSWORD",
+        "POSTGRES_DATABASE",
+        "PGHOST",
+        "PGHOST_UNPOOLED",
+        "PGUSER",
+        "PGPASSWORD",
+        "PGDATABASE",
+        "NEON_PROJECT_ID",
+        "KV_URL",
+        "KV_REST_API_URL",
+        "KV_REST_API_TOKEN",
+        "KV_REST_API_READ_ONLY_TOKEN",
+        "REDIS_URL",
+        "SLACK_DIGEST_CHANNEL_ID",
+        "SLACK_GTM_FEEDBACK_CHANNEL_ID",
+        "AUTH_GOOGLE_CLIENT_ID",
+        "AUTH_GOOGLE_SECRET",
+        "AUTH_SECRET",
+        "EXTERNAL_API_VERIFICATION",
+        "OPENAI_API_KEY",
+        "SYSTEM_USER_ID",
+        "CRON_SECRET",
+        "UPSTASH_VECTOR_REST_URL",
+        "UPSTASH_VECTOR_REST_TOKEN",
+        "UPSTASH_VECTOR_REST_READONLY_TOKEN"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "description": "Fixture H-04: Conflict on sentence 23 speech field between two regions",
+  "cases": [
+    {
+      "id": "rg-21-22",
+      "type": "vung",
+      "title": "Khu vực câu 21-22 nối sang 23",
+      "issueIds": ["is-21"],
+      "sentenceNs": [21, 22],
+      "tuGiay": 100,
+      "denGiay": 120,
+      "issues": [],
+      "options": [
+        {
+          "id": "op-rg21-A",
+          "label": "A",
+          "title": "Sửa câu 23 từ hồ sơ thứ nhất",
+          "rationale": "Làm rõ phân tách ứng dụng và mô hình",
+          "status": "hop-le",
+          "expectedEffect": "giai-quyet",
+          "patches": [
+            {
+              "n": 23,
+              "field": "loi",
+              "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+              "after": "Vì vậy, chỉ nhìn tên ứng dụng thì chưa biết bên trong đang dùng mô hình nào."
+            }
+          ]
+        }
+      ],
+      "hasDisagreement": false,
+      "independentSenders": 1,
+      "mentions": 1,
+      "flags": []
+    },
+    {
+      "id": "rg-24-25",
+      "type": "vung",
+      "title": "Khu vực câu 24-25 nối ngược 23",
+      "issueIds": ["is-24"],
+      "sentenceNs": [24, 25],
+      "tuGiay": 121,
+      "denGiay": 140,
+      "issues": [],
+      "options": [
+        {
+          "id": "op-rg24-A",
+          "label": "A",
+          "title": "Sửa câu 23 từ hồ sơ thứ hai",
+          "rationale": "Lời nối sang phần đặt thẻ",
+          "status": "hop-le",
+          "expectedEffect": "giai-quyet",
+          "patches": [
+            {
+              "n": 23,
+              "field": "loi",
+              "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+              "after": "Nên tên ứng dụng không cho biết bên trong có những mô hình nào."
+            }
+          ]
+        }
+      ],
+      "hasDisagreement": false,
+      "independentSenders": 1,
+      "mentions": 1,
+      "flags": []
+    }
+  ],
+  "decisions": {
+    "rg-21-22": {
+      "type": "chon",
+      "optionId": "op-rg21-A",
+      "at": "2026-09-17T12:00:00.000Z"
+    },
+    "rg-24-25": {
+      "type": "chon",
+      "optionId": "op-rg24-A",
+      "at": "2026-09-17T12:00:00.000Z"
+    }
+  }
+}

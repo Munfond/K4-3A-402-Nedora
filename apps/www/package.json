@@ -13,6 +13,8 @@
     "db:migrate": "pnpm --filter @feedback/db db:migrate",
     "db:push": "pnpm --filter @feedback/db db:push",
     "db:seed": "tsx scripts/seed.ts",
+    "eval:cp3": "tsx scripts/eval-cp3.ts",
+    "check:leaks": "tsx scripts/check-leaks.ts",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "node ./fonts/init.mjs"
   },

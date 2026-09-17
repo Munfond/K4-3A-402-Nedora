@@ -1,0 +1,16 @@
+{
+  "name": "@feedback/redis",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Redis client package for the GTM Feedback project",
+  "license": "MIT",
+  "dependencies": {
+    "@upstash/redis": "^1.35.6"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

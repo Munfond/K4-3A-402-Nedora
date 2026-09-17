@@ -2,7 +2,7 @@
 
 import { Check, Undo2, X } from "lucide-react";
 
-import { NhanLoaiThayDoi } from "@/components/c5/nhan";
+import { NhanThayDoi } from "@/components/c5/nhan";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuyetDinh } from "@/hooks/use-quyet-dinh";
@@ -27,7 +27,8 @@ export default function DeXuatList({ deXuats, cauTheoSo }: Props) {
   return (
     <div className="space-y-3">
       {deXuats.map((dx) => {
-        const quyetDinh = layQuyetDinh(dx.id, dx.quyetDinh);
+        const quyetDinhRec = layQuyetDinh(dx.id);
+        const quyetDinhType = quyetDinhRec?.type || "cho-duyet";
         const cau = cauTheoSo[dx.cau];
         const truoc = dx.loaiThayDoi === "hinh" ? cau?.yDoHinh : cau?.loi;
 
@@ -36,19 +37,19 @@ export default function DeXuatList({ deXuats, cauTheoSo }: Props) {
             <CardContent className="space-y-3 p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-sm">Câu {dx.cau}</span>
-                <NhanLoaiThayDoi loai={dx.loaiThayDoi} />
+                <NhanThayDoi loai={dx.loaiThayDoi as any} />
                 <span className="font-mono text-muted-foreground text-xs">
                   {dx.id}
                 </span>
-                {quyetDinh !== "cho-duyet" && (
+                {quyetDinhType !== "cho-duyet" && (
                   <span
                     className={
-                      quyetDinh === "dong-y"
+                      quyetDinhType === "chon"
                         ? "ml-auto rounded-md bg-green-50 px-2 py-0.5 font-medium text-green-700 text-xs ring-1 ring-green-200 dark:bg-green-950 dark:text-green-300 dark:ring-green-900"
                         : "ml-auto rounded-md bg-neutral-100 px-2 py-0.5 font-medium text-neutral-600 text-xs ring-1 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:ring-neutral-700"
                     }
                   >
-                    {quyetDinh === "dong-y" ? "Đã đồng ý" : "Đã bỏ"}
+                    {quyetDinhType === "chon" ? "Đã đồng ý" : "Đã bỏ"}
                   </span>
                 )}
               </div>
@@ -77,12 +78,18 @@ export default function DeXuatList({ deXuats, cauTheoSo }: Props) {
               </p>
 
               <div className="flex gap-2">
-                {quyetDinh === "cho-duyet" ? (
+                {quyetDinhType === "cho-duyet" ? (
                   <>
                     <Button
                       type="button"
                       size="sm"
-                      onClick={() => dat(dx.id, "dong-y")}
+                      onClick={() =>
+                        dat(dx.id, {
+                          type: "chon",
+                          optionId: dx.id,
+                          at: new Date().toISOString(),
+                        })
+                      }
                       className="gap-1.5"
                     >
                       <Check className="size-3.5" />
@@ -92,7 +99,12 @@ export default function DeXuatList({ deXuats, cauTheoSo }: Props) {
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={() => dat(dx.id, "bo")}
+                      onClick={() =>
+                        dat(dx.id, {
+                          type: "bo",
+                          at: new Date().toISOString(),
+                        })
+                      }
                       className="gap-1.5"
                     >
                       <X className="size-3.5" />
@@ -104,7 +116,12 @@ export default function DeXuatList({ deXuats, cauTheoSo }: Props) {
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => dat(dx.id, "cho-duyet")}
+                    onClick={() =>
+                      dat(dx.id, {
+                        type: "hoan",
+                        at: new Date().toISOString(),
+                      })
+                    }
                     className="gap-1.5 text-muted-foreground"
                   >
                     <Undo2 className="size-3.5" />

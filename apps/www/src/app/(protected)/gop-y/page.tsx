@@ -1,79 +1,146 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import useSWR from "swr";
 
 import GopYItem from "@/components/c5/gop-y-item";
 import PageWrapper from "@/components/page-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
-import { getGopYList, getVanDeById } from "@/lib/mock-data";
+import { Button } from "@/components/ui/button";
+import { getLastRunId } from "@/hooks/use-quyet-dinh";
+import type {
+  FeedbackItem,
+  RevisionRunResult,
+  RunMetadata,
+} from "@/lib/revision/types";
 
-export const metadata: Metadata = {
-  title: "Góp ý gốc",
-  description:
-    "Toàn bộ góp ý đã nhận từ khảo sát, bình luận và tin nhắn, kèm trạng thái xử lý.",
-};
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function GopYPage() {
-  const gopYList = getGopYList();
+  const searchParams = useSearchParams();
+  const queryRunId = searchParams.get("run");
+  const [activeRunId, setActiveRunId] = useState<string>(queryRunId || "");
 
-  const daGom = gopYList.filter((g) => g.trangThai === "da-gom");
-  const chuaGom = gopYList.filter((g) => g.trangThai === "chua-gom");
-  const ganCo = gopYList.filter((g) => g.trangThai === "gan-co");
+  useEffect(() => {
+    if (queryRunId) {
+      setActiveRunId(queryRunId);
+    } else {
+      const last = getLastRunId();
+      if (last) setActiveRunId(last);
+    }
+  }, [queryRunId]);
+
+  const { data, isLoading } = useSWR<{
+    run: RunMetadata;
+    result?: RevisionRunResult;
+  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+
+  const result = data?.result;
+  const feedbackList = result?.feedback || [];
+
+  const issueFeedbackMap = new Map<string, string[]>();
+  for (const iss of result?.issues || []) {
+    for (const fid of iss.feedbackIds) {
+      const list = issueFeedbackMap.get(fid) || [];
+      list.push(iss.id);
+      issueFeedbackMap.set(fid, list);
+    }
+  }
+
+  const daGom = feedbackList.filter(
+    (g) => !g.isQuarantined && (issueFeedbackMap.get(g.id)?.length ?? 0) > 0,
+  );
+  const chuaGom = feedbackList.filter(
+    (g) => !g.isQuarantined && !(issueFeedbackMap.get(g.id)?.length ?? 0),
+  );
+  const ganCo = feedbackList.filter((g) => g.isQuarantined);
 
   return (
     <PageWrapper className="overflow-y-auto pb-16">
-      <div className="mx-auto mt-10 w-full max-w-4xl space-y-6 px-4">
+      <div className="mx-auto mt-6 w-full max-w-4xl space-y-6 px-4">
         <div>
-          <h1 className="font-bold text-3xl dark:text-neutral-50">Góp ý gốc</h1>
+          <h1 className="font-bold text-2xl dark:text-neutral-50 sm:text-3xl">
+            Góp ý gốc
+          </h1>
           <p className="mt-2 text-muted-foreground text-sm">
-            {gopYList.length} góp ý đã nhận · {daGom.length} đã gom thành vấn đề
-            · {chuaGom.length} chưa gom ·{" "}
-            <Link href="/gop-y/gan-co" className="underline">
-              {ganCo.length} gắn cờ
+            {feedbackList.length} góp ý trong lượt phân tích (
+            {activeRunId || "hiện tại"}) · {daGom.length} đã gom vào vấn đề ·{" "}
+            {chuaGom.length} không tạo vấn đề ·{" "}
+            <Link
+              href={`/gop-y/gan-co?run=${activeRunId}`}
+              className="underline text-red-600 dark:text-red-400"
+            >
+              {ganCo.length} gắn cờ cách ly
             </Link>
           </p>
         </div>
 
-        <section className="space-y-3">
-          <h2 className="font-semibold text-sm uppercase tracking-wide">
-            Đã gom thành vấn đề ({daGom.length})
-          </h2>
-          <Card>
-            <CardContent className="divide-y p-0">
-              {daGom.map((gy) => (
-                <div key={gy.id}>
-                  <GopYItem gopY={gy} />
-                  {gy.vanDeId && (
-                    <div className="px-4 pb-3">
-                      <Link
-                        href={`/van-de/${gy.vanDeId}`}
-                        className="text-muted-foreground text-xs underline hover:text-foreground"
-                      >
-                        → {getVanDeById(gy.vanDeId)?.moTa ?? gy.vanDeId}
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+        {feedbackList.length === 0 && !isLoading && (
+          <div className="rounded-lg border border-dashed p-8 text-center space-y-3">
+            <p className="text-muted-foreground text-sm">
+              Chưa có dữ liệu góp ý của lượt chạy này.
+            </p>
+            <Link href="/">
+              <Button size="sm">Đến trang phân tích</Button>
+            </Link>
+          </div>
+        )}
 
-        <section className="space-y-3">
-          <h2 className="font-semibold text-sm uppercase tracking-wide">
-            Chưa gom thành vấn đề ({chuaGom.length})
-          </h2>
-          <p className="text-muted-foreground text-xs">
-            Góp ý khen, góp ý mơ hồ không chỉ rõ chỗ nào, hoặc chưa đủ người
-            nhắc để thành một vấn đề chung.
-          </p>
-          <Card>
-            <CardContent className="divide-y p-0">
-              {chuaGom.map((gy) => (
-                <GopYItem key={gy.id} gopY={gy} />
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+        {daGom.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="font-semibold text-sm uppercase tracking-wide">
+              Đã gom vào vấn đề ({daGom.length})
+            </h2>
+            <Card>
+              <CardContent className="divide-y p-0">
+                {daGom.map((gy) => {
+                  const linkedIssues = issueFeedbackMap.get(gy.id) || [];
+                  return (
+                    <div key={gy.id}>
+                      <GopYItem gopY={gy} />
+                      {linkedIssues.length > 0 && (
+                        <div className="px-4 pb-3 flex flex-wrap gap-2 text-xs">
+                          <span className="text-muted-foreground">
+                            Thuộc vấn đề:
+                          </span>
+                          {linkedIssues.map((iid) => (
+                            <span
+                              key={iid}
+                              className="font-mono bg-muted px-2 py-0.5 rounded border"
+                            >
+                              {iid}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
+        {chuaGom.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="font-semibold text-sm uppercase tracking-wide">
+              Không thành vấn đề sửa ({chuaGom.length})
+            </h2>
+            <p className="text-muted-foreground text-xs">
+              Góp ý khen ngợi, chỉ có điểm số, hoặc không có yêu cầu chỉnh sửa
+              kịch bản.
+            </p>
+            <Card>
+              <CardContent className="divide-y p-0">
+                {chuaGom.map((gy) => (
+                  <GopYItem key={gy.id} gopY={gy} />
+                ))}
+              </CardContent>
+            </Card>
+          </section>
+        )}
       </div>
     </PageWrapper>
   );

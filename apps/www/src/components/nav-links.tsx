@@ -4,6 +4,8 @@ import {
   FileDown,
   Flag,
   GalleryVerticalEnd,
+  History,
+  Home,
   MessagesSquare,
 } from "lucide-react";
 import type { Route } from "next";
@@ -22,10 +24,12 @@ const navLinks: Array<{
   url: Route;
   icon: typeof GalleryVerticalEnd;
 }> = [
+  { name: "Tổng quan", url: "/", icon: Home },
   { name: "Vấn đề", url: "/van-de", icon: GalleryVerticalEnd },
   { name: "Góp ý gốc", url: "/gop-y", icon: MessagesSquare },
   { name: "Góp ý gắn cờ", url: "/gop-y/gan-co", icon: Flag },
   { name: "Xuất kịch bản", url: "/xuat", icon: FileDown },
+  { name: "Lịch sử chạy", url: "/lich-su" as Route, icon: History },
 ];
 
 export default function NavLinks() {
@@ -38,7 +42,7 @@ export default function NavLinks() {
           <SidebarMenuItem key={link.url}>
             <SidebarMenuButton asChild isActive={pathname === link.url}>
               <Link href={link.url}>
-                <link.icon />
+                <link.icon className="size-4" />
                 <span>{link.name}</span>
               </Link>
             </SidebarMenuButton>

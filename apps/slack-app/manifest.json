@@ -1,0 +1,90 @@
+{
+  "display_information": {
+    "name": "GTM Feedback",
+    "background_color": "#000000"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "GTM Feedback",
+      "always_online": true
+    },
+    "unfurl_domains": ["[your-prod-domain.com]"],
+    "shortcuts": [
+      {
+        "name": "Add Feedback",
+        "type": "global",
+        "callback_id": "feedback_shortcut_id",
+        "description": "Add customer feedback"
+      }
+    ],
+    "slash_commands": [
+      {
+        "command": "/shipped",
+        "url": "[your-dev-domain.com]/api/slack/events",
+        "description": "Mark a feature request as shipped",
+        "usage_hint": "[feedback URL]",
+        "should_escape": false
+      }
+    ],
+    "rich_previews": {
+      "is_active": true,
+      "entity_types": ["slack#/entities/content_item"]
+    },
+    "assistant_view": {
+      "assistant_description": "GTM Feedback description"
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "channels:history",
+        "channels:join",
+        "chat:write",
+        "chat:write.public",
+        "commands",
+        "app_mentions:read",
+        "groups:history",
+        "groups:write",
+        "im:history",
+        "mpim:history",
+        "assistant:write",
+        "reactions:write",
+        "reactions:read",
+        "users:read",
+        "users:read.email",
+        "links:read",
+        "links:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "[your-dev-domain.com]/api/slack/events",
+      "bot_events": [
+        "app_home_opened",
+        "app_mention",
+        "assistant_thread_context_changed",
+        "assistant_thread_started",
+        "entity_details_requested",
+        "link_shared",
+        "message.channels",
+        "message.groups",
+        "message.im",
+        "message.mpim",
+        "reaction_added"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "[your-dev-domain.com]/api/slack/events"
+    },
+    "org_deploy_enabled": true,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

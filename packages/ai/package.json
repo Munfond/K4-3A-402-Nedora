@@ -1,0 +1,34 @@
+{
+  "name": "@feedback/ai",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "AI package for the GTM Feedback project",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/devtools": "0.0.1",
+    "@ai-sdk/openai": "^3.0.0",
+    "@feedback/db": "workspace:*",
+    "@feedback/redis": "workspace:*",
+    "@upstash/vector": "^1.0.0",
+    "ai": "6.0.5",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./models": "./src/models.ts",
+    "./agents": "./src/agents/index.ts",
+    "./agents/slack": "./src/agents/slack/index.ts",
+    "./agents/requests": "./src/agents/requests/index.ts",
+    "./agents/search": "./src/agents/search/index.ts",
+    "./agents/analytics": "./src/agents/analytics/index.ts",
+    "./agents/identity": "./src/agents/identity/index.ts",
+    "./agents/revision": "./src/agents/revision/index.ts",
+    "./embeddings": "./src/embeddings/index.ts"
+  }
+}

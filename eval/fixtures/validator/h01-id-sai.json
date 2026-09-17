@@ -1,0 +1,57 @@
+{
+  "feedback": [
+    {
+      "id": "gy-015",
+      "label": "gop-y",
+      "note": "Góp ý câu 10-11 về việc chưa hiểu rõ học máy"
+    }
+  ],
+  "issues": [
+    {
+      "key": "is-h01-invalid",
+      "summary": "Vấn đề kiểm thử chứa ID không tồn tại và patch không hợp lệ",
+      "category": "kho-hieu",
+      "feedbackIds": ["gy-015", "gy-999"],
+      "location": {
+        "status": "da-dinh-vi",
+        "sentenceNs": [10, 41],
+        "basis": "Thử nghiệm câu 41 không tồn tại"
+      },
+      "stances": [],
+      "uncertainties": ["Cần kiểm tra lại toàn bộ"],
+      "causeHypothesis": {
+        "text": "Dữ liệu đầu ra của model giả lập bị lỗi",
+        "source": "ai-doi-chieu"
+      },
+      "impact": {
+        "level": "cao",
+        "reason": "Kiểm thử validator"
+      },
+      "options": [
+        {
+          "label": "A",
+          "title": "Phương án có patch sai toàn bộ tiêu chí",
+          "rationale": "Kiểm tra phát hiện lỗi của validator",
+          "expectedEffect": "giai-quyet",
+          "remaining": null,
+          "needsHumanCheck": null,
+          "unsupportedOperation": null,
+          "patches": [
+            {
+              "n": 10,
+              "field": "loi",
+              "before": "Nội dung before này hoàn toàn không khớp với kịch bản gốc",
+              "after": "Lời đọc mới này chứa chữ số 12345 nên vi phạm quy tắc"
+            },
+            {
+              "n": 10,
+              "field": "chuTrenManHinh",
+              "before": "Học máy: học từ dữ liệu",
+              "after": "Chữ trên màn hình này dài quá bốn mươi ký tự quy định trong đặc tả của đề bài"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

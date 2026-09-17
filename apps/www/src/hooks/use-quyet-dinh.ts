@@ -1,69 +1,146 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { DecisionRecord, DecisionType } from "@/lib/revision/types";
 
-import type { QuyetDinh } from "@/lib/mock-data";
+const LAST_RUN_KEY = "revision:lastRunId";
 
-const KHOA = "c5-quyet-dinh";
+function getDecisionStorageKey(runId: string): string {
+  return `revision:decisions:${runId}`;
+}
 
-type BangQuyetDinh = Record<string, QuyetDinh>;
+type BangQuyetDinh = Record<string, DecisionRecord>;
 
-function doc(): BangQuyetDinh {
+function doc(key: string): BangQuyetDinh {
   if (typeof window === "undefined") return {};
   try {
-    const raw = window.localStorage.getItem(KHOA);
+    const raw = window.localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as BangQuyetDinh) : {};
   } catch {
     return {};
   }
 }
 
-/** Sự kiện riêng để các component trên cùng một tab cùng cập nhật. */
-const SU_KIEN = "c5-quyet-dinh-doi";
+export function getLastRunId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.localStorage.getItem(LAST_RUN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
 
-/**
- * Quyết định duyệt của đội sản xuất. Bản mock không có database nên giữ ở
- * localStorage — đủ để đi hết luồng duyệt rồi xuất kịch bản.
- */
-export function useQuyetDinh() {
+export function setLastRunId(runId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LAST_RUN_KEY, runId);
+    window.dispatchEvent(
+      new CustomEvent("revision:run-changed", { detail: runId }),
+    );
+  } catch {
+    // bỏ qua
+  }
+}
+
+export function useQuyetDinh(explicitRunId?: string) {
+  const [activeRunId, setActiveRunId] = useState<string>(explicitRunId || "");
   const [bang, setBang] = useState<BangQuyetDinh>({});
+  const [isStorageFailed, setIsStorageFailed] = useState<boolean>(false);
 
+  // Lấy runId hiện tại nếu không truyền trực tiếp
   useEffect(() => {
-    setBang(doc());
+    if (explicitRunId) {
+      setActiveRunId(explicitRunId);
+    } else {
+      const last = getLastRunId();
+      if (last) setActiveRunId(last);
+    }
 
-    const dongBo = () => setBang(doc());
-    window.addEventListener(SU_KIEN, dongBo);
+    const onRunChanged = (e: Event) => {
+      const ce = e as CustomEvent<string>;
+      if (!explicitRunId && ce.detail) {
+        setActiveRunId(ce.detail);
+      }
+    };
+    window.addEventListener("revision:run-changed", onRunChanged);
+    return () =>
+      window.removeEventListener("revision:run-changed", onRunChanged);
+  }, [explicitRunId]);
+
+  const storageKey = activeRunId ? getDecisionStorageKey(activeRunId) : "";
+  const eventName = activeRunId
+    ? `revision:decisions-changed:${activeRunId}`
+    : "";
+
+  // Tải dữ liệu ban đầu
+  useEffect(() => {
+    if (!storageKey) return;
+    setBang(doc(storageKey));
+
+    const dongBo = () => {
+      setBang(doc(storageKey));
+    };
+
+    window.addEventListener(eventName, dongBo);
     window.addEventListener("storage", dongBo);
     return () => {
-      window.removeEventListener(SU_KIEN, dongBo);
+      window.removeEventListener(eventName, dongBo);
       window.removeEventListener("storage", dongBo);
     };
-  }, []);
+  }, [storageKey, eventName]);
 
-  const dat = useCallback((deXuatId: string, quyetDinh: QuyetDinh) => {
-    const moi = { ...doc(), [deXuatId]: quyetDinh };
-    try {
-      window.localStorage.setItem(KHOA, JSON.stringify(moi));
-    } catch {
-      // Chế độ riêng tư chặn localStorage — vẫn cập nhật trong bộ nhớ.
-    }
-    window.dispatchEvent(new Event(SU_KIEN));
-  }, []);
+  // C3-STO-03: Sửa nhánh lưu thất bại để vẫn cập nhật bộ nhớ và báo chưa lưu
+  const dat = useCallback(
+    (caseId: string, quyetDinh: DecisionRecord) => {
+      setBang((prev) => {
+        const moi = { ...prev, [caseId]: quyetDinh };
+        if (storageKey) {
+          try {
+            window.localStorage.setItem(storageKey, JSON.stringify(moi));
+            setIsStorageFailed(false);
+          } catch {
+            // Chế độ riêng tư chặn localStorage — vẫn giữ trong state và báo lỗi
+            setIsStorageFailed(true);
+          }
+        }
+        return moi;
+      });
+
+      if (eventName) {
+        window.dispatchEvent(new Event(eventName));
+      }
+    },
+    [storageKey, eventName],
+  );
 
   const xoaHet = useCallback(() => {
-    try {
-      window.localStorage.removeItem(KHOA);
-    } catch {
-      // bỏ qua
+    setBang({});
+    if (storageKey) {
+      try {
+        window.localStorage.removeItem(storageKey);
+      } catch {
+        // bỏ qua
+      }
     }
-    window.dispatchEvent(new Event(SU_KIEN));
-  }, []);
+    if (eventName) {
+      window.dispatchEvent(new Event(eventName));
+    }
+  }, [storageKey, eventName]);
 
   const layQuyetDinh = useCallback(
-    (deXuatId: string, macDinh: QuyetDinh): QuyetDinh =>
-      bang[deXuatId] ?? macDinh,
+    (caseId: string): DecisionRecord | undefined => {
+      return bang[caseId];
+    },
     [bang],
   );
 
-  return { bang, dat, xoaHet, layQuyetDinh };
+  return {
+    runId: activeRunId,
+    setRunId: setActiveRunId,
+    bang,
+    dat,
+    xoaHet,
+    layQuyetDinh,
+    isStorageFailed,
+  };
 }

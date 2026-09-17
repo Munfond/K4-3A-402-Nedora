@@ -1,0 +1,370 @@
+import { createHash } from "node:crypto";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
+import type {
+  AnalyzeInput,
+  FeedbackItem,
+  NewFeedbackInput,
+  ScriptData,
+  SentenceData,
+} from "./types";
+import { sanitizeFeedbackItem } from "./sanitize";
+
+export function getDataDir(): string {
+  if (
+    process.env.REVISION_DATA_DIR &&
+    existsSync(process.env.REVISION_DATA_DIR)
+  ) {
+    return process.env.REVISION_DATA_DIR;
+  }
+  // Thử các đường dẫn tương đối phổ biến
+  const candidates = [
+    join(process.cwd(), "apps/www/src/data"),
+    join(process.cwd(), "src/data"),
+    join(process.cwd(), "data/studio-pack/c5-feedbackradar"),
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+  return join(process.cwd(), "apps/www/src/data");
+}
+
+function parseCsv(content: string): Array<Record<string, string>> {
+  const lines = content
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length === 0) return [];
+
+  // Parse header
+  const headerLine = lines[0];
+  const headers = parseCsvLine(headerLine);
+
+  const rows: Array<Record<string, string>> = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCsvLine(lines[i]);
+    const row: Record<string, string> = {};
+    headers.forEach((h, idx) => {
+      row[h] = values[idx] ?? "";
+    });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+function timeToSeconds(timeStr: string): number {
+  // Format mm:ss.f (ví dụ 00:05.4 hoặc 01:28.5)
+  const parts = timeStr.split(":");
+  if (parts.length !== 2) return 0;
+  const minutes = parseFloat(parts[0]);
+  const seconds = parseFloat(parts[1]);
+  return Math.round((minutes * 60 + seconds) * 10) / 10;
+}
+
+export function loadScriptD1(dataDir: string = getDataDir()): ScriptData {
+  const scriptPath = join(dataDir, "kich-ban-d1.json");
+  const timecodePath = join(dataDir, "cau-timecode-d1.csv");
+
+  if (!existsSync(scriptPath)) {
+    throw new Error(`Không tìm thấy file kịch bản: ${scriptPath}`);
+  }
+  if (!existsSync(timecodePath)) {
+    throw new Error(`Không tìm thấy file timecode: ${timecodePath}`);
+  }
+
+  const rawScript = JSON.parse(readFileSync(scriptPath, "utf-8"));
+  const timecodeRows = parseCsv(readFileSync(timecodePath, "utf-8"));
+
+  const timecodeByN = new Map<
+    number,
+    { batDau: number; ketThucTieng: number; ketThuc: number; loiCsv?: string }
+  >();
+
+  for (const row of timecodeRows) {
+    const n = parseInt(row.cau || row.n, 10);
+    if (!isNaN(n)) {
+      const batDau = timeToSeconds(row.batDau || "00:00.0");
+      const ketThucTieng = timeToSeconds(
+        row.ketThucTieng || row.batDau || "00:00.0",
+      );
+      const ketThuc = timeToSeconds(
+        row.ketThuc || row.ketThucTieng || "00:00.0",
+      );
+      timecodeByN.set(n, {
+        batDau,
+        ketThucTieng,
+        ketThuc,
+        loiCsv: row.loi,
+      });
+    }
+  }
+
+  // Kiểm tra C3-IN-01
+  const sentences: SentenceData[] = [];
+  let lastN = 0;
+
+  for (const c of rawScript.cau) {
+    const n = c.n;
+    if (typeof n !== "number" || n <= lastN) {
+      throw new Error(
+        `C3-IN-01 Lỗi cấu trúc kịch bản: số câu n không tăng dần (câu ${n}, câu trước ${lastN})`,
+      );
+    }
+    lastN = n;
+
+    const hasLoi = typeof c.loi === "string" && c.loi.length > 0;
+    const hasDung = typeof c.dungGiay === "number" && c.dungGiay > 0;
+
+    if (hasLoi && hasDung) {
+      throw new Error(
+        `C3-IN-01 Lỗi cấu trúc: câu ${n} có cả lời lẫn khoảng lặng dừng giây`,
+      );
+    }
+    if (!hasLoi && !hasDung) {
+      throw new Error(
+        `C3-IN-01 Lỗi cấu trúc: câu ${n} thiếu cả lời lẫn khoảng lặng dừng giây`,
+      );
+    }
+
+    const tc = timecodeByN.get(n);
+    if (!tc) {
+      throw new Error(
+        `C3-IN-01 Lỗi cấu trúc: câu ${n} không có mốc thời gian trong timecode`,
+      );
+    }
+
+    if (!(tc.batDau <= tc.ketThucTieng && tc.ketThucTieng <= tc.ketThuc)) {
+      throw new Error(
+        `C3-IN-01 Lỗi cấu trúc: mốc câu ${n} vi phạm start <= speechEnd <= sceneEnd (${tc.batDau} <= ${tc.ketThucTieng} <= ${tc.ketThuc})`,
+      );
+    }
+
+    const loi = hasLoi ? (c.loi as string) : undefined;
+    const dungGiay = hasDung ? (c.dungGiay as number) : undefined;
+
+    sentences.push({
+      n,
+      phan: c.phan,
+      kieu: c.kieu,
+      loi,
+      dungGiay,
+      chuTrenManHinh: c.chuTrenManHinh,
+      yDoHinh: c.yDoHinh,
+      batDauGiay: tc.batDau,
+      ketThucTiengGiay: tc.ketThucTieng,
+      ketThucGiay: tc.ketThuc,
+      soKyTu: loi ? Array.from(loi.normalize("NFC")).length : 0,
+    });
+  }
+
+  if (sentences.length !== timecodeRows.length) {
+    throw new Error(
+      `C3-IN-01 Lỗi cấu trúc: số câu kịch bản (${sentences.length}) khác số dòng timecode (${timecodeRows.length})`,
+    );
+  }
+
+  return {
+    id: rawScript.id || "d1",
+    tieuDe: rawScript.tieuDe || "Bài học D1",
+    mucTieu: rawScript.mucTieu || "",
+    thoiLuongDuKienGiay: rawScript.thoiLuongDuKienGiay || 251,
+    phan: rawScript.phan || [],
+    cau: sentences,
+  };
+}
+
+export function loadD1RawFeedback(
+  dataDir: string = getDataDir(),
+): FeedbackItem[] {
+  const gopYPath = join(dataDir, "gop-y-mau.json");
+  const khaoSatPath = join(dataDir, "khao-sat-mau.csv");
+
+  let gopYList: any[] = [];
+  if (existsSync(gopYPath)) {
+    const raw = JSON.parse(readFileSync(gopYPath, "utf-8"));
+    gopYList = raw.gopY || [];
+  }
+
+  let khaoSatRows: any[] = [];
+  if (existsSync(khaoSatPath)) {
+    khaoSatRows = parseCsv(readFileSync(khaoSatPath, "utf-8"));
+  }
+
+  const khaoSatMap = new Map<string, any>();
+  for (const r of khaoSatRows) {
+    khaoSatMap.set(r.ma_gop_y || r.id, r);
+  }
+
+  const combinedItems: FeedbackItem[] = [];
+  const processedIds = new Set<string>();
+
+  // 1. Duyệt qua 18 mục trong gop-y-mau.json
+  for (const gy of gopYList) {
+    processedIds.add(gy.id);
+    const ks = khaoSatMap.get(gy.id);
+
+    const deHieu = ks ? parseInt(ks.de_hieu_1_5, 10) : undefined;
+    const nhipDo = ks ? parseInt(ks.nhip_do_1_5, 10) : undefined;
+    const diemSo = gy.diemSo ?? deHieu;
+
+    const item = sanitizeFeedbackItem({
+      id: gy.id,
+      channel: gy.kenh || "binh-luan",
+      sender: gy.nguoiGui,
+      text: gy.noiDung || "",
+      time: gy.thoiDiem,
+      survey: {
+        deHieu: isNaN(deHieu!) ? undefined : deHieu,
+        nhipDo: isNaN(nhipDo!) ? undefined : nhipDo,
+        diemSo: isNaN(diemSo!) ? undefined : diemSo,
+      },
+    });
+
+    combinedItems.push(item);
+  }
+
+  // 2. Duyệt các dòng chỉ có trong khao-sat-mau.csv
+  for (const ks of khaoSatRows) {
+    const id = ks.ma_gop_y || ks.id;
+    if (!processedIds.has(id)) {
+      processedIds.add(id);
+      const deHieu = parseInt(ks.de_hieu_1_5, 10);
+      const nhipDo = parseInt(ks.nhip_do_1_5, 10);
+
+      const item = sanitizeFeedbackItem({
+        id,
+        channel: "khao-sat",
+        sender: ks.nguoi_gui,
+        text: ks.y_kien_them || "",
+        time: ks.thoi_diem
+          ? ks.thoi_diem.replace(" ", "T") + ":00+07:00"
+          : undefined,
+        survey: {
+          deHieu: isNaN(deHieu) ? undefined : deHieu,
+          nhipDo: isNaN(nhipDo) ? undefined : nhipDo,
+          diemSo: isNaN(deHieu) ? undefined : deHieu,
+        },
+      });
+
+      combinedItems.push(item);
+    }
+  }
+
+  return combinedItems.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export function prepareAnalyzeInput(
+  input: AnalyzeInput,
+  dataDir: string = getDataDir(),
+): {
+  script: ScriptData;
+  allFeedback: FeedbackItem[];
+  feedbackForModel: FeedbackItem[];
+  inputHash: string;
+} {
+  const script = loadScriptD1(dataDir);
+  const allFeedback: FeedbackItem[] = [];
+
+  // 1. Nạp D1 nếu bật
+  if (input.includeD1Feedback) {
+    const d1Items = loadD1RawFeedback(dataDir);
+    if (input.feedbackIds && input.feedbackIds.length > 0) {
+      allFeedback.push(
+        ...d1Items.filter((f) => input.feedbackIds!.includes(f.id)),
+      );
+    } else {
+      allFeedback.push(...d1Items);
+    }
+  }
+
+  // 2. Kiểm tra giới hạn C3-IN-04
+  const newItems = input.newFeedback || [];
+  if (newItems.length > 20) {
+    throw new Error(
+      `C3-IN-04 Giới hạn mỗi run: tối đa 20 góp ý mới (hiện có ${newItems.length})`,
+    );
+  }
+
+  // 3. Xử lý góp ý mới C3-IN-03
+  let newCounter = 1;
+  for (const item of newItems) {
+    const text = (item.text || "").trim();
+    if (text.length < 1 || text.length > 2000) {
+      throw new Error(
+        `C3-IN-03 Nội dung góp ý mới phải từ 1 đến 2000 ký tự (hiện có ${text.length} ký tự)`,
+      );
+    }
+
+    const assignedId = item.id || `moi-${newCounter++}`;
+    const sanitized = sanitizeFeedbackItem({
+      id: assignedId,
+      channel: item.channel || "binh-luan",
+      sender: item.sender,
+      text,
+    });
+    allFeedback.push(sanitized);
+  }
+
+  if (allFeedback.length > 60) {
+    throw new Error(
+      `C3-IN-04 Giới hạn mỗi run: tối đa 60 góp ý (hiện có ${allFeedback.length})`,
+    );
+  }
+
+  // 4. Lọc danh sách gửi model:
+  // - Không gửi những góp ý bị luật cách ly (cai-lenh, cong-kich)
+  // - Không gửi góp ý chỉ chấm điểm (chi-cham-diem)
+  const feedbackForModel = allFeedback.filter(
+    (f) => !f.isQuarantined && f.label !== "chi-cham-diem",
+  );
+
+  // 5. Tính inputHash C3-IN-05
+  const normalizedFeedbackList = allFeedback.map((f) => ({
+    id: f.id,
+    channel: f.channel,
+    sender: f.sender,
+    text: f.sanitizedText,
+  }));
+
+  const hashPayload = {
+    scriptId: script.id,
+    scriptSentenceCount: script.cau.length,
+    feedback: normalizedFeedbackList.sort((a, b) => a.id.localeCompare(b.id)),
+  };
+
+  const inputHash = createHash("sha256")
+    .update(JSON.stringify(hashPayload))
+    .digest("hex");
+
+  return {
+    script,
+    allFeedback,
+    feedbackForModel,
+    inputHash,
+  };
+}
