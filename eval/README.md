@@ -4,12 +4,24 @@ Tài liệu hướng dẫn phương pháp đánh giá, quy trình chạy bộ ki
 
 ---
 
-## 1. Cấu trúc thư mục `eval/`
+## 1. Bộ Golden Set chuẩn & Cấu trúc thư mục `eval/`
+
+> [!IMPORTANT]
+> **Bộ kiểm chuẩn chính thức (Canonical):**
+> - Chuẩn chính thức hiện tại là `eval/golden/golden-set.v1.json` (20 test cases với góp ý tổng hợp riêng từng case, `expected` có cấu trúc và `passCriteria` máy kiểm được).
+> - File `eval/golden-set.v0-pack.json` là bộ cũ dựa trên pack ban đầu, **không còn là chuẩn**.
+> - `expected` và `passCriteria` là dữ liệu dành riêng cho bộ chấm eval; **tuyệt đối không bao giờ được gửi cho model**.
 
 ```text
 eval/
-  README.md                     # Tài liệu này: cách chạy, phần thật/mock, giới hạn, trạng thái R4
-  golden-set.v1.json            # 20 test cases (8 thường · 8 khó · 4 hiếm)
+  README.md                     # Tài liệu này: hợp nhất hướng dẫn, chuẩn golden set, trạng thái R4
+  golden/                       # BỘ KIỂM CHUẨN CHÍNH THỨC
+    golden-set.v1.json          # 20 test cases chuẩn (8 thường · 8 khó · 4 hiếm) kèm passCriteria
+    COVERAGE-v1.md              # Ma trận độ phủ, hard gates và ngưỡng chất lượng CP3
+    batches.json                # Lịch sử batch / kịch bản kiểm thử
+    pool.json                   # Pool case kiểm thử
+  ingestion-cases.v1.json       # Ca kiểm thử nạp dữ liệu (JSON + CSV) cho server
+  golden-set.v0-pack.json       # [DEPRECATED] Bộ case v0 cũ theo pack, không còn là chuẩn
   fixtures/
     validator/
       h01-id-sai.json           # Fixture kiểm thử validator: ID sai, patch lỗi, chữ quá dài
@@ -17,6 +29,7 @@ eval/
       h03-cau-bien.json         # Fixture kiểm thử engine: mở rộng câu biên 1 và 40
       h04-xung-dot.json         # Fixture kiểm thử engine: xung đột ghi đè CONFLICT_SAME_FIELD
   runs/
+    _templates/                 # Mẫu artifact chuẩn cho các đợt chạy (manifest, results, summary)
     cp3-run-001/                # Lượt chạy benchmark chính thức (bất biến)
       manifest.json             # Model, prompt hash, schema, policy, commit SHA, hash golden set
       results.jsonl             # Kết quả chi tiết từng case trên từng tiêu chí máy kiểm
@@ -71,7 +84,7 @@ pnpm --filter www eval:cp3 -- --run-dir=test-mock-run --mock
 
 | Thành phần | Cơ chế thực thi | Vai trò | Ghi chú |
 |---|---|---|---|
-| **Pipeline Agent** (`kind: pipeline`) | **AI Model THẬT** | Đọc góp ý, hiểu ngữ cảnh video, phân loại nhãn, phát hiện mâu thuẫn, giả thuyết nguyên nhân, đề xuất phương án A/B | Gọi qua Vercel AI SDK Gateway (`Output.object({ schema })`) với prompt version `revision-cp3@1`. Có cơ chế retry 1 lần tự động kèm chi tiết lỗi schema. |
+| **Pipeline Agent** (`kind: pipeline`) | **AI Model THẬT** | Đọc góp ý, hiểu ngữ cảnh video, phân loại nhãn, phát hiện mâu thuẫn, giả thuyết nguyên nhân, đề xuất phương án A/B | Chạy qua pipeline chuẩn của hệ thống; có kiểm tra patch trong từng vùng và retry ≤2. |
 | **Sanitizer & PII Redactor** | **Code thuần (Deterministic)** | Làm sạch NFC, lọc ký tự vô hình, ẩn email, SĐT VN, dãy số dài, cách ly lệnh tiêm và công kích | Chạy trước khi dữ liệu gửi tới prompt template; đảm bảo không rò rỉ canary vào prompt. |
 | **Validator** (`kind: validator`) | **Code thuần (Deterministic)** | Kiểm tra ràng buộc kỹ thuật: tính toàn vẹn ID, câu tồn tại, before verbatim, không chứa chữ số trong lời mới, chữ màn hình ≤ 40 ký tự | Đánh giá fixture `h01-id-sai.json` để kiểm tra khả năng bắt lỗi của hệ thống. |
 | **Release Engine** (`kind: engine`) | **Code thuần (Deterministic)** | Gom vùng liên thông, mở rộng ngữ cảnh thu âm $\pm 1$ câu, đếm ký tự trên bản nháp mới, phát hiện xung đột `CONFLICT_SAME_FIELD` | Đánh giá fixture `h03-cau-bien.json` (mở rộng biên 1 và 40) và `h04-xung-dot.json` (chặn xuất khi có xung đột). |
@@ -99,6 +112,6 @@ pnpm --filter www eval:cp3 -- --run-dir=test-mock-run --mock
 
 | Tiêu chí Rubric R4 | Trạng thái hiện tại | Đánh giá & Kế hoạch |
 |---|---|---|
-| **≥ 20 test cases** | **20 / 20 case** đã thiết kế hoàn chỉnh trong `golden-set.v1.json` (8 thường, 8 khó, 4 hiếm) | **ĐẠT** |
+| **≥ 20 test cases** | **20 / 20 case** đã thiết kế hoàn chỉnh trong `golden/golden-set.v1.json` (8 thường, 8 khó, 4 hiếm) | **ĐẠT** |
 | **≥ 2 cases mỗi lớp ①②③④** | **0 case**. Tài liệu đề thi hiện tại chưa định nghĩa bộ phân loại 4 lớp này; toàn bộ case trong golden set tạm gán `taxonomyClass: null` | **CHƯA ĐÁP ỨNG** (sẽ cập nhật ngay khi BTC ban hành định nghĩa 4 lớp) |
 | **≥ 10 cases từ chatlog thật** | **0 case**. Mọi case do nhóm phát triển đều được ghi nhận trung thực xuất xứ là `synthetic` (tự viết mô phỏng) hoặc `pack` (từ gói dữ liệu đề thi D1), tuyệt đối không mạo nhận là chatlog thực tế | **CHƯA ĐÁP ỨNG** (chờ bổ sung dữ liệu người học thực tế trong CP4) |

@@ -40,19 +40,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { setLastRunId } from "@/hooks/use-quyet-dinh";
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
 import type { RunMetadata } from "@/lib/revision/types";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function LichSuPage() {
   const router = useRouter();
   const { data, isLoading, error, mutate } = useSWR<{ runs: RunMetadata[] }>(
-    "/api/revisions/runs",
-    fetcher,
+    "revision-runs-list",
+    () => revisionClient.listRuns(),
   );
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const isServiceOffline = Boolean(
+    (error instanceof RevisionServiceError && error.isConnectionError) ||
+      (error &&
+        "isConnectionError" in (error as any) &&
+        (error as any).isConnectionError),
+  );
 
   const runs = data?.runs || [];
 
@@ -71,11 +78,10 @@ export default function LichSuPage() {
   const handleDownloadTrace = async (runId: string) => {
     try {
       setDownloadingId(runId);
-      const res = await fetch(`/api/revisions/runs/${runId}/trace`);
-      if (!res.ok) {
-        throw new Error("Không thể tải trace");
-      }
-      const blob = await res.blob();
+      const trace = await revisionClient.getTrace(runId);
+      const blob = new Blob([JSON.stringify(trace, null, 2)], {
+        type: "application/json",
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -95,6 +101,9 @@ export default function LichSuPage() {
   return (
     <PageWrapper>
       <div className="space-y-6 pb-12">
+        {isServiceOffline && (
+          <ServiceOfflineBanner onRetry={() => void mutate()} />
+        )}
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

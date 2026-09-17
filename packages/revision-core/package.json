@@ -1,0 +1,28 @@
+{
+  "name": "@feedback/revision-core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Pure TypeScript core logic for Revision Planner pipeline, engine, validation, and storage",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./preview": "./src/preview.ts",
+    "./format": "./src/format.ts",
+    "./types": "./src/types.ts",
+    "./engine": "./src/engine.ts",
+    "./sanitize": "./src/sanitize.ts",
+    "./events": "./src/events.ts",
+    "./pipeline/graph": "./src/pipeline/graph.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@feedback/ai": "workspace:*",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5"
+  }
+}

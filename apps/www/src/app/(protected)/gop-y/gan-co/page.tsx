@@ -10,7 +10,9 @@ import GopYItem from "@/components/c5/gop-y-item";
 import PageWrapper from "@/components/page-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { getLastRunId } from "@/hooks/use-quyet-dinh";
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
 import { nhanCanhBao } from "@/lib/revision/format";
 import type { RevisionRunResult, RunMetadata } from "@/lib/revision/types";
 
@@ -30,10 +32,26 @@ export default function GanCoPage() {
     }
   }, [queryRunId]);
 
-  const { data, isLoading } = useSWR<{
+  const {
+    data,
+    isLoading,
+    error: runFetchError,
+    mutate: mutateRun,
+  } = useSWR<{
     run: RunMetadata;
     result?: RevisionRunResult;
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  }>(
+    activeRunId ? ["revision-run", activeRunId] : null,
+    ([, id]: [string, string]) => revisionClient.getRun(id),
+  );
+
+  const isServiceOffline = Boolean(
+    (runFetchError instanceof RevisionServiceError &&
+      runFetchError.isConnectionError) ||
+      (runFetchError &&
+        "isConnectionError" in (runFetchError as any) &&
+        (runFetchError as any).isConnectionError),
+  );
 
   const result = data?.result;
   const ganCo = result?.quarantinedFeedback || [];
@@ -46,6 +64,9 @@ export default function GanCoPage() {
   return (
     <PageWrapper className="overflow-y-auto pb-16">
       <div className="mx-auto mt-6 w-full max-w-4xl space-y-6 px-4">
+        {isServiceOffline && (
+          <ServiceOfflineBanner onRetry={() => void mutateRun()} />
+        )}
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="font-bold text-2xl dark:text-neutral-50 sm:text-3xl">

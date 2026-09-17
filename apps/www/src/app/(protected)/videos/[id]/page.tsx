@@ -25,6 +25,8 @@ import {
   Users,
   LayoutList,
   Network,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 
 import PageWrapper from "@/components/page-wrapper";
@@ -38,17 +40,20 @@ import VideoVersionsTab from "@/components/studio/video-versions-tab";
 import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
 import V2PreparationColumn from "@/components/studio/v2-preparation-column";
-import AnalysisProgressPanel from "@/components/studio/analysis-progress-panel";
+import PipelineFlow from "@/components/studio/pipeline-flow";
 import RevisionGraphView from "@/components/studio/revision-graph-view";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import {
   getLastRunId,
   setLastRunId,
   useQuyetDinh,
 } from "@/hooks/use-quyet-dinh";
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
 import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import { dinhDangPhut } from "@/lib/revision/format";
 import type { StudioFeedback, StudioVideo } from "@/lib/studio/types";
 import type {
+  DecisionCase,
   NewFeedbackInput,
   RevisionOption,
   RevisionRunResult,
@@ -132,7 +137,7 @@ export default function VideoDetailPage({
     }
   }, [queryRunId, runScope]);
 
-  // Lấy dữ liệu run (nếu có run)
+  // Lấy dữ liệu run qua revision-service (R2 & AR-06)
   const {
     data: runData,
     error: runFetchError,
@@ -141,7 +146,18 @@ export default function VideoDetailPage({
     run: RunMetadata;
     result?: RevisionRunResult;
     error?: { code: string; message: string };
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  }>(
+    activeRunId ? ["revision-run", activeRunId] : null,
+    ([, id]: [string, string]) => revisionClient.getRun(id),
+  );
+
+  const isServiceOffline = Boolean(
+    (runFetchError instanceof RevisionServiceError &&
+      runFetchError.isConnectionError) ||
+      (runFetchError &&
+        "isConnectionError" in (runFetchError as any) &&
+        (runFetchError as any).isConnectionError),
+  );
 
   // Run cũ (trước studio) không có videoId/versionId: đều là D1 v1.
   const runOwner = runData?.run
@@ -161,6 +177,7 @@ export default function VideoDetailPage({
   useEffect(() => {
     if (
       queryRunId &&
+      !isServiceOffline &&
       (runFetchError ||
         (runData && (runData.error || !runData.run || !runBelongsToVideo)))
     ) {
@@ -173,17 +190,39 @@ export default function VideoDetailPage({
       url.searchParams.delete("run");
       window.history.replaceState(null, "", url.toString());
     }
-  }, [queryRunId, runFetchError, runData, runBelongsToVideo, runScope]);
+  }, [
+    queryRunId,
+    runFetchError,
+    runData,
+    runBelongsToVideo,
+    runScope,
+    isServiceOffline,
+  ]);
 
   const result = runBelongsToVideo ? runData?.result : undefined;
   const runMeta = runBelongsToVideo ? runData?.run : undefined;
   const isMockRun =
     runMeta?.mode === "gia-lap" || runMeta?.modelId?.startsWith("mock");
   const script = video?.script || result?.script;
-  const cases = useMemo(() => result?.cases || [], [result]);
+  const [streamingCases, setStreamingCases] = useState<DecisionCase[] | null>(
+    null,
+  );
+  const cases = useMemo(() => {
+    if (result?.cases && result.cases.length > 0) return result.cases;
+    if (streamingCases && streamingCases.length > 0) return streamingCases;
+    return [];
+  }, [result?.cases, streamingCases]);
   const allFeedback = useMemo(() => result?.feedback || [], [result]);
 
-  const { bang, dat, xoa, isStorageFailed } = useQuyetDinh(activeRunId, {
+  const {
+    bang,
+    dat,
+    xoa,
+    isStorageFailed,
+    isSavedToServer,
+    hasConflict,
+    serverSnapshot,
+  } = useQuyetDinh(activeRunId, {
     scoped: true,
   });
 
@@ -202,9 +241,12 @@ export default function VideoDetailPage({
     return cases.find((c) => c.id === selectedCaseId) || cases[0];
   }, [cases, selectedCaseId]);
 
-  // Snapshot phát hành v2
+  // Gói bản sửa: lấy từ server khi quyết định đã lưu. Chỉ tự tính ở client khi
+  // quyết định còn là bản nháp chưa lưu được, và khi đó hiện nhãn "xem trước".
+  const isReleasePreview = !isSavedToServer || !serverSnapshot;
   const snapshot = useMemo(() => {
     if (!script || cases.length === 0) return null;
+    if (!isReleasePreview && serverSnapshot) return serverSnapshot;
     return computeReleaseSnapshot({
       runId: activeRunId,
       inputHash: result?.inputHash || "video-v2",
@@ -212,7 +254,15 @@ export default function VideoDetailPage({
       cases,
       decisions: bang,
     });
-  }, [activeRunId, result, script, cases, bang]);
+  }, [
+    activeRunId,
+    result,
+    script,
+    cases,
+    bang,
+    isReleasePreview,
+    serverSnapshot,
+  ]);
 
   // Phân tích góp ý
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -230,37 +280,33 @@ export default function VideoDetailPage({
 
   const [analyzeError, setAnalyzeError] = useState<AnalyzeError | null>(null);
 
-  const handleTriggerAnalyze = async () => {
+  const handleTriggerAnalyze = async (options?: { useCache?: boolean }) => {
     setIsAnalyzing(true);
+    setStreamingCases(null);
     setAnalyzeError(null);
     try {
-      const res = await fetch("/api/revisions/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId, versionId }),
+      const data = await revisionClient.startRun({
+        videoId,
+        versionId,
+        ...(options?.useCache === false ? { useCache: false } : {}),
       });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || !data?.runId) {
-        setAnalyzeError({
-          code: data?.error?.code ?? `HTTP_${res.status}`,
-          message:
-            data?.error?.message ?? "Máy chủ không trả kết quả phân tích",
-          runId: data?.error?.runId,
-        });
-        return;
-      }
-
       setLastRunId(data.runId, runScope);
       setActiveRunId(data.runId);
       setSelectedCaseId("");
       setActiveTab("de-xuat");
       router.replace(`/videos/${videoId}?tab=de-xuat&run=${data.runId}`);
-    } catch (err) {
-      setAnalyzeError({
-        code: "NETWORK_ERROR",
-        message: err instanceof Error ? err.message : String(err),
-      });
+    } catch (err: unknown) {
+      if (err instanceof RevisionServiceError) {
+        setAnalyzeError({
+          code: err.code,
+          message: err.message,
+        });
+      } else {
+        setAnalyzeError({
+          code: "NETWORK_ERROR",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -340,52 +386,11 @@ export default function VideoDetailPage({
     fb: NewFeedbackInput,
   ): Promise<string | null> => {
     try {
-      const res = await fetch(`/api/studio/videos/${videoId}/feedback`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ versionId, items: [fb] }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        return (
-          data?.error?.message ?? `Lưu góp ý thất bại (HTTP ${res.status})`
-        );
-      }
+      await revisionClient.saveVideoFeedback(videoId, [fb], versionId);
       await mutateVideo();
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : String(err);
-    }
-  };
-
-  // API nhận tối đa 20 góp ý mỗi lần nên CSV được gửi theo từng lô.
-  const handleImportFeedbacks = async (
-    items: NewFeedbackInput[],
-  ): Promise<string | null> => {
-    let saved = 0;
-    try {
-      for (let i = 0; i < items.length; i += 20) {
-        const batch = items.slice(i, i + 20);
-        const res = await fetch(`/api/studio/videos/${videoId}/feedback`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ versionId, items: batch }),
-        });
-        const data = await res.json().catch(() => null);
-        if (!res.ok) {
-          const msg =
-            data?.error?.message ?? `Lưu góp ý thất bại (HTTP ${res.status})`;
-          return saved > 0
-            ? `Đã lưu ${saved}/${items.length} góp ý, lô dòng ${i + 1}–${i + batch.length} lỗi: ${msg}`
-            : msg;
-        }
-        saved += batch.length;
-      }
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : String(err);
-    } finally {
-      if (saved > 0) await mutateVideo();
     }
   };
 
@@ -434,23 +439,11 @@ export default function VideoDetailPage({
     setExportError(null);
 
     try {
-      const res = await fetch(`/api/revisions/runs/${activeRunId}/export`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          decisions: bang,
-          file: fileType,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(
-          data.error?.message || `Lỗi xuất file (HTTP ${res.status})`,
-        );
-      }
-
-      const blob = await res.blob();
+      const blob = await revisionClient.exportReleaseFile(
+        activeRunId,
+        fileType as any,
+        bang,
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -644,6 +637,20 @@ export default function VideoDetailPage({
         </div>
       </div>
 
+      {/* THÔNG BÁO MẤT KẾT NỐI REVISION SERVICE (AR-06) */}
+      {(isServiceOffline || video?.feedbackError) && (
+        <div className="max-w-7xl mx-auto w-full px-4 pt-2">
+          <ServiceOfflineBanner
+            serviceUrl={video?.feedbackError?.serviceUrl}
+            error={video?.feedbackError}
+            onRetry={() => {
+              void mutateVideo();
+              void mutateRun();
+            }}
+          />
+        </div>
+      )}
+
       {/* THÔNG BÁO RUN KHÔNG TỒN TẠI (P0a - AP-09) */}
       {urlRunNotFoundMessage && (
         <div className="max-w-7xl mx-auto w-full px-4 pt-2">
@@ -720,7 +727,9 @@ export default function VideoDetailPage({
             video={video}
             feedbacks={localFeedbacks}
             onAddNewFeedback={handleAddNewFeedback}
-            onImportFeedbacks={handleImportFeedbacks}
+            onRefreshFeedbacks={() => {
+              void mutateVideo();
+            }}
             onTriggerAnalyze={handleTriggerAnalyze}
             isAnalyzing={isAnalyzing}
             analysisTimer={analysisTimer}
@@ -740,14 +749,39 @@ export default function VideoDetailPage({
 
         {/* TAB 4: ĐỀ XUẤT CHỈNH SỬA (REVISION PLANNER 3 CỘT TRONG NGỮ CẢNH VIDEO) */}
         {(activeTab === "de-xuat" || activeTab === "chinh-sua") && (
-          <div className="flex-1 flex flex-col min-h-[620px] space-y-3">
+          <div className="flex-1 flex flex-col min-h-[620px] space-y-4">
+            {/* SƠ ĐỒ PIPELINE CỐ ĐỊNH KIỂU DIFY (R0.6 & AR-01) */}
+            <PipelineFlow
+              runId={activeRunId}
+              runMeta={runMeta}
+              isAnalyzing={isAnalyzing}
+              onFinished={() => {
+                mutateRun();
+              }}
+              onRetry={() => void handleTriggerAnalyze()}
+              onPartialCases={(newCases) => {
+                setStreamingCases(newCases);
+              }}
+              onCaseOptionsReady={({ caseId, options }) => {
+                setStreamingCases((prev) =>
+                  prev
+                    ? prev.map((c) =>
+                        c.id === caseId
+                          ? { ...c, options, status: "xong" as const }
+                          : c,
+                      )
+                    : prev,
+                );
+              }}
+            />
+
             {!activeRunId ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-4 bg-muted/10">
                 <Sparkles className="size-10 text-primary animate-bounce" />
                 <div className="space-y-1">
                   <h3 className="font-bold text-base text-foreground">
                     Chưa có đợt phân tích nào cho phiên bản{" "}
-                    {video.currentVersion}
+                    {video?.currentVersion ?? versionId}
                   </h3>
                   <p className="text-xs text-muted-foreground max-w-md">
                     Bấm nút bên dưới để AI đối chiếu {localFeedbacks.length} góp
@@ -763,7 +797,7 @@ export default function VideoDetailPage({
                 </div>
                 {analyzeError && <AnalyzeErrorBox error={analyzeError} />}
                 <Button
-                  onClick={handleTriggerAnalyze}
+                  onClick={() => void handleTriggerAnalyze()}
                   disabled={
                     isAnalyzing || localFeedbacks.length === 0 || !script
                   }
@@ -775,28 +809,40 @@ export default function VideoDetailPage({
                     : `Bắt đầu phân tích góp ý v1`}
                 </Button>
               </div>
-            ) : runMeta?.status === "dang-chay" ||
-              (isAnalyzing && cases.length === 0) ? (
-              <div className="space-y-3">
-                <AnalysisProgressPanel
-                  runId={activeRunId}
-                  runMeta={runMeta}
-                  onFinished={() => {
-                    mutateRun();
-                  }}
-                  onRetry={handleTriggerAnalyze}
-                />
+            ) : cases.length === 0 &&
+              (runMeta?.status === "dang-chay" || isAnalyzing) ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-3 bg-muted/5">
+                <Loader2 className="size-8 text-primary animate-spin" />
+                <div className="space-y-1">
+                  <h3 className="font-bold text-sm text-foreground">
+                    Đang phân tích và lập hồ sơ vùng...
+                  </h3>
+                  <p className="text-xs text-muted-foreground max-w-md">
+                    Các hồ sơ vùng sẽ xuất hiện ngay khi bước &quot;Lập hồ sơ
+                    vùng&quot; hoàn tất.
+                  </p>
+                </div>
               </div>
-            ) : runMeta?.status === "loi" ? (
-              <div className="space-y-3">
-                <AnalysisProgressPanel
-                  runId={activeRunId}
-                  runMeta={runMeta}
-                  onFinished={() => {
-                    mutateRun();
-                  }}
-                  onRetry={handleTriggerAnalyze}
-                />
+            ) : cases.length === 0 && runMeta?.status === "loi" ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-3 bg-rose-50/10">
+                <AlertCircle className="size-8 text-rose-500" />
+                <div className="space-y-1">
+                  <h3 className="font-bold text-sm text-foreground">
+                    Đợt phân tích gặp sự cố
+                  </h3>
+                  <p className="text-xs text-muted-foreground max-w-md">
+                    Vui lòng bấm nút &quot;Thử lại&quot; ở thanh tiến trình bên
+                    trên để thực hiện lại.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => void handleTriggerAnalyze()}
+                  disabled={isAnalyzing}
+                  className="gap-2 font-bold shadow-xs"
+                >
+                  <RefreshCw className="size-4" />
+                  Chạy lại phân tích
+                </Button>
               </div>
             ) : cases.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-4 bg-muted/10">
@@ -811,7 +857,7 @@ export default function VideoDetailPage({
                   </p>
                 </div>
                 <Button
-                  onClick={handleTriggerAnalyze}
+                  onClick={() => void handleTriggerAnalyze()}
                   disabled={isAnalyzing || localFeedbacks.length === 0}
                   className="gap-2 font-bold shadow-xs"
                 >
@@ -955,6 +1001,23 @@ export default function VideoDetailPage({
                       <Badge variant="outline" className="font-mono text-xs">
                         {snapshot.appliedOptionIds.length} phương án áp dụng
                       </Badge>
+                      {isReleasePreview ? (
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-amber-500/50 text-amber-700 dark:text-amber-300"
+                        >
+                          Xem trước · quyết định chưa lưu lên server
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs">
+                          Đã lưu trên server
+                        </Badge>
+                      )}
+                      {hasConflict && (
+                        <Badge variant="destructive" className="text-xs">
+                          Quyết định vừa được sửa ở nơi khác, đã tải lại
+                        </Badge>
+                      )}
                     </div>
                     <h2 className="text-xl font-bold text-foreground mt-1">
                       Gói bàn giao sản xuất phiên bản mới

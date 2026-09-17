@@ -13,6 +13,7 @@ import {
   MessageSquare,
   MessageSquarePlus,
   Play,
+  RotateCcw,
   Search,
   Sparkles,
   Upload,
@@ -28,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { dinhDangPhut } from "@/lib/revision/format";
 import type { NewFeedbackInput } from "@/lib/revision/types";
 import { parseSurveyCsv, type CsvParseResult } from "@/lib/studio/csv-import";
+import { revisionClient } from "@/lib/revision-client";
 import type {
   LocationSource,
   StudioFeedback,
@@ -48,9 +50,9 @@ interface VideoFeedbackTabProps {
   onSeekToTime?: (timeSeconds: number) => void;
   /** Trả về thông báo lỗi, hoặc null khi server đã lưu. */
   onAddNewFeedback: (fb: NewFeedbackInput) => Promise<string | null>;
-  /** Lưu nhiều góp ý từ CSV; trả về lỗi hoặc null khi server đã lưu hết. */
-  onImportFeedbacks?: (items: NewFeedbackInput[]) => Promise<string | null>;
-  onTriggerAnalyze: () => void;
+  onRefreshFeedbacks?: () => Promise<void> | void;
+  /** useCache: false gọi model cho mọi node, không dùng lại kết quả cũ. */
+  onTriggerAnalyze: (options?: { useCache?: boolean }) => void;
   isAnalyzing: boolean;
   analysisTimer: number;
   analyzeError?: { code: string; message: string; runId?: string } | null;
@@ -67,7 +69,7 @@ export default function VideoFeedbackTab({
   feedbacks,
   onSeekToTime,
   onAddNewFeedback,
-  onImportFeedbacks,
+  onRefreshFeedbacks,
   onTriggerAnalyze,
   isAnalyzing,
   analysisTimer,
@@ -109,25 +111,52 @@ export default function VideoFeedbackTab({
   const [isDragOver, setIsDragOver] = useState(false);
   const [csvError, setCsvError] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [rawCsvText, setRawCsvText] = useState<string>("");
+  const [duplicateCount, setDuplicateCount] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCsvFile = useCallback((file: File) => {
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      setCsvError("Chỉ hỗ trợ file .csv");
-      return;
-    }
-    setCsvError(null);
-    setCsvFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        setCsvResult(parseSurveyCsv(String(e.target?.result ?? "")));
-      } catch {
-        setCsvError("Không thể đọc file. Vui lòng kiểm tra lại định dạng CSV.");
+  const handleCsvFile = useCallback(
+    async (file: File) => {
+      if (!file.name.toLowerCase().endsWith(".csv")) {
+        setCsvError("Chỉ hỗ trợ file .csv");
+        return;
       }
-    };
-    reader.readAsText(file, "utf-8");
-  }, []);
+      setCsvError(null);
+      setCsvFileName(file.name);
+      try {
+        const text = await file.text();
+        setRawCsvText(text);
+
+        // Gọi dryRun trên server để xem trước, kiểm tra nạp trùng và làm sạch PII
+        const data = await revisionClient.importVideoFeedback(
+          video.id,
+          text,
+          true,
+          video.currentVersion,
+        );
+
+        if (!data || data.error) {
+          setCsvError(data?.error?.message ?? "Không thể phân tích file CSV");
+          setCsvResult(null);
+          return;
+        }
+
+        setDuplicateCount(data.duplicateCount || 0);
+        setCsvResult({
+          rows: data.preview,
+          format: data.format,
+          totalRows: data.totalRows,
+          warnings: data.warnings,
+        });
+      } catch (err: unknown) {
+        setCsvError(
+          err instanceof Error ? err.message : "Không thể đọc file CSV",
+        );
+        setCsvResult(null);
+      }
+    },
+    [video.id, video.currentVersion],
+  );
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -143,32 +172,37 @@ export default function VideoFeedbackTab({
     setCsvResult(null);
     setCsvFileName("");
     setCsvError(null);
+    setRawCsvText("");
+    setDuplicateCount(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleConfirmCsvImport = async () => {
-    if (!csvResult || csvResult.rows.length === 0) return;
+    if (!rawCsvText) return;
     setIsImporting(true);
     setCsvError(null);
-    const items: NewFeedbackInput[] = csvResult.rows.map(
-      ({ rowKey: _rowKey, ...fb }) => fb,
-    );
-    const error = onImportFeedbacks
-      ? await onImportFeedbacks(items)
-      : await (async () => {
-          for (const fb of items) {
-            const e = await onAddNewFeedback(fb);
-            if (e) return e;
-          }
-          return null;
-        })();
-    setIsImporting(false);
-    if (error) {
-      setCsvError(error);
-      return;
+    try {
+      // Lưu toàn bộ qua server trong một request duy nhất
+      const data = await revisionClient.importVideoFeedback(
+        video.id,
+        rawCsvText,
+        false,
+        video.currentVersion,
+      );
+
+      if (!data || data.error) {
+        setCsvError(data?.error?.message ?? "Không thể lưu góp ý từ file CSV");
+        return;
+      }
+
+      handleResetCsv();
+      setShowCsvPanel(false);
+      await onRefreshFeedbacks?.();
+    } catch (err: unknown) {
+      setCsvError(err instanceof Error ? err.message : "Lỗi khi lưu góp ý");
+    } finally {
+      setIsImporting(false);
     }
-    handleResetCsv();
-    setShowCsvPanel(false);
   };
 
   // Synchronize when initial props change
@@ -348,13 +382,34 @@ export default function VideoFeedbackTab({
                 ? undefined
                 : "Video chưa có kịch bản và timecode nên chưa phân tích được"
             }
-            onClick={onTriggerAnalyze}
+            onClick={() => onTriggerAnalyze()}
             className="text-xs gap-1.5 h-8 font-semibold shadow-xs"
           >
             <Sparkles className="size-3.5" />
             {isAnalyzing
-              ? `Đang gọi model (${analysisTimer}s)...`
+              ? `Đang phân tích (${analysisTimer}s)...`
               : `Phân tích góp ý cho ${video.currentVersion}`}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isAnalyzing || feedbacks.length === 0 || !canAnalyze}
+            title="Gọi model cho mọi bước, không dùng lại kết quả của lần phân tích trước"
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Phân tích lại từ đầu sẽ gọi model cho mọi bước (khoảng 1–3 phút và tốn token). Tiếp tục?",
+                )
+              ) {
+                onTriggerAnalyze({ useCache: false });
+              }
+            }}
+            className="text-xs gap-1.5 h-8"
+          >
+            <RotateCcw className="size-3.5" />
+            Phân tích lại từ đầu
           </Button>
         </div>
       </div>
@@ -640,9 +695,14 @@ export default function VideoFeedbackTab({
                   <Badge className="bg-green-50 text-green-700 border-green-200 border text-[11px] dark:bg-green-950 dark:text-green-300">
                     {csvResult.rows.length} dòng hợp lệ
                   </Badge>
+                  {duplicateCount > 0 && (
+                    <Badge className="bg-blue-50 text-blue-700 border-blue-200 border text-[11px] dark:bg-blue-950 dark:text-blue-300">
+                      ℹ {duplicateCount} dòng đã có (bỏ qua)
+                    </Badge>
+                  )}
                   {csvResult.warnings.length > 0 && (
                     <Badge className="bg-amber-50 text-amber-700 border-amber-200 border text-[11px] dark:bg-amber-950 dark:text-amber-300">
-                      ⚠ {csvResult.warnings.length} dòng bỏ qua
+                      ⚠ {csvResult.warnings.length} dòng cảnh báo
                     </Badge>
                   )}
                   <span className="text-muted-foreground">
@@ -711,6 +771,14 @@ export default function VideoFeedbackTab({
                                 </span>
                               )}
                             </span>
+                            {"isQuarantined" in fb && fb.isQuarantined ? (
+                              <span className="mt-1 block text-[10px] font-medium text-amber-700 dark:text-amber-300">
+                                Giữ lại, không phân tích:{" "}
+                                {"quarantineReason" in fb
+                                  ? String(fb.quarantineReason)
+                                  : "cần kiểm tra"}
+                              </span>
+                            ) : null}
                           </td>
                           <td className="px-3 py-2 text-center">
                             {fb.survey?.deHieu != null ? (

@@ -1,0 +1,24 @@
+{
+  "name": "revision-service",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Revision service backend on Hono & Node.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@feedback/revision-core": "workspace:*",
+    "@feedback/ai": "workspace:*",
+    "@hono/node-server": "^1.13.8",
+    "dotenv": "^16.4.7",
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5"
+  }
+}

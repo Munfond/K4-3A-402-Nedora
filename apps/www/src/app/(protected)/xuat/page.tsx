@@ -30,7 +30,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { getLastRunId, useQuyetDinh } from "@/hooks/use-quyet-dinh";
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
 import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import { dinhDangPhut } from "@/lib/revision/format";
 import type {
@@ -57,10 +59,26 @@ export default function XuatPage() {
 
   const { bang, xoaHet, isStorageFailed } = useQuyetDinh(activeRunId);
 
-  const { data, isLoading } = useSWR<{
+  const {
+    data,
+    isLoading,
+    error: runFetchError,
+    mutate: mutateRun,
+  } = useSWR<{
     run: RunMetadata;
     result?: RevisionRunResult;
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  }>(
+    activeRunId ? ["revision-run", activeRunId] : null,
+    ([, id]: [string, string]) => revisionClient.getRun(id),
+  );
+
+  const isServiceOffline = Boolean(
+    (runFetchError instanceof RevisionServiceError &&
+      runFetchError.isConnectionError) ||
+      (runFetchError &&
+        "isConnectionError" in (runFetchError as any) &&
+        (runFetchError as any).isConnectionError),
+  );
 
   const result = data?.result;
   const script = result?.script;
@@ -116,23 +134,11 @@ export default function XuatPage() {
     setExportError(null);
 
     try {
-      const res = await fetch(`/api/revisions/runs/${activeRunId}/export`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          decisions: bang,
-          file: fileType,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(
-          data.error?.message || `Lỗi xuất file (HTTP ${res.status})`,
-        );
-      }
-
-      const blob = await res.blob();
+      const blob = await revisionClient.exportReleaseFile(
+        activeRunId,
+        fileType,
+        bang,
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -225,6 +231,10 @@ export default function XuatPage() {
   return (
     <PageWrapper className="overflow-y-auto pb-24">
       <div className="mx-auto mt-6 w-full max-w-5xl space-y-6 px-4">
+        {isServiceOffline && (
+          <ServiceOfflineBanner onRetry={() => void mutateRun()} />
+        )}
+
         {/* HEADER: TIÊU ĐỀ RÕ RÀNG */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5">
           <div className="space-y-1">

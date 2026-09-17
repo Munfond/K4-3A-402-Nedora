@@ -1,6 +1,6 @@
-import { loadScriptD1, loadD1RawFeedback } from "@/lib/revision/load";
+import { loadScriptD1 } from "@/lib/revision/load";
 import type { FeedbackItem } from "@/lib/revision/types";
-import { loadStoredFeedback } from "./feedback-store";
+import { RevisionServiceError, revisionClient } from "@/lib/revision-client";
 import type { StudioFeedback, StudioVideo } from "./types";
 
 export function toStudioFeedback(item: FeedbackItem): StudioFeedback {
@@ -17,33 +17,48 @@ export function toStudioFeedback(item: FeedbackItem): StudioFeedback {
   };
 }
 
-/** Góp ý của một video + phiên bản: bộ gốc (nếu là video mẫu) và góp ý đã lưu. */
-export function getVideoFeedback(
-  videoId: string,
-  versionId: string,
-): StudioFeedback[] {
-  const video = getInitialVideos().find((v) => v.id === videoId);
-  if (videoId === "d1" && versionId === "v1") return video?.feedbacks ?? [];
-  return loadStoredFeedback(videoId, versionId).map(toStudioFeedback);
+/**
+ * Góp ý chỉ có một nguồn: Revision service. Next không đọc/ghi kho góp ý riêng,
+ * nên góp ý vừa lưu và góp ý đem đi phân tích luôn là cùng một bộ.
+ * Service không trả lời thì báo lỗi, không trả danh sách rỗng âm thầm.
+ */
+export async function attachServiceFeedback(
+  video: StudioVideo,
+): Promise<StudioVideo> {
+  if (!video.hasScript) return video;
+  try {
+    const { feedback } = await revisionClient.getVideoFeedback(
+      video.id,
+      video.currentVersion,
+    );
+    const feedbacks = feedback.map(toStudioFeedback);
+    return { ...video, feedbacks, feedbackCount: feedbacks.length };
+  } catch (err) {
+    const e =
+      err instanceof RevisionServiceError
+        ? err
+        : new RevisionServiceError(String(err));
+    return {
+      ...video,
+      feedbacks: [],
+      feedbackCount: 0,
+      feedbackError: {
+        code: e.code,
+        message: e.message,
+        serviceUrl: e.serviceUrl,
+      },
+    };
+  }
 }
 
 // Seed danh sách video mẫu của Studio
 export function getInitialVideos(): StudioVideo[] {
   // Nạp kịch bản D1 mẫu nếu đang chạy server-side
   let scriptD1;
-  let d1Feedbacks: StudioFeedback[] = [];
-
   try {
     scriptD1 = loadScriptD1();
-    const rawF = loadD1RawFeedback();
-    // Bộ góp ý D1 không có trường vị trí có cấu trúc: trước khi phân tích,
-    // mọi góp ý là "chưa xác định" (C3-UI-03). Không suy vị trí từ chữ.
-    d1Feedbacks = [
-      ...rawF.map(toStudioFeedback),
-      ...loadStoredFeedback("d1", "v1").map(toStudioFeedback),
-    ];
-  } catch (err) {
-    // Client fallback nếu không nạp trực tiếp được từ fs
+  } catch {
+    // Thiếu gói dữ liệu: trang video báo "chưa có kịch bản" thay vì lỗi.
     scriptD1 = undefined;
   }
 
@@ -59,13 +74,13 @@ export function getInitialVideos(): StudioVideo[] {
       videoUrl: "/video/d1.mp4",
       thumbnailUrl: "/thumbnails/d1.png",
       createdAt: "2026-03-10T08:00:00.000Z",
-      hasScript: true,
-      hasTimecodes: true,
+      hasScript: Boolean(scriptD1),
+      hasTimecodes: Boolean(scriptD1),
       hasVideoFile: true,
-      feedbackCount: d1Feedbacks.length,
+      feedbackCount: 0,
       activeRunId: null,
       script: scriptD1,
-      feedbacks: d1Feedbacks,
+      feedbacks: [],
       versions: [
         {
           versionId: "v1",

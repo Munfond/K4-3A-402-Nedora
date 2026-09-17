@@ -23,7 +23,9 @@ import { Button } from "@/components/ui/button";
 import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
 import V2PreparationColumn from "@/components/studio/v2-preparation-column";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { getLastRunId, useQuyetDinh } from "@/hooks/use-quyet-dinh";
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
 import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import type {
   DecisionCase,
@@ -35,9 +37,9 @@ import type {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function DanhSachVanDePage() {
-  const searchParams = useSearchParams();
+export default function VanDePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryRunId = searchParams.get("run");
   const queryCaseId = searchParams.get("case");
 
@@ -57,11 +59,26 @@ export default function DanhSachVanDePage() {
 
   const { bang, dat, xoa, isStorageFailed } = useQuyetDinh(activeRunId);
 
-  // Lấy dữ liệu run
-  const { data, isLoading, error } = useSWR<{
+  // Lấy dữ liệu run qua revisionClient
+  const {
+    data,
+    isLoading,
+    error,
+    mutate: mutateRun,
+  } = useSWR<{
     run: RunMetadata;
     result?: RevisionRunResult;
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  }>(
+    activeRunId ? ["revision-run", activeRunId] : null,
+    ([, id]: [string, string]) => revisionClient.getRun(id),
+  );
+
+  const isServiceOffline = Boolean(
+    (error instanceof RevisionServiceError && error.isConnectionError) ||
+      (error &&
+        "isConnectionError" in (error as any) &&
+        (error as any).isConnectionError),
+  );
 
   const result = data?.result;
   const run = data?.run;
@@ -146,6 +163,19 @@ export default function DanhSachVanDePage() {
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <span>Đang tải hồ sơ quyết định sửa...</span>
         </div>
+      </PageWrapper>
+    );
+  }
+
+  if (isServiceOffline) {
+    return (
+      <PageWrapper className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center space-y-4 max-w-2xl mx-auto">
+        <ServiceOfflineBanner onRetry={() => void mutateRun()} />
+        <Link href="/">
+          <Button size="sm" variant="outline">
+            Về trang chủ
+          </Button>
+        </Link>
       </PageWrapper>
     );
   }

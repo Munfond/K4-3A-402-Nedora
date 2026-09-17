@@ -32,10 +32,19 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
   schema: T;
   config?: RevisionAgentConfig;
   stepLabel: string;
+  callModel?: (params?: any) => Promise<any>;
 }): Promise<RevisionStepResult<z.infer<T>>> {
-  const { systemPrompt, userPayload, schema, config = {}, stepLabel } = params;
+  const {
+    systemPrompt,
+    userPayload,
+    schema,
+    config = {},
+    stepLabel,
+    callModel,
+  } = params;
 
-  const modelId = resolveRevisionModelId(config.modelId);
+  const modelId =
+    resolveRevisionModelId(config.modelId) || (callModel ? "mock-agent" : "");
   const timeoutMs =
     config.timeoutMs ??
     (Number(process.env.REVISION_MODEL_TIMEOUT_MS) || 150000);
@@ -46,6 +55,66 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
   const promptHash = getPromptHashP1(systemPrompt);
   const attempts: RevisionAttemptRecord[] = [];
   const startAll = Date.now();
+
+  if (callModel) {
+    try {
+      const raw = await callModel({
+        system: systemPrompt,
+        prompt: JSON.stringify(userPayload),
+      });
+      let mockOutput: any = raw;
+      if (stepLabel.includes("hiểu")) {
+        mockOutput = {
+          feedback: raw.feedback || [],
+          issues: (raw.issues || []).map((iss: any) => {
+            const { options: _, ...rest } = iss;
+            return rest;
+          }),
+        };
+      } else if (
+        stepLabel.includes("lập phương án") ||
+        stepLabel.includes("phương án")
+      ) {
+        mockOutput = {
+          issueOptions: (raw.issues || []).map((iss: any) => ({
+            issueKey: iss.key,
+            options: iss.options || [],
+          })),
+        };
+      }
+      return {
+        ok: true,
+        output: mockOutput,
+        attempts: [
+          {
+            attemptNumber: 1,
+            status: "xong",
+            durationMs: 5,
+            inputTokens: 50,
+            outputTokens: 50,
+            totalTokens: 100,
+          },
+        ],
+        durationMs: 5,
+        promptHash,
+        modelId: modelId || "mock-agent",
+        totalTokens: 100,
+      };
+    } catch (e: any) {
+      return {
+        ok: false,
+        error: {
+          code: "MODEL_CALL_FAILED",
+          message: e?.message || "Lỗi mock caller",
+        },
+        attempts,
+        durationMs: 5,
+        promptHash,
+        modelId: modelId || "mock-agent",
+        totalTokens: 0,
+      };
+    }
+  }
 
   if (!modelId) {
     return {

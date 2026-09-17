@@ -9,14 +9,10 @@ import GopYItem from "@/components/c5/gop-y-item";
 import PageWrapper from "@/components/page-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { getLastRunId } from "@/hooks/use-quyet-dinh";
-import type {
-  FeedbackItem,
-  RevisionRunResult,
-  RunMetadata,
-} from "@/lib/revision/types";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
+import type { RevisionRunResult, RunMetadata } from "@/lib/revision/types";
 
 export default function GopYPage() {
   const searchParams = useSearchParams();
@@ -32,10 +28,26 @@ export default function GopYPage() {
     }
   }, [queryRunId]);
 
-  const { data, isLoading } = useSWR<{
+  const {
+    data,
+    isLoading,
+    error: runFetchError,
+    mutate: mutateRun,
+  } = useSWR<{
     run: RunMetadata;
     result?: RevisionRunResult;
-  }>(activeRunId ? `/api/revisions/runs/${activeRunId}` : null, fetcher);
+  }>(
+    activeRunId ? ["revision-run", activeRunId] : null,
+    ([, id]: [string, string]) => revisionClient.getRun(id),
+  );
+
+  const isServiceOffline = Boolean(
+    (runFetchError instanceof RevisionServiceError &&
+      runFetchError.isConnectionError) ||
+      (runFetchError &&
+        "isConnectionError" in (runFetchError as any) &&
+        (runFetchError as any).isConnectionError),
+  );
 
   const result = data?.result;
   const feedbackList = result?.feedback || [];
@@ -60,6 +72,9 @@ export default function GopYPage() {
   return (
     <PageWrapper className="overflow-y-auto pb-16">
       <div className="mx-auto mt-6 w-full max-w-4xl space-y-6 px-4">
+        {isServiceOffline && (
+          <ServiceOfflineBanner onRetry={() => void mutateRun()} />
+        )}
         <div>
           <h1 className="font-bold text-2xl dark:text-neutral-50 sm:text-3xl">
             Góp ý gốc

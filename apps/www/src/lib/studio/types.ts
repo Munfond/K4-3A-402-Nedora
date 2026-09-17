@@ -40,4 +40,6 @@ export interface StudioVideo {
   script?: ScriptData;
   versions: StudioVersion[];
   feedbacks: StudioFeedback[];
+  /** Có khi không lấy được góp ý từ Revision service. */
+  feedbackError?: { code: string; message: string; serviceUrl?: string };
 }

@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import type { DecisionRecord, DecisionType } from "@/lib/revision/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type {
+  DecisionRecord,
+  ReleaseSnapshot,
+} from "@feedback/revision-core/types";
+import { revisionClient } from "@/lib/revision-client";
 
 const LAST_RUN_KEY = "revision:lastRunId";
 
 function getDecisionStorageKey(runId: string): string {
-  return `revision:decisions:${runId}`;
+  return `revision:decisions:draft:${runId}`;
 }
 
 type BangQuyetDinh = Record<string, DecisionRecord>;
@@ -21,10 +25,6 @@ function doc(key: string): BangQuyetDinh {
   }
 }
 
-/**
- * `scope` = "<videoId>:<versionId>" để mỗi video nhớ run riêng (C3-STO-03).
- * Không truyền scope thì dùng khóa chung cũ (các trang /van-de, /xuat, /lich-su).
- */
 function lastRunKey(scope?: string): string {
   return scope ? `${LAST_RUN_KEY}:${scope}` : LAST_RUN_KEY;
 }
@@ -46,14 +46,10 @@ export function setLastRunId(runId: string, scope?: string): void {
       new CustomEvent("revision:run-changed", { detail: runId }),
     );
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
-/**
- * `scoped: true` (trang video): chỉ dùng đúng runId truyền vào, không rơi về
- * run cuối cùng của video khác khi chưa có run.
- */
 export function useQuyetDinh(
   explicitRunId?: string,
   options: { scoped?: boolean } = {},
@@ -61,9 +57,20 @@ export function useQuyetDinh(
   const scoped = options.scoped ?? false;
   const [activeRunId, setActiveRunId] = useState<string>(explicitRunId || "");
   const [bang, setBang] = useState<BangQuyetDinh>({});
-  const [isStorageFailed, setIsStorageFailed] = useState<boolean>(false);
+  const [serverVersion, setServerVersion] = useState<number>(0);
+  const serverVersionRef = useRef<number>(0);
+  serverVersionRef.current = serverVersion;
 
-  // Lấy runId hiện tại nếu không truyền trực tiếp
+  const [isSavedToServer, setIsSavedToServer] = useState<boolean>(true);
+  const [hasConflict, setHasConflict] = useState<boolean>(false);
+  const [isStorageFailed, setIsStorageFailed] = useState<boolean>(false);
+  const [isLoadingServer, setIsLoadingServer] = useState<boolean>(false);
+  // Gói bản sửa do server tính từ quyết định đã lưu (nguồn có thẩm quyền).
+  const [serverSnapshot, setServerSnapshot] = useState<ReleaseSnapshot | null>(
+    null,
+  );
+
+  // Sync runId
   useEffect(() => {
     if (explicitRunId || scoped) {
       setActiveRunId(explicitRunId || "");
@@ -88,71 +95,145 @@ export function useQuyetDinh(
     ? `revision:decisions-changed:${activeRunId}`
     : "";
 
-  // Tải dữ liệu ban đầu
+  // Refresh decisions from server
+  const refreshFromServer = useCallback(
+    async (runIdToFetch?: string) => {
+      const id = runIdToFetch || activeRunId;
+      if (!id) {
+        setBang({});
+        setServerSnapshot(null);
+        setServerVersion(0);
+        serverVersionRef.current = 0;
+        return;
+      }
+
+      setIsLoadingServer(true);
+      try {
+        const res = await revisionClient.getDecisionsAndRelease(id);
+        if (res && res.decisions) {
+          setBang(res.decisions);
+          setServerSnapshot(res.snapshot ?? null);
+          setServerVersion(res.version);
+          serverVersionRef.current = res.version;
+          setIsSavedToServer(true);
+          setHasConflict(false);
+        }
+      } catch {
+        // If server unavailable, fallback to local draft
+        const draft = storageKey ? doc(storageKey) : {};
+        if (Object.keys(draft).length > 0) {
+          setBang(draft);
+          setIsSavedToServer(false);
+        }
+      } finally {
+        setIsLoadingServer(false);
+      }
+    },
+    [activeRunId, storageKey],
+  );
+
   useEffect(() => {
-    if (!storageKey) {
-      setBang({});
-      return;
-    }
-    setBang(doc(storageKey));
+    void refreshFromServer();
+  }, [refreshFromServer]);
 
-    const dongBo = () => {
-      setBang(doc(storageKey));
-    };
-
-    window.addEventListener(eventName, dongBo);
-    window.addEventListener("storage", dongBo);
-    return () => {
-      window.removeEventListener(eventName, dongBo);
-      window.removeEventListener("storage", dongBo);
-    };
-  }, [storageKey, eventName]);
-
-  // C3-STO-03: Sửa nhánh lưu thất bại để vẫn cập nhật bộ nhớ và báo chưa lưu
+  // Set a decision
   const dat = useCallback(
-    (caseId: string, quyetDinh: DecisionRecord) => {
-      setBang((prev) => {
-        const moi = { ...prev, [caseId]: quyetDinh };
+    async (caseId: string, quyetDinh: DecisionRecord) => {
+      // Optimistic update
+      setBang((prev) => ({ ...prev, [caseId]: quyetDinh }));
+
+      if (!activeRunId) return;
+
+      try {
+        const res = await revisionClient.saveDecision(activeRunId, caseId, {
+          type: quyetDinh.type,
+          optionId: quyetDinh.optionId,
+          reason: quyetDinh.reason,
+          expectedVersion: serverVersionRef.current,
+        });
+
+        setServerVersion(res.version);
+        serverVersionRef.current = res.version;
+        setBang(res.decisions);
+        setServerSnapshot(res.snapshot ?? null);
+        setIsSavedToServer(true);
+        setHasConflict(false);
+
         if (storageKey) {
           try {
-            window.localStorage.setItem(storageKey, JSON.stringify(moi));
-            setIsStorageFailed(false);
-          } catch {
-            // Chế độ riêng tư chặn localStorage — vẫn giữ trong state và báo lỗi
-            setIsStorageFailed(true);
+            window.localStorage.removeItem(storageKey);
+          } catch {}
+        }
+      } catch (err: any) {
+        if (err?.statusCode === 409 || err?.code === "VERSION_CONFLICT") {
+          setHasConflict(true);
+          const conflictData = err?.data;
+          if (conflictData?.state) {
+            setServerVersion(conflictData.currentVersion);
+            serverVersionRef.current = conflictData.currentVersion;
+            setBang(conflictData.state.decisions);
+          }
+          // Lấy lại gói bản sửa khớp quyết định mới nhất của server.
+          void refreshFromServer();
+        } else {
+          // Server offline / network error: keep local draft
+          setIsSavedToServer(false);
+          if (storageKey) {
+            try {
+              window.localStorage.setItem(
+                storageKey,
+                JSON.stringify({ ...bang, [caseId]: quyetDinh }),
+              );
+              setIsStorageFailed(false);
+            } catch {
+              setIsStorageFailed(true);
+            }
           }
         }
-        return moi;
-      });
+      }
 
       if (eventName) {
         window.dispatchEvent(new Event(eventName));
       }
     },
-    [storageKey, eventName],
+    [activeRunId, bang, storageKey, eventName, refreshFromServer],
   );
 
   const xoa = useCallback(
-    (caseId: string) => {
+    async (caseId: string) => {
       setBang((prev) => {
         const moi = { ...prev };
         delete moi[caseId];
-        if (storageKey) {
-          try {
-            window.localStorage.setItem(storageKey, JSON.stringify(moi));
-            setIsStorageFailed(false);
-          } catch {
-            setIsStorageFailed(true);
-          }
-        }
         return moi;
       });
+
+      if (!activeRunId) return;
+
+      try {
+        const res = await revisionClient.saveDecision(activeRunId, caseId, {
+          type: "bo",
+          expectedVersion: serverVersionRef.current,
+        });
+
+        setServerVersion(res.version);
+        serverVersionRef.current = res.version;
+        setBang(res.decisions);
+        setServerSnapshot(res.snapshot ?? null);
+        setIsSavedToServer(true);
+        setHasConflict(false);
+      } catch (err: any) {
+        if (err?.statusCode === 409 || err?.code === "VERSION_CONFLICT") {
+          setHasConflict(true);
+        } else {
+          setIsSavedToServer(false);
+        }
+      }
 
       if (eventName) {
         window.dispatchEvent(new Event(eventName));
       }
     },
-    [storageKey, eventName],
+    [activeRunId, eventName],
   );
 
   const xoaHet = useCallback(() => {
@@ -160,9 +241,7 @@ export function useQuyetDinh(
     if (storageKey) {
       try {
         window.localStorage.removeItem(storageKey);
-      } catch {
-        // bỏ qua
-      }
+      } catch {}
     }
     if (eventName) {
       window.dispatchEvent(new Event(eventName));
@@ -185,5 +264,11 @@ export function useQuyetDinh(
     xoaHet,
     layQuyetDinh,
     isStorageFailed,
+    isSavedToServer,
+    hasConflict,
+    serverVersion,
+    isLoadingServer,
+    refreshFromServer,
+    serverSnapshot,
   };
 }

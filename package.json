@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "turbo dev",
+    "dev:revision": "turbo run dev --filter www --filter revision-service --filter revision-debug",
     "build": "turbo build",
     "format": "biome format --write",
     "lint": "biome check",

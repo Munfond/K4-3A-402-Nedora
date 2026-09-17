@@ -1153,3 +1153,36 @@ Khi phải cắt (plan): bỏ trước trang trí UI, database, chèn/xóa câu,
 | Q8 | Tốc độ tham chiếu cho ước lượng: 2,9 (mẫu, plan) hay 4,49 (đo D1)? | Chưa hiện ước lượng tới khi chốt | Ban tổ chức |
 | Q11 | Bản sao pack và `d1.mp4` đã commit | Không xóa lúc này; rà trước khi công khai artifact | Đội, trước khi nộp |
 | Q13 | Công cụ kiểm thử | CP3: runner + test tự động tối thiểu cho `engine.ts`, `validate.ts`; sau CP3: Vitest + Playwright | Đội |
+
+---
+
+## A20. Kiến trúc đồ thị cố định và giao thức sự kiện (Cập nhật sau MVP — Phase R0)
+
+### A20.1 Đồ thị pipeline cố định (`revision@2`)
+Đồ thị phân tích được chuẩn hóa thành dữ liệu có phiên bản (`PIPELINE_GRAPH`, phiên bản `GRAPH_VERSION = "revision@2"`), gồm 12 node với 5 node hiển thị trực tiếp cho người dùng (`userVisible: true`):
+
+| Bước | Node ID | Kiểu | Mô tả nhiệm vụ | Hiển thị người dùng |
+|---|---|---|---|---|
+| 1 | `nhan-dau-vao` | code | Nhận input, chuẩn hóa ID, nạp kịch bản/góp ý/timecode | "Chuẩn bị dữ liệu" |
+| 2 | `lam-sach` | code | NFC/NFKC, ẩn PII, cách ly theo luật an toàn | Gộp vào bước 1 |
+| 3 | `hieu-gop-y` | ai | Phân loại góp ý, gom ý, định vị về câu kịch bản | "Hiểu góp ý" |
+| 4 | `kiem-tra-hieu` | code | Kiểm tra tính nhất quán, câu hợp lệ | Ẩn |
+| 5 | `lap-ho-so` | code | Gom vấn đề, tính ảnh hưởng, chia vùng → **phát `cases.ready` sớm** | "Lập hồ sơ vùng" |
+| 6 | `lap-phuong-an` | iteration | Lặp song song theo từng vùng (≤ 3 worker) | "Đề xuất cách sửa · k/n vùng" |
+| 6.a | `de-xuat` | ai, childOf 6 | Đề xuất nội dung thay thế cho từng vùng (`iterationKey`) | Ẩn (gộp ở 6) |
+| 6.b | `kiem-tra-de-xuat` | code, childOf 6 | Kiểm tra patch của vùng; lỗi thì quay lại 6.a kèm mã lỗi (≤ 2 lần) | Ẩn |
+| 6.c | `tinh-pham-vi` | code, childOf 6 | Tính toán thu âm/cảnh/chữ màn hình phát sinh → **phát `case.options.ready`** | Ẩn |
+| 7 | `cho-duyet` | human | Chờ người phụ trách duyệt phương án | "Chờ bạn duyệt" |
+| 8 | `ap-dung` | code | Áp dụng quyết định đã duyệt, tính lại toàn bộ kịch bản | Chạy khi có quyết định |
+| 9 | `xuat-goi` | code | Xuất 4 file bàn giao v2 | Chạy khi xuất |
+
+### A20.2 Giao thức sự kiện thời gian thực (SSE)
+- Toàn bộ sự kiện phát theo ID chuẩn của đồ thị, kèm `iterationKey` cho các node lặp.
+- Bổ sung các loại sự kiện mới:
+  - `node.skipped`: Ghi nhận node được bỏ qua (ví dụ: không có dữ liệu cần xử lý).
+  - `node.retry`: Ghi nhận vòng lặp sửa lỗi của một vùng (`{ attempt, reason }`), không ảnh hưởng các vùng khác.
+  - `node.cache_hit`: Ghi nhận dùng lại kết quả từ run trước (`{ sourceRunId }`).
+  - `partial: cases.ready`: Phát ngay sau bước `lap-ho-so` (khi chưa có phương án nào được sinh ra) để UI dựng trước danh sách vùng.
+  - `partial: case.options.ready`: Phát ngay sau khi một vùng hoàn thành kiểm tra và tính phạm vi, cho phép UI cập nhật phương án theo thời gian thực.
+- Giao diện người dùng: Component `PipelineFlow` thay thế hoàn toàn `analysis-progress-panel`, luôn hiển thị 5 node cố định ngay từ khi mở tab (màu xám "Chưa chạy"), theo dõi nhịp sống và tự thu gọn thành một dòng tóm tắt khi hoàn thành.
+

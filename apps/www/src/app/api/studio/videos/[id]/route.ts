@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { getInitialVideos } from "@/lib/studio/video-store";
-import { loadScriptD1 } from "@/lib/revision/load";
+import {
+  attachServiceFeedback,
+  getInitialVideos,
+} from "@/lib/studio/video-store";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const initial = getInitialVideos();
-  const video = initial.find((v) => v.id === id);
+  const video = getInitialVideos().find((v) => v.id === id);
 
   if (!video) {
     return NextResponse.json(
@@ -17,14 +18,5 @@ export async function GET(
     );
   }
 
-  // Nếu là D1, bảo đảm script được nạp đầy đủ 40 câu
-  if (id === "d1" && !video.script) {
-    try {
-      video.script = loadScriptD1();
-    } catch (e) {
-      // bỏ qua
-    }
-  }
-
-  return NextResponse.json({ video });
+  return NextResponse.json({ video: await attachServiceFeedback(video) });
 }

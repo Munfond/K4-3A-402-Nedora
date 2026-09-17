@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
-import { getInitialVideos } from "@/lib/studio/video-store";
+import {
+  attachServiceFeedback,
+  getInitialVideos,
+} from "@/lib/studio/video-store";
 import type { StudioVideo } from "@/lib/studio/types";
 
 // In-memory registry for session
 const customVideos: StudioVideo[] = [];
 
 export async function GET() {
-  const initial = getInitialVideos();
+  const initial = await Promise.all(
+    getInitialVideos().map(attachServiceFeedback),
+  );
   // Strip heavy script details from list view for optimal performance
   const list = [...initial, ...customVideos].map((v) => ({
     id: v.id,
@@ -22,6 +27,7 @@ export async function GET() {
     hasTimecodes: v.hasTimecodes,
     hasVideoFile: v.hasVideoFile,
     feedbackCount: v.feedbackCount,
+    feedbackError: v.feedbackError,
     activeRunId: v.activeRunId,
     versions: v.versions,
   }));
