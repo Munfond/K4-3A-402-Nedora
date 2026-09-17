@@ -13,6 +13,14 @@ import {
 export * from "./schema";
 export * from "./prompt";
 
+/**
+ * Giải quyết model ID cần dùng cho Revision Agent.
+ * Ưu tiên: override > REVISION_MODEL env > mặc định claude-haiku-4-5
+ */
+export function resolveRevisionModelId(override?: string): string {
+  return override ?? process.env.REVISION_MODEL ?? "claude-haiku-4-5";
+}
+
 export interface RevisionAgentScriptSentence {
   n: number;
   phan: number;
