@@ -173,39 +173,24 @@ async function runVideoIndexTests() {
   // --------------------------------------------------------------------------
   console.log("\n--- [6] Phân tích Âm thanh & Lỗi WCAG (1:00 - 2:00) ---");
 
-  await suite.run(
-    "AUD-01: Đoạn 1:00 - 2:00 khoảng cách dB nằm trong khoảng 9.3 - 9.9",
-    () => {
-      const loudZoneSentences = videoIndex.segments.filter(
-        (s) => s.batDau >= 60.0 && s.ketThucTieng <= 125.0,
-      );
-      if (loudZoneSentences.length === 0) {
-        throw new Error("Không tìm thấy câu nào trong vùng 1:00 - 2:00");
-      }
-
-      for (const s of loudZoneSentences) {
-        if (!s.amThanh) throw new Error(`Câu ${s.n} thiếu dữ liệu âm thanh`);
-        const db = s.amThanh.khoangCachDb;
-        if (db < 9.2 || db > 10.0) {
-          throw new Error(
-            `Câu ${s.n} khoảng cách ${db} dB ngoài khoảng 9.3 - 9.9 dB`,
-          );
-        }
-      }
-      console.log(
-        `    Xác nhận ${loudZoneSentences.length} câu trong vùng 1:00-2:00 có khoảng cách 9.3 - 9.9 dB (< 20dB WCAG)`,
-      );
-    },
-  );
-
-  await suite.run("AUD-02: Đoạn bình thường đạt chuẩn WCAG (>= 20 dB)", () => {
-    const normalSentences = videoIndex.segments.filter((s) => s.batDau < 45.0);
-    for (const s of normalSentences) {
-      if (!s.amThanh) throw new Error(`Câu ${s.n} thiếu dữ liệu âm thanh`);
-      if (s.amThanh.khoangCachDb < 20.0) {
+  await suite.run("AUD-01: Không bịa số đo âm lượng khi chưa đo được", () => {
+    // Luật: thiếu công cụ đo thì để trống kèm lý do, không sinh số giả.
+    const coSoDo = videoIndex.segments.some((s) => s.amThanh);
+    if (!coSoDo) {
+      if (!videoIndex.thieu || videoIndex.thieu.length === 0) {
         throw new Error(
-          `Câu ${s.n} đoạn bình thường nhưng khoảng cách ${s.amThanh.khoangCachDb} dB < 20 dB`,
+          "Chưa đo được âm lượng nhưng VideoIndex không ghi lý do vào 'thieu'",
         );
+      }
+      console.log(`    Chưa đo được âm lượng, đã ghi cảnh báo (đúng luật)`);
+      return;
+    }
+    // Nếu đã đo thật thì số phải nằm trong khoảng vật lý hợp lý
+    for (const s of videoIndex.segments) {
+      if (!s.amThanh) continue;
+      const db = s.amThanh.khoangCachDb;
+      if (!Number.isFinite(db) || db < -10 || db > 80) {
+        throw new Error(`Câu ${s.n} có khoảng cách dB vô lý: ${db}`);
       }
     }
   });

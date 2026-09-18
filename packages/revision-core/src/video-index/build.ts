@@ -92,7 +92,7 @@ export function buildVideoIndex(options: BuildVideoIndexOptions): VideoIndex {
 
   // 6. Phân tích Âm thanh
   const audioAnalysis = analyzeAudioSentences(videoFilePath, rawSentences);
-  if (!audioAnalysis.ffmpegAvailable && audioAnalysis.missingReason) {
+  if (audioAnalysis.missingReason) {
     thieu.push(audioAnalysis.missingReason);
   }
 

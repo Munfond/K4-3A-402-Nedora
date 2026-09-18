@@ -13,6 +13,23 @@ export function createMockModel(
   return new MockLanguageModelV3({
     doGenerate: async (options) => {
       const flat = JSON.stringify(options.prompt);
+      // Luồng K2 gọi model hai lượt: lượt đầu là vòng công cụ (không có
+      // responseFormat), lượt sau mới chốt bằng JSON có schema. Lượt đầu chỉ
+      // cần trả text tự do để agent dừng lại.
+      const canJson = options.responseFormat?.type === "json";
+      if (!canJson) {
+        return {
+          finishReason: "stop" as const,
+          usage: { inputTokens: 50, outputTokens: 10, totalTokens: 60 },
+          content: [
+            {
+              type: "text" as const,
+              text: "Đã tra cứu xong các câu liên quan.",
+            },
+          ],
+          warnings: [],
+        };
+      }
       const text = responder(flat);
       if (text === null) {
         throw new Error("MOCK_MODEL_NO_OUTPUT");
@@ -33,29 +50,44 @@ export function scriptEditResponse(
   after: string,
   alternative?: { n: number; after: string; truong?: "chuTrenManHinh" },
 ): string {
+  // Schema dùng strictObject + nullable nên mọi field phải có mặt, kể cả null.
+  const change = (kind: string, cn: number, ca: string) => ({
+    kind,
+    n: cn,
+    after: ca,
+    kieu: null,
+    giay: null,
+    tu: null,
+    den: null,
+    viec: null,
+    moTa: null,
+  });
+
   const payload: Record<string, unknown> = {
     recommended: {
       strategy: "Diễn đạt lại cho rõ quan hệ giữa khái niệm",
       thayDoiChinh: `Viết lại câu ${n}`,
       nhamToi: "Gỡ chỗ người học hiểu nhầm",
-      changes: [{ kind: "loi", n, after }],
+      changes: [change("loi", n, after)],
       conLai: null,
+      nguonDoiChieu: null,
     },
+    alternative: alternative
+      ? {
+          strategy: "Chỉ sửa hình, giữ nguyên giọng đọc",
+          thayDoiChinh: `Cập nhật chữ trên màn hình câu ${alternative.n}`,
+          nhamToi: "Tiết kiệm chi phí thu âm",
+          changes: [
+            change(
+              alternative.truong || "chuTrenManHinh",
+              alternative.n,
+              alternative.after,
+            ),
+          ],
+          conLai: "Người chỉ nghe mà không nhìn slide vẫn có thể chưa rõ",
+          nguonDoiChieu: null,
+        }
+      : null,
   };
-  if (alternative) {
-    payload.alternative = {
-      strategy: "Chỉ sửa hình, giữ nguyên giọng đọc",
-      thayDoiChinh: `Cập nhật chữ trên màn hình câu ${alternative.n}`,
-      nhamToi: "Tiết kiệm chi phí thu âm",
-      changes: [
-        {
-          kind: alternative.truong || "chuTrenManHinh",
-          n: alternative.n,
-          after: alternative.after,
-        },
-      ],
-      conLai: "Người chỉ nghe mà không nhìn slide vẫn có thể chưa rõ",
-    };
-  }
   return JSON.stringify(payload);
 }

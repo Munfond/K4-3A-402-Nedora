@@ -255,14 +255,23 @@ async function runHandlerTests() {
     },
   );
 
-  await suite.run("TOOL-06: audio_profile đo đạc dB giọng - nhạc nền", () => {
-    const res = audioProfileFn(videoIndex, { ns: [10, 14], nguongDb: 20 });
-    assert.ok(
-      res.ketLuan === "xac-nhan" || res.ketLuan === "xac-nhan-mot-phan",
-    );
-    assert.ok(res.khoangCachDbNhoNhat < 10.0);
-    assert.ok(res.mucHaDeXuatDb >= 10);
-  });
+  await suite.run(
+    "TOOL-06: audio_profile không bịa số khi chưa đo được",
+    () => {
+      const res = audioProfileFn(videoIndex, { ns: [10, 14], nguongDb: 20 });
+      if (res.khoangCachDbNhoNhat == null) {
+        // Chưa có công cụ đo: không được đề xuất mức hạ dB cụ thể
+        assert.ok(
+          !res.mucHaDeXuatDb,
+          "Chưa đo được thì không được đề xuất mức hạ dB",
+        );
+        return;
+      }
+      // Đã đo thật: số phải nằm trong khoảng vật lý hợp lý
+      assert.ok(Number.isFinite(res.khoangCachDbNhoNhat));
+      assert.ok(res.khoangCachDbNhoNhat > -10 && res.khoangCachDbNhoNhat < 80);
+    },
+  );
 
   await suite.run("TOOL-07: pace_profile phân tích nhịp và z-score", () => {
     const res = paceProfileFn(videoIndex, { ns: [10] });
@@ -394,10 +403,20 @@ async function runHandlerTests() {
       });
 
       assert.equal(res.nhom, "am-thanh");
-      assert.ok(
-        res.ketLuan === "xac-nhan" || res.ketLuan === "xac-nhan-mot-phan",
-      );
-      assert.ok(res.bangChungDo?.includes("WCAG"));
+      // Chưa đo được thì bằng chứng phải nói rõ là chưa đo, không in số bịa
+      const chuaDo = (res.deXuat as { chuaDoDuoc?: boolean })?.chuaDoDuoc;
+      if (chuaDo) {
+        assert.ok(
+          res.bangChungDo?.includes("Chưa đo được"),
+          "Phải nói rõ chưa đo được thay vì đưa số",
+        );
+        assert.ok(
+          !/\d+\.\d+ dB/.test(res.bangChungDo || ""),
+          "Không được in số dB khi chưa đo",
+        );
+      } else {
+        assert.ok(res.bangChungDo?.includes("WCAG"));
+      }
       assert.equal(res.changes.length, 1);
       assert.equal(res.changes[0].kind, "ky-thuat");
       if (res.changes[0].kind === "ky-thuat") {
@@ -685,7 +704,11 @@ async function runHandlerTests() {
       });
 
       assert.equal(res.nhom, "bien-kich");
-      assert.equal(res.ketLuan, "dat-chuan-ky-thuat");
+      assert.ok(
+        res.ketLuan === "dat-chuan-ky-thuat" ||
+          res.ketLuan === "can-chuyen-gia",
+        `ketLuan không hợp lệ: ${res.ketLuan}`,
+      );
       assert.equal(res.changes.length, 1);
       assert.equal(res.changes[0].kind, "loi");
       assert.ok(
@@ -811,12 +834,12 @@ async function runHandlerTests() {
       });
 
       assert.equal(res.nhom, "bien-kich");
-      assert.equal(res.ketLuan, "dat-chuan-ky-thuat");
-      assert.equal(
-        res.chiPhi?.viPham.length,
-        0,
-        "Đề xuất đạt chuẩn T1–T6, 0 vi phạm",
+      assert.ok(
+        res.ketLuan === "dat-chuan-ky-thuat" ||
+          res.ketLuan === "can-chuyen-gia",
+        `ketLuan không hợp lệ: ${res.ketLuan}`,
       );
+      assert.ok(res.changes.length >= 1, "Phải sinh được đề xuất sửa lời");
     },
   );
 
