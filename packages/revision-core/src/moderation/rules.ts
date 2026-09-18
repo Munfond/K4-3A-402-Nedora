@@ -111,52 +111,116 @@ export function checkModerationLexiconRules(
     }
   }
 
-  // 3. Kiểm tra công kích cá nhân
-  let offensiveWord: string | null = null;
-  for (const tu of LEXICON.congKich.tu) {
-    const wordPattern = new RegExp(
-      `(?:^|[^\\p{L}\\p{N}])${tu}(?:[^\\p{L}\\p{N}]|$)`,
+  function makeWordPattern(phrase: string): RegExp {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(
+      `(?:^|[^\\p{L}\\p{N}])${escaped}(?:[^\\p{L}\\p{N}]|$)`,
       "iu",
     );
-    if (wordPattern.test(norm) || wordPattern.test(rawText)) {
+  }
+
+  function extractNeutralFeedback(raw: string, normalized: string): string {
+    if (
+      normalized.includes("nhac") &&
+      (normalized.includes("to") || normalized.includes("lon"))
+    ) {
+      return "Nhạc nền hơi to, lấn át tiếng nói";
+    }
+    if (
+      normalized.includes("am thanh") ||
+      normalized.includes("be") ||
+      normalized.includes("nho") ||
+      normalized.includes("nghe")
+    ) {
+      return "Âm thanh hơi nhỏ, khó nghe rõ lời";
+    }
+    if (normalized.includes("nhanh") || normalized.includes("nuot")) {
+      return "Nói hơi nhanh ở một số đoạn";
+    }
+    if (normalized.includes("slide") || normalized.includes("chinh ta")) {
+      return "Slide có chỗ sai chính tả cần chỉnh sửa";
+    }
+    let cleanIdea = raw;
+    const allBadWords = [
+      ...LEXICON.thoTucCoDau,
+      ...LEXICON.thoTucKhongDau,
+      ...LEXICON.congKich.tuCoDau,
+      ...LEXICON.congKich.tuKhongDau,
+    ];
+    for (const bw of allBadWords) {
+      cleanIdea = cleanIdea.replace(makeWordPattern(bw), " ");
+    }
+    return cleanIdea.replace(/\s+/g, " ").trim() || raw;
+  }
+
+  // 3. Kiểm tra công kích cá nhân (Đòi hỏi CẢ 2: từ miệt thị VÀ đối tượng là người)
+  const nfc = rawText.normalize("NFC");
+  let offensiveWord: string | null = null;
+  for (const tu of LEXICON.congKich.tuCoDau) {
+    if (makeWordPattern(tu).test(nfc)) {
       offensiveWord = tu;
       break;
     }
   }
+  if (!offensiveWord) {
+    for (const tu of LEXICON.congKich.tuKhongDau) {
+      if (makeWordPattern(tu).test(norm)) {
+        offensiveWord = tu;
+        break;
+      }
+    }
+  }
 
   let personTarget: string | null = null;
-  for (const dt of LEXICON.congKich.doiTuongNguoi) {
-    const targetPattern = new RegExp(
-      `(?:^|[^\\p{L}\\p{N}])${dt}(?:[^\\p{L}\\p{N}]|$)`,
-      "iu",
-    );
-    if (targetPattern.test(norm)) {
+  for (const dt of LEXICON.congKich.doiTuongCoDau) {
+    if (makeWordPattern(dt).test(nfc)) {
       personTarget = dt;
       break;
     }
   }
+  if (!personTarget) {
+    for (const dt of LEXICON.congKich.doiTuongKhongDau) {
+      if (makeWordPattern(dt).test(norm)) {
+        personTarget = dt;
+        break;
+      }
+    }
+  }
 
-  // Từ xúc phạm/công kích luôn được ưu tiên xử lý trước thô tục cảm thán
-  if (offensiveWord) {
+  // 3a. Có từ miệt thị VÀ có đối tượng người -> công kích cá nhân
+  if (offensiveWord && personTarget) {
     return {
       nhan: "cong-kich-ca-nhan",
       chacChan: true,
-      lyDo: personTarget
-        ? `Công kích cá nhân nhắm vào ${personTarget} (từ ngữ: '${offensiveWord}')`
-        : `Chứa từ ngữ miệt thị, xúc phạm: '${offensiveWord}'`,
+      lyDo: `Công kích cá nhân nhắm vào ${personTarget} (từ ngữ: '${offensiveWord}')`,
+    };
+  }
+
+  // 3b. Có từ miệt thị nhưng KHÔNG có đối tượng người -> tho-tuc-noi-dung (giữ ý, diễn đạt lại trung tính)
+  if (offensiveWord && !personTarget) {
+    const yDung = extractNeutralFeedback(rawText, norm);
+    return {
+      nhan: "tho-tuc-noi-dung",
+      chacChan: false, // Cần thẩm định thêm nếu có model
+      lyDo: `Có từ ngữ miệt thị ('${offensiveWord}') nhưng không nhắm vào đối tượng cá nhân cụ thể`,
+      yDungDuoc: yDung,
     };
   }
 
   // 4. Kiểm tra thô tục cảm thán về nội dung
   let vulgarWord: string | null = null;
-  for (const tt of LEXICON.thoTuc) {
-    const vulgarPattern = new RegExp(
-      `(?:^|[^\\p{L}\\p{N}])${tt}(?:[^\\p{L}\\p{N}]|$)`,
-      "iu",
-    );
-    if (vulgarPattern.test(norm) || vulgarPattern.test(rawText.toLowerCase())) {
+  for (const tt of LEXICON.thoTucCoDau) {
+    if (makeWordPattern(tt).test(nfc)) {
       vulgarWord = tt;
       break;
+    }
+  }
+  if (!vulgarWord) {
+    for (const tt of LEXICON.thoTucKhongDau) {
+      if (makeWordPattern(tt).test(norm)) {
+        vulgarWord = tt;
+        break;
+      }
     }
   }
 
@@ -165,44 +229,16 @@ export function checkModerationLexiconRules(
       return {
         nhan: "cong-kich-ca-nhan",
         chacChan: true,
-        lyDo: `Sử dụng từ ngữ thô tục nhắm vào ${personTarget}`,
+        lyDo: `Sử dụng từ ngữ thô tục nhắm vào ${personTarget} ('${vulgarWord}')`,
       };
     }
 
-    // Thô tục về nội dung (ví dụ: "đm nhạc nền to vãi", "như cc", "slide như cứt")
-    // Trích xuất ý nội dung sạch đã diễn đạt lại trung tính
-    let yDung: string | undefined;
-    if (
-      norm.includes("nhac") &&
-      (norm.includes("to") || norm.includes("lon"))
-    ) {
-      yDung = "Nhạc nền hơi to, lấn át tiếng nói";
-    } else if (
-      norm.includes("am thanh") ||
-      norm.includes("be") ||
-      norm.includes("nho") ||
-      norm.includes("nghe")
-    ) {
-      yDung = "Âm thanh hơi nhỏ, khó nghe rõ lời";
-    } else if (norm.includes("nhanh") || norm.includes("nuot")) {
-      yDung = "Nói hơi nhanh ở một số đoạn";
-    } else if (norm.includes("slide") || norm.includes("chinh ta")) {
-      yDung = "Slide có chỗ sai chính tả cần chỉnh sửa";
-    } else {
-      let cleanIdea = rawText;
-      for (const tt of LEXICON.thoTuc) {
-        cleanIdea = cleanIdea
-          .replace(new RegExp(`\\b${tt}\\b`, "gi"), "")
-          .trim();
-      }
-      yDung = cleanIdea.replace(/\s+/g, " ").trim();
-    }
-
+    const yDung = extractNeutralFeedback(rawText, norm);
     return {
       nhan: "tho-tuc-noi-dung",
       chacChan: true,
       lyDo: `Có từ ngữ thô tục cảm thán ('${vulgarWord}') nhưng hướng về nội dung video`,
-      yDungDuoc: yDung || undefined,
+      yDungDuoc: yDung,
     };
   }
 

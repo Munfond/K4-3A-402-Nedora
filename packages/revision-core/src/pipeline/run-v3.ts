@@ -254,12 +254,16 @@ export async function runRevisionV3(
       store,
     );
 
-    const modResults = moderateFeedbackBatch(
+    const modResults = await moderateFeedbackBatch(
       rawFeedbackList.map((f) => ({
         id: f.id,
         sender: f.sender || "nguoi-dung",
         rawText: f.rawText || f.sanitizedText || "",
       })),
+      {
+        model: (deps as any)?.model,
+        onWarning: (msg) => canhBao.push(msg),
+      },
     );
 
     const safeFeedback: FeedbackItem[] = [];
@@ -274,9 +278,9 @@ export async function runRevisionV3(
       if (mod?.label) {
         switch (mod.label) {
           case "an-toan":
+          case "tho-tuc-noi-dung":
             mappedLabel = item.label || "gop-y";
             break;
-          case "tho-tuc-noi-dung":
           case "cong-kich-ca-nhan":
             mappedLabel = "cong-kich";
             break;

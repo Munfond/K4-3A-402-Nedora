@@ -10,10 +10,13 @@ export interface ModerationLexicon {
     thaoTung: string[];
   };
   congKich: {
-    tu: string[];
-    doiTuongNguoi: string[];
+    tuCoDau: string[];
+    tuKhongDau: string[];
+    doiTuongCoDau: string[];
+    doiTuongKhongDau: string[];
   };
-  thoTuc: string[];
+  thoTucCoDau: string[];
+  thoTucKhongDau: string[];
   teencode: Record<string, string>;
   lacDe: string[];
   camXuc: string[];

@@ -198,6 +198,7 @@ export function sanitizeFeedbackItem(item: {
       ruleCheck.isQuarantined && ruleCheck.label !== "thong-tin-ca-nhan"
         ? ""
         : piiRedactedText,
+    rawText: item.text,
     time: item.time || new Date().toISOString(),
     survey: item.survey,
     label,

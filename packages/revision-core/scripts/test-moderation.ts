@@ -5,6 +5,7 @@ import {
   stripInvisibleChars,
   toDetection,
 } from "../src/moderation";
+import { loadD1RawFeedback } from "../src/load";
 import { TestSuite } from "./lib/assert";
 
 async function runModerationTests() {
@@ -205,11 +206,24 @@ async function runModerationTests() {
       throw new Error(`Mong đợi cong-kich-ca-nhan nhưng nhận ${res.nhan}`);
   });
 
-  await suite.run("ATK-04: Xúc phạm 'dốt vãi'", () => {
-    const res = checkModerationLexiconRules("Nói năng dốt vãi, không đáng xem");
+  await suite.run("ATK-04: Xúc phạm có đối tượng 'Giảng viên dốt vãi'", () => {
+    const res = checkModerationLexiconRules(
+      "Giảng viên nói năng dốt vãi, không đáng xem",
+    );
     if (res.nhan !== "cong-kich-ca-nhan")
       throw new Error(`Mong đợi cong-kich-ca-nhan nhưng nhận ${res.nhan}`);
   });
+
+  await suite.run(
+    "ATK-05: Từ miệt thị không có đối tượng người thì gán tho-tuc-noi-dung (F1)",
+    () => {
+      const res = checkModerationLexiconRules(
+        "Nói năng dốt vãi, không đáng xem",
+      );
+      if (res.nhan !== "tho-tuc-noi-dung")
+        throw new Error(`Mong đợi tho-tuc-noi-dung nhưng nhận ${res.nhan}`);
+    },
+  );
 
   // --------------------------------------------------------------------------
   // Nhóm 4: Thô tục nhưng có ý dùng được - 4 test cases
@@ -294,7 +308,7 @@ async function runModerationTests() {
 
   await suite.run(
     "SPAM-01: Đợt spam cùng nội dung từ 3 người gửi khác nhau",
-    () => {
+    async () => {
       const batch = [
         {
           id: "sp-1",
@@ -312,7 +326,7 @@ async function runModerationTests() {
           rawText: "Tham gia nhóm nhận quà miễn phí tại link xyz",
         },
       ];
-      const results = moderateFeedbackBatch(batch);
+      const results = await moderateFeedbackBatch(batch);
       const quarantinedCount = results.filter(
         (r) => r.isQuarantined && r.label === "spam",
       ).length;
@@ -326,7 +340,7 @@ async function runModerationTests() {
 
   await suite.run(
     "SPAM-02: Góp ý ngắn tự nhiên từ 2 người gửi không bị coi là spam đồng loạt",
-    () => {
+    async () => {
       const batch = [
         {
           id: "legit-1",
@@ -339,7 +353,7 @@ async function runModerationTests() {
           rawText: "Video rất hay và dễ hiểu",
         },
       ];
-      const results = moderateFeedbackBatch(batch);
+      const results = await moderateFeedbackBatch(batch);
       const isSpam = results.some((r) => r.label === "spam");
       if (isSpam) {
         throw new Error(
@@ -354,33 +368,36 @@ async function runModerationTests() {
   // --------------------------------------------------------------------------
   console.log("\n--- [Nhóm 7] Rủi ro riêng tư trong video (2 ca) ---");
 
-  await suite.run("PRIV-01: Báo video làm lộ số CCCD của học viên", () => {
-    const batch = [
-      {
-        id: "pv-1",
-        sender: "user-X",
-        rawText: "Ở phút 2:15 video làm lộ cccd của bạn học viên trong slide",
-      },
-    ];
-    const results = moderateFeedbackBatch(batch);
-    if (
-      !results[0].hasVideoPrivacyRisk ||
-      results[0].label !== "rui-ro-rieng-tu-trong-video"
-    ) {
-      throw new Error(
-        `Phải kích hoạt cảnh báo rui-ro-rieng-tu-trong-video, nhận: ${results[0].label}`,
-      );
-    }
-    if (!results[0].isQuarantined) {
-      throw new Error(
-        "Cảnh báo rủi ro video phải được cách ly và ưu tiên cao nhất",
-      );
-    }
-  });
+  await suite.run(
+    "PRIV-01: Báo video làm lộ số CCCD của học viên",
+    async () => {
+      const batch = [
+        {
+          id: "pv-1",
+          sender: "user-X",
+          rawText: "Ở phút 2:15 video làm lộ cccd của bạn học viên trong slide",
+        },
+      ];
+      const results = await moderateFeedbackBatch(batch);
+      if (
+        !results[0].hasVideoPrivacyRisk ||
+        results[0].label !== "rui-ro-rieng-tu-trong-video"
+      ) {
+        throw new Error(
+          `Phải kích hoạt cảnh báo rui-ro-rieng-tu-trong-video, nhận: ${results[0].label}`,
+        );
+      }
+      if (!results[0].isQuarantined) {
+        throw new Error(
+          "Cảnh báo rủi ro video phải được cách ly và ưu tiên cao nhất",
+        );
+      }
+    },
+  );
 
   await suite.run(
     "PRIV-02: Báo video bị lộ thông tin cá nhân và tài khoản",
-    () => {
+    async () => {
       const batch = [
         {
           id: "pv-2",
@@ -388,9 +405,142 @@ async function runModerationTests() {
           rawText: "Đoạn demo video bị lộ thông tin cá nhân khách hàng kìa",
         },
       ];
-      const results = moderateFeedbackBatch(batch);
+      const results = await moderateFeedbackBatch(batch);
       if (!results[0].hasVideoPrivacyRisk) {
         throw new Error("Phải nhận diện nguy cơ lộ dữ liệu trong video");
+      }
+    },
+  );
+
+  // --------------------------------------------------------------------------
+  // Nhóm 8: Chuẩn hóa Leetspeak giữ nguyên chữ số và mốc thời gian (F1)
+  // --------------------------------------------------------------------------
+  console.log("\n--- [Nhóm 8] Leetspeak giữ số và timecode (F1) ---");
+
+  await suite.run(
+    "LEET-01: Giữ nguyên số 5, 3 và timecode 1:15 trong câu",
+    () => {
+      const detected = toDetection("Câu 5 dừng 3 giây ở phút 1:15");
+      if (!detected.includes("5")) throw new Error("Mất số 5");
+      if (!detected.includes("3")) throw new Error("Mất số 3");
+      if (!detected.includes("1:15")) throw new Error("Mất mốc 1:15");
+    },
+  );
+
+  // --------------------------------------------------------------------------
+  // Nhóm 9: Các ca âm tính không bắt nhầm tiếng Việt thông dụng (F1 - 8 ca)
+  // --------------------------------------------------------------------------
+  console.log("\n--- [Nhóm 9] Kiểm tra âm tính không bắt nhầm (8 ca F1) ---");
+
+  const negativeCases = [
+    { text: "mô hình ngôn ngữ lớn", desc: "mô hình ngôn ngữ lớn (chứa ngữ)" },
+    { text: "em ngủ gật đoạn này", desc: "em ngủ gật đoạn này (chứa ngủ)" },
+    {
+      text: "em không hiểu gì đoạn 2:10",
+      desc: "em không hiểu gì đoạn 2:10 (không hiểu gì)",
+    },
+    { text: "các ví dụ", desc: "các ví dụ (chứa các)" },
+    { text: "vai trò của mô hình", desc: "vai trò của mô hình (chứa vai)" },
+    { text: "con số ở câu 5", desc: "con số ở câu 5 (chứa con)" },
+    { text: "ba ví dụ dồn một chỗ", desc: "ba ví dụ dồn một chỗ (chứa ba)" },
+    { text: "tháng sau học tiếp", desc: "tháng sau học tiếp (chứa tháng)" },
+  ];
+
+  for (let idx = 0; idx < negativeCases.length; idx++) {
+    const c = negativeCases[idx];
+    await suite.run(`NEG-0${idx + 1}: ${c.desc} -> an-toan`, () => {
+      const res = checkModerationLexiconRules(c.text);
+      if (res.nhan !== "an-toan") {
+        throw new Error(
+          `Bắt nhầm '${c.text}' thành nhãn '${res.nhan}' (lý do: ${res.lyDo})`,
+        );
+      }
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // Nhóm 10: Các ca dương tính công kích cá nhân có đối tượng rõ ràng (F1 - 6 ca)
+  // --------------------------------------------------------------------------
+  console.log(
+    "\n--- [Nhóm 10] Ca dương tính công kích cá nhân rõ ràng (6 ca F1) ---",
+  );
+
+  const positiveCases = [
+    { text: "Giảng viên dạy ngu như bò", target: "giảng viên" },
+    { text: "Người làm video này dốt nát thật sự", target: "người làm video" },
+    { text: "Thầy giáo trình độ rác rưởi", target: "thầy giáo" },
+    {
+      text: "Đội ngũ biên kịch làm ăn kiểu gì vậy",
+      target: "biên kịch/đội ngũ",
+    },
+    { text: "Tác giả video bất tài vô dụng", target: "tác giả" },
+    { text: "Admin kênh này óc chó quá", target: "admin" },
+  ];
+
+  for (let idx = 0; idx < positiveCases.length; idx++) {
+    const c = positiveCases[idx];
+    await suite.run(`POS-0${idx + 1}: Công kích cá nhân '${c.target}'`, () => {
+      const res = checkModerationLexiconRules(c.text);
+      if (res.nhan !== "cong-kich-ca-nhan") {
+        throw new Error(
+          `Bỏ lọt công kích '${c.text}': nhận '${res.nhan}' thay vì 'cong-kich-ca-nhan'`,
+        );
+      }
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // Nhóm 11: Kiểm thử kiểm duyệt trên 22 góp ý D1 thực tế (F1)
+  // --------------------------------------------------------------------------
+  console.log("\n--- [Nhóm 11] Kiểm thử kiểm duyệt trên D1 thực tế ---");
+
+  await suite.run(
+    "D1-MOD: gy-002,003,016,018,020,022 an toàn, gy-011,012 cách ly",
+    async () => {
+      const rawFeedbacks = loadD1RawFeedback();
+      const batch = rawFeedbacks.map((f) => ({
+        id: f.id,
+        sender: f.sender || "user",
+        rawText: f.rawText || f.sanitizedText || "",
+      }));
+
+      const results = await moderateFeedbackBatch(batch);
+      const resultMap = new Map(results.map((r) => [r.id, r]));
+
+      const shouldBeSafe = [
+        "gy-002",
+        "gy-003",
+        "gy-016",
+        "gy-018",
+        "gy-020",
+        "gy-022",
+      ];
+      for (const id of shouldBeSafe) {
+        const r = resultMap.get(id);
+        if (!r) throw new Error(`Không tìm thấy kết quả kiểm duyệt cho ${id}`);
+        if (r.isQuarantined) {
+          throw new Error(
+            `Góp ý ${id} bị cách ly nhầm: nhãn=${r.label}, lý do=${r.quarantineReason}`,
+          );
+        }
+      }
+
+      const gy011 = resultMap.get("gy-011");
+      if (!gy011 || !gy011.isQuarantined || gy011.label !== "cai-lenh") {
+        throw new Error(
+          `gy-011 phải bị cách ly cài lệnh, thực tế: ${gy011?.label}`,
+        );
+      }
+
+      const gy012 = resultMap.get("gy-012");
+      if (
+        !gy012 ||
+        !gy012.isQuarantined ||
+        gy012.label !== "cong-kich-ca-nhan"
+      ) {
+        throw new Error(
+          `gy-012 phải bị cách ly công kích cá nhân, thực tế: ${gy012?.label}`,
+        );
       }
     },
   );

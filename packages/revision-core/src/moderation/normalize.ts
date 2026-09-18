@@ -25,15 +25,28 @@ export function removeVietnameseDiacritics(str: string): string {
     .replace(/Đ/g, "D");
 }
 
+function replaceWordLeetspeak(word: string): string {
+  // Nếu là mốc thời gian (ví dụ 1:15, 01:20:00, v.v.) thì không đổi
+  if (/^\(?\d+:\d+(?::\d+)?\)?$/.test(word)) {
+    return word;
+  }
+  // Nếu không chứa chữ cái (chỉ là số hoặc dấu câu như "5", "3", "100%", "3.") -> giữ nguyên
+  if (!/\p{L}/u.test(word)) {
+    return word;
+  }
+  // Chỉ đổi chữ số khi nó kề với chữ cái trong cùng một từ
+  return word
+    .replace(/(?<=\p{L})0|0(?=\p{L})/gu, "o")
+    .replace(/(?<=\p{L})1|1(?=\p{L})/gu, "i")
+    .replace(/(?<=\p{L})3|3(?=\p{L})/gu, "e")
+    .replace(/(?<=\p{L})4|4(?=\p{L})/gu, "a")
+    .replace(/(?<=\p{L})5|5(?=\p{L})/gu, "s")
+    .replace(/(?<=\p{L})7|7(?=\p{L})/gu, "t")
+    .replace(/(?<=\p{L})@|@(?=\p{L})/gu, "a");
+}
+
 function replaceLeetspeak(str: string): string {
-  return str
-    .replace(/0/g, "o")
-    .replace(/1/g, "i")
-    .replace(/3/g, "e")
-    .replace(/4/g, "a")
-    .replace(/5/g, "s")
-    .replace(/7/g, "t")
-    .replace(/@/g, "a");
+  return str.replace(/\S+/g, (word) => replaceWordLeetspeak(word));
 }
 
 function joinSpacedLetters(str: string): string {
