@@ -144,7 +144,7 @@ export class FsRevisionStore implements RevisionStore {
     studioDir?: string;
     cacheDir?: string;
   }) {
-    const base = options?.baseDir || ".";
+    const base = options?.baseDir || findRepoRoot();
     this.runsDir = resolveDataDir(
       "revision-runs",
       options?.runsDir,
@@ -426,11 +426,15 @@ export class FsRevisionStore implements RevisionStore {
   }
 
   readPackFile(filename: string): string {
-    const p = join(this.packDir, filename);
-    if (!existsSync(p)) {
-      throw new Error(`File pack không tồn tại: ${p}`);
+    const candidate1 = join(this.packDir, filename);
+    if (existsSync(candidate1)) {
+      return readFileSync(candidate1, "utf-8");
     }
-    return readFileSync(p, "utf-8");
+    const candidate2 = join(this.packDir, "video-mau", filename);
+    if (existsSync(candidate2)) {
+      return readFileSync(candidate2, "utf-8");
+    }
+    throw new Error(`File pack không tồn tại: ${candidate1}`);
   }
 
   loadDecisions(runId: string): RunDecisionState {

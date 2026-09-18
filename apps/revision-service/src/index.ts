@@ -13,6 +13,7 @@ import {
   GRAPH_VERSION,
   generateAllExports,
   getDefaultStore,
+  getOrBuildVideoIndex,
   loadD1RawFeedback,
   loadScriptD1,
   type NewFeedbackInput,
@@ -311,6 +312,72 @@ app.get("/videos/:id", (c) => {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return c.json({ error: { code: "LOAD_SCRIPT_FAILED", message: msg } }, 500);
+  }
+});
+
+// GET /videos/:id/versions/:v/index
+app.get("/videos/:id/versions/:v/index", (c) => {
+  const videoId = c.req.param("id");
+  const versionId = c.req.param("v");
+  const forceRebuild = c.req.query("rebuild") === "1";
+
+  if (videoId !== "d1") {
+    return c.json(
+      {
+        error: {
+          code: "VIDEO_NOT_FOUND",
+          message: `Không tìm thấy video ${videoId}`,
+        },
+      },
+      404,
+    );
+  }
+
+  try {
+    const script = loadScriptD1(store);
+    const packDir = store.getPackDir();
+
+    let timecodeCsvText: string | undefined;
+    let transcriptText: string | undefined;
+    let slideJsonText: string | undefined;
+    let videoFilePath: string | undefined;
+
+    try {
+      timecodeCsvText = store.readPackFile("video-mau/cau-timecode-d1.csv");
+    } catch {}
+    try {
+      transcriptText = store.readPackFile("video-mau/transcript-d1.txt");
+    } catch {}
+    try {
+      slideJsonText = store.readPackFile("video-mau/slide-d1.json");
+    } catch {}
+
+    const candidateVideo = join(packDir, "video-mau", "d1.mp4");
+    if (existsSync(candidateVideo)) {
+      videoFilePath = candidateVideo;
+    }
+
+    const index = getOrBuildVideoIndex(
+      {
+        videoId,
+        versionId,
+        script,
+        timecodeCsvText,
+        transcriptText,
+        slideJsonText,
+        videoFilePath,
+      },
+      store,
+      forceRebuild,
+    );
+
+    return c.json(index);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return c.json(
+      { error: { code: "BUILD_VIDEO_INDEX_FAILED", message: msg } },
+      500,
+    );
   }
 });
 

@@ -14,7 +14,8 @@
     "./events": "./src/events.ts",
     "./pipeline/graph": "./src/pipeline/graph.ts",
     "./timeline": "./src/timeline/index.ts",
-    "./moderation": "./src/moderation/index.ts"
+    "./moderation": "./src/moderation/index.ts",
+    "./video-index": "./src/video-index/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
