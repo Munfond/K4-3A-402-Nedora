@@ -13,7 +13,8 @@
     "./sanitize": "./src/sanitize.ts",
     "./events": "./src/events.ts",
     "./pipeline/graph": "./src/pipeline/graph.ts",
-    "./timeline": "./src/timeline/index.ts"
+    "./timeline": "./src/timeline/index.ts",
+    "./moderation": "./src/moderation/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

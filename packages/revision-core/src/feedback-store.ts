@@ -1,6 +1,6 @@
-import type { FeedbackItem } from "./types";
 import type { RevisionStore } from "./store";
 import { getDefaultStore } from "./store";
+import type { FeedbackItem } from "./types";
 
 export function getStudioDataDir(
   store: RevisionStore = getDefaultStore(),
@@ -27,6 +27,15 @@ export function appendStoredFeedback(
   store: RevisionStore = getDefaultStore(),
 ): FeedbackItem[] {
   return store.appendStoredFeedback(videoId, versionId, items);
+}
+
+export function saveStoredFeedback(
+  videoId: string,
+  versionId: string,
+  items: FeedbackItem[],
+  store: RevisionStore = getDefaultStore(),
+): void {
+  store.saveStoredFeedback(videoId, versionId, items);
 }
 
 /** Số thứ tự tiếp theo cho mã `gy-u-<k>`, không trùng với góp ý đã lưu. */

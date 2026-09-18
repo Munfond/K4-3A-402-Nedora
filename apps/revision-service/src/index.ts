@@ -1,33 +1,33 @@
 import "dotenv/config";
+import { timingSafeEqual } from "node:crypto";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import {
+  type AnalyzeInput,
+  buildNewFeedbackItems,
+  cancelRevisionRun,
+  computeFeedbackFingerprint,
+  computeReleaseSnapshot,
+  type DecisionRecord,
+  type FeedbackItem,
+  GRAPH_VERSION,
+  generateAllExports,
+  getDefaultStore,
+  loadD1RawFeedback,
+  loadScriptD1,
+  type NewFeedbackInput,
+  nextStoredFeedbackIndex,
+  PIPELINE_GRAPH,
+  parseFeedbackCsv,
+  type RunDecisionState,
+  runPipeline,
+  sanitizeFeedbackItem,
+  subscribeRunEvents,
+} from "@feedback/revision-core";
+import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
-import { serve } from "@hono/node-server";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { timingSafeEqual } from "node:crypto";
-import {
-  PIPELINE_GRAPH,
-  GRAPH_VERSION,
-  runPipeline,
-  cancelRevisionRun,
-  getDefaultStore,
-  subscribeRunEvents,
-  computeReleaseSnapshot,
-  generateAllExports,
-  loadScriptD1,
-  loadD1RawFeedback,
-  buildNewFeedbackItems,
-  parseFeedbackCsv,
-  computeFeedbackFingerprint,
-  sanitizeFeedbackItem,
-  nextStoredFeedbackIndex,
-  type AnalyzeInput,
-  type DecisionRecord,
-  type RunDecisionState,
-  type FeedbackItem,
-  type NewFeedbackInput,
-} from "@feedback/revision-core";
 
 const app = new Hono();
 const store = getDefaultStore();
@@ -324,14 +324,179 @@ app.get("/videos/:id/feedback", (c) => {
       items = loadD1RawFeedback(store);
     }
     const stored = store.loadStoredFeedback(id, versionId);
-    const combined = [...items, ...stored];
-    return c.json({ feedback: combined });
+    const map = new Map<string, FeedbackItem>();
+    for (const item of items) {
+      map.set(item.id, item);
+    }
+    for (const item of stored) {
+      map.set(item.id, item);
+    }
+    return c.json({ feedback: Array.from(map.values()) });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return c.json(
       { error: { code: "LOAD_FEEDBACK_FAILED", message: msg } },
       500,
     );
+  }
+});
+
+// POST /feedback/:id/release
+app.post("/feedback/:id/release", async (c) => {
+  const feedbackId = c.req.param("id");
+  let body: { videoId?: string; versionId?: string; editedText?: string } = {};
+  try {
+    body = await c.req.json();
+  } catch {}
+  const videoId = body.videoId || "d1";
+  const versionId = body.versionId || "v1";
+
+  try {
+    const rawD1 = videoId === "d1" ? loadD1RawFeedback(store) : [];
+    const stored = store.loadStoredFeedback(videoId, versionId);
+    const existingMap = new Map<string, FeedbackItem>();
+    rawD1.forEach((it) => existingMap.set(it.id, it));
+    stored.forEach((it) => existingMap.set(it.id, it));
+
+    const target = existingMap.get(feedbackId);
+    if (!target) {
+      return c.json(
+        {
+          error: {
+            code: "FEEDBACK_NOT_FOUND",
+            message: `Không tìm thấy góp ý ${feedbackId}`,
+          },
+        },
+        404,
+      );
+    }
+
+    const updatedItem: FeedbackItem = {
+      ...target,
+      isQuarantined: false,
+      quarantineReason: undefined,
+      sanitizedText: body.editedText?.trim() || target.sanitizedText,
+      moderationBy: "nguoi-duyet",
+    };
+
+    const storedMap = new Map<string, FeedbackItem>();
+    stored.forEach((it) => storedMap.set(it.id, it));
+    storedMap.set(feedbackId, updatedItem);
+    store.saveStoredFeedback(
+      videoId,
+      versionId,
+      Array.from(storedMap.values()),
+    );
+
+    return c.json({ ok: true, item: updatedItem });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return c.json({ error: { code: "RELEASE_FAILED", message: msg } }, 500);
+  }
+});
+
+// POST /feedback/release (batch)
+app.post("/feedback/release", async (c) => {
+  try {
+    const body = (await c.req.json()) as {
+      videoId?: string;
+      versionId?: string;
+      ids: string[];
+    };
+    const videoId = body.videoId || "d1";
+    const versionId = body.versionId || "v1";
+    const idsToRelease = new Set(body.ids || []);
+
+    const rawD1 = videoId === "d1" ? loadD1RawFeedback(store) : [];
+    const stored = store.loadStoredFeedback(videoId, versionId);
+    const existingMap = new Map<string, FeedbackItem>();
+    rawD1.forEach((it) => existingMap.set(it.id, it));
+    stored.forEach((it) => existingMap.set(it.id, it));
+
+    const storedMap = new Map<string, FeedbackItem>();
+    stored.forEach((it) => storedMap.set(it.id, it));
+
+    const releasedIds: string[] = [];
+    for (const id of idsToRelease) {
+      const target = existingMap.get(id);
+      if (target) {
+        const updatedItem: FeedbackItem = {
+          ...target,
+          isQuarantined: false,
+          quarantineReason: undefined,
+          moderationBy: "nguoi-duyet",
+        };
+        storedMap.set(id, updatedItem);
+        releasedIds.push(id);
+      }
+    }
+
+    store.saveStoredFeedback(
+      videoId,
+      versionId,
+      Array.from(storedMap.values()),
+    );
+    return c.json({ ok: true, releasedIds, count: releasedIds.length });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return c.json(
+      { error: { code: "BATCH_RELEASE_FAILED", message: msg } },
+      400,
+    );
+  }
+});
+
+// POST /feedback/:id/reject
+app.post("/feedback/:id/reject", async (c) => {
+  const feedbackId = c.req.param("id");
+  let body: { videoId?: string; versionId?: string; reason?: string } = {};
+  try {
+    body = await c.req.json();
+  } catch {}
+  const videoId = body.videoId || "d1";
+  const versionId = body.versionId || "v1";
+
+  try {
+    const rawD1 = videoId === "d1" ? loadD1RawFeedback(store) : [];
+    const stored = store.loadStoredFeedback(videoId, versionId);
+    const existingMap = new Map<string, FeedbackItem>();
+    rawD1.forEach((it) => existingMap.set(it.id, it));
+    stored.forEach((it) => existingMap.set(it.id, it));
+
+    const target = existingMap.get(feedbackId);
+    if (!target) {
+      return c.json(
+        {
+          error: {
+            code: "FEEDBACK_NOT_FOUND",
+            message: `Không tìm thấy góp ý ${feedbackId}`,
+          },
+        },
+        404,
+      );
+    }
+
+    const updatedItem: FeedbackItem = {
+      ...target,
+      isQuarantined: true,
+      label: "bo-qua",
+      quarantineReason: body.reason || "Người duyệt từ chối",
+      moderationBy: "nguoi-duyet",
+    };
+
+    const storedMap = new Map<string, FeedbackItem>();
+    stored.forEach((it) => storedMap.set(it.id, it));
+    storedMap.set(feedbackId, updatedItem);
+    store.saveStoredFeedback(
+      videoId,
+      versionId,
+      Array.from(storedMap.values()),
+    );
+
+    return c.json({ ok: true, item: updatedItem });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return c.json({ error: { code: "REJECT_FAILED", message: msg } }, 500);
   }
 });
 

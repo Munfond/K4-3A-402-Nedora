@@ -1,7 +1,7 @@
-import { readdirSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +28,7 @@ async function main() {
   for (const file of testFiles) {
     const filePath = join(__dirname, file);
     console.log(`\n>>> Đang chạy: ${file}`);
-    const res = spawnSync(process.execPath, ["--loader", "tsx", filePath], {
+    const res = spawnSync(process.execPath, ["--import", "tsx", filePath], {
       stdio: "inherit",
       env: process.env,
     });

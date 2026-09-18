@@ -1,20 +1,21 @@
 import {
+  appendFileSync,
   existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
   writeFileSync,
-  appendFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
+
+import { type NodeDebugData, type RunEvent, setEventStore } from "./events";
+import type { NodeCacheEntry } from "./node-cache";
 import type {
   FeedbackItem,
   RevisionRunResult,
-  RunMetadata,
   RunDecisionState,
+  RunMetadata,
 } from "./types";
-import { type RunEvent, type NodeDebugData, setEventStore } from "./events";
-import type { NodeCacheEntry } from "./node-cache";
 
 export interface RevisionStore {
   getRunsDir(): string;
@@ -59,6 +60,11 @@ export interface RevisionStore {
     versionId: string,
     items: FeedbackItem[],
   ): FeedbackItem[];
+  saveStoredFeedback(
+    videoId: string,
+    versionId: string,
+    items: FeedbackItem[],
+  ): void;
 
   readPackFile(filename: string): string;
 
@@ -288,7 +294,7 @@ export class FsRevisionStore implements RevisionStore {
       } catch {}
     }
     const eventsPath = join(runDir, "events.jsonl");
-    appendFileSync(eventsPath, JSON.stringify(event) + "\n", "utf-8");
+    appendFileSync(eventsPath, `${JSON.stringify(event)}\n`, "utf-8");
   }
 
   readEvents(runId: string, afterSeq = 0): RunEvent[] {
@@ -400,6 +406,23 @@ export class FsRevisionStore implements RevisionStore {
     const next = [...current, ...cleaned];
     writeFileSync(p, JSON.stringify({ feedback: next }, null, 2), "utf-8");
     return cleaned;
+  }
+
+  saveStoredFeedback(
+    videoId: string,
+    versionId: string,
+    items: FeedbackItem[],
+  ): void {
+    if (!SAFE_ID.test(videoId) || !SAFE_ID.test(versionId)) {
+      throw new Error("INPUT_INVALID: mã video hoặc phiên bản không hợp lệ");
+    }
+    const feedbackDir = join(this.studioDir, "feedback");
+    if (!existsSync(feedbackDir)) {
+      mkdirSync(feedbackDir, { recursive: true });
+    }
+    const p = join(feedbackDir, `${videoId}-${versionId}.json`);
+    const cleaned = items.map(({ rawText: _rawText, ...rest }) => rest);
+    writeFileSync(p, JSON.stringify({ feedback: cleaned }, null, 2), "utf-8");
   }
 
   readPackFile(filename: string): string {

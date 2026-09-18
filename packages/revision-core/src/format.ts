@@ -51,6 +51,7 @@ export const nhanLabel: Record<Label, string> = {
   "cong-kich": "Công kích",
   "cai-lenh": "Cài lệnh",
   "thong-tin-ca-nhan": "Thông tin cá nhân",
+  "bo-qua": "Bỏ qua",
 };
 
 export const nhanTrangThaiPhuongAn: Record<OptionStatus, string> = {
@@ -64,7 +65,7 @@ export function laLoiKyThuat(category: Category): boolean {
 }
 
 export function dinhDangPhut(giay: number): string {
-  if (isNaN(giay) || giay < 0) return "0:00";
+  if (Number.isNaN(giay) || giay < 0) return "0:00";
   const phut = Math.floor(giay / 60);
   const giayLe = Math.floor(giay % 60);
   return `${phut}:${giayLe.toString().padStart(2, "0")}`;

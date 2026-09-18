@@ -7,7 +7,8 @@ export type Label =
   | "nhieu"
   | "cong-kich"
   | "cai-lenh"
-  | "thong-tin-ca-nhan";
+  | "thong-tin-ca-nhan"
+  | "bo-qua";
 
 export type Category =
   | "noi-dung-sai"
@@ -63,7 +64,7 @@ export interface FeedbackItem {
     diemSo?: number;
   };
   label: Label;
-  moderationBy: "luat" | "model" | "code";
+  moderationBy: "luat" | "model" | "code" | "nguoi-duyet";
   isQuarantined: boolean;
   quarantineReason?: string;
   note?: string;

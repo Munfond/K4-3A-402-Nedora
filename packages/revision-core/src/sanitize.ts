@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+
 import type { FeedbackItem, Label } from "./types";
 
 // Loại bỏ ký tự vô hình: U+200B..U+200D, U+2060, U+FEFF
@@ -89,16 +90,6 @@ export function checkModerationRules(text: string): ModerationRuleCheckResult {
   return { isQuarantined: false };
 }
 
-// PII Detector & Redactor (C3-SAN-02)
-const EMAIL_REGEX = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
-// Số điện thoại Việt Nam: bắt đầu bằng 0 hoặc +84 và 9 chữ số theo sau (cho phép dấu cách, chấm, gạch nối).
-// Không được dính liền chữ/số phía trước hoặc phía sau, để không ăn nhầm vào mã như runId
-// "run-20260917-121246-16af" (đoạn "0917-121246" trông giống số điện thoại).
-const VN_PHONE_REGEX =
-  /(?<![\p{L}\p{N}])(?:\+84|0)(?:[\s.-]*\d){9}(?![\p{L}\p{N}])/gu;
-// Dãy số >= 7 chữ số liên tiếp (số định danh, CMND, CCCD, MST)
-const LONG_DIGITS_REGEX = /(?<![\p{L}\p{N}-])\d{7,}(?![\p{L}\p{N}-])/gu;
-
 // Mã máy do hệ thống tự sinh, không bao giờ chứa PII — không lọc để tránh làm hỏng liên kết.
 const MACHINE_ID_KEYS = new Set([
   "runId",
@@ -107,87 +98,14 @@ const MACHINE_ID_KEYS = new Set([
   "promptHash",
   "goldenSetHash",
 ]);
-// URL hoặc @handle
-const URL_REGEX = /https?:\/\/[^\s]+/g;
-const HANDLE_REGEX = /@[A-Za-z0-9_.-]+/g;
 
-// Email viết lách: an[at]example[dot]test, an (at) example (dot) test
-const OBFUSCATED_EMAIL_REGEX =
-  /[\p{L}\p{N}._%+-]+\s*[[(]\s*(?:at|a còng)\s*[\])]\s*[\p{L}\p{N}.-]+(?:\s*[[(]\s*(?:dot|chấm)\s*[\])]\s*[\p{L}\p{N}-]+)+/giu;
-// Liên kết không có giao thức: example.test/profile/abc
-const BARE_LINK_REGEX =
-  /(?<![\p{L}\p{N}@.])(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}\/[^\s,;]*/giu;
-// Ngày tháng dạng 14/02/2002, 14-02-02, 14.02.2002
-const DATE_REGEX =
-  /(?<![\p{L}\p{N}./-])\d{1,2}[/.-]\d{1,2}[/.-](?:\d{4}|\d{2})(?![\p{L}\p{N}]|[/.-]\d)/gu;
-// Mã hồ sơ/học viên: HV-0007, SV 2412, MSSV: B2012345 (mã hv-012 của bộ dữ liệu mẫu là bí danh, không phải PII)
-const RECORD_CODE_REGEX =
-  /(?<![\p{L}\p{N}])(?:(?:HV|SV|GV|MSSV|MSV|MSHV)[-\s]?\d{4,}|(?:mssv|msv|mshv|mã (?:số )?(?:hồ sơ|sinh viên|học viên|nhân viên))\s*[:#]?\s*[\p{L}\p{N}-]*\d[\p{L}\p{N}-]*)(?![\p{L}\p{N}])/giu;
-// Địa chỉ sau từ báo hiệu
-const ADDRESS_REGEX =
-  /(?<![\p{L}])(?:địa chỉ|nhà (?:em|mình|tôi) ở|sống ở|ở số)\s*[:-]?\s*[^,.;!?\n]+/giu;
-// Tên người: họ Việt phổ biến + 1–3 chữ viết hoa hoặc chữ tắt (Nguyễn M. A.)
-const VN_SURNAMES =
-  "Nguyễn|Trần|Lê|Phạm|Hoàng|Huỳnh|Phan|Vũ|Võ|Đặng|Bùi|Đỗ|Hồ|Ngô|Dương|Lý|Đinh|Trương|Lâm|Đoàn|Lương|Trịnh|Tạ|Chu|Cao|Tô|Châu|Quách|Thái|Kiều|Mạc|Hứa|Vương|Phùng|Tăng|La|Lưu|Diệp|Triệu";
-const FULL_NAME_REGEX = new RegExp(
-  String.raw`(?<![\p{L}])(?:${VN_SURNAMES})(?:\s+\p{Lu}(?:\p{Ll}+|\.)?)(?:\s*\p{Lu}(?:\p{Ll}+|\.)?){0,2}(?![\p{L}])`,
-  "gu",
-);
-// Tên sau mẫu tự giới thiệu hoặc xưng hô (PII-02)
-const INTRO_NAME_REGEX =
-  /(?<![\p{L}])((?:[Tt]ên (?:tôi|em|mình|con) là|(?:[Tt]ôi|[Ee]m|[Mm]ình) tên(?: là)?|(?:[Tt]ôi|[Ee]m|[Mm]ình) là)\s+)(\p{Lu}\p{Ll}*(?:\s+\p{Lu}(?:\p{Ll}+|\.)){0,3})/gu;
+import {
+  detectAndRedactPii,
+  type PiiDetectionResult,
+  type PiiRedaction,
+} from "./moderation/pii";
 
-export interface PiiRedaction {
-  type: string;
-  count: number;
-}
-
-/**
- * `heuristics` bật dò tên và địa chỉ theo mẫu câu. Chỉ dùng cho nội dung góp ý;
- * kịch bản và file xuất không đi qua bước này để không sửa nhầm nội dung bài.
- */
-export function detectAndRedactPii(
-  text: string,
-  { heuristics = true }: { heuristics?: boolean } = {},
-): {
-  text: string;
-  redactions: PiiRedaction[];
-} {
-  const counts = new Map<string, number>();
-  let res = text;
-  const apply = (regex: RegExp, type: string, replacement: string) => {
-    res = res.replace(regex, (...args: unknown[]) => {
-      counts.set(type, (counts.get(type) ?? 0) + 1);
-      // Mẫu tự giới thiệu: giữ cụm dẫn ("tên tôi là"), chỉ ẩn phần tên.
-      if (
-        type === "ten" &&
-        typeof args[1] === "string" &&
-        typeof args[2] === "string"
-      ) {
-        return `${args[1]}${replacement}`;
-      }
-      return replacement;
-    });
-  };
-  apply(EMAIL_REGEX, "email", "[EMAIL]");
-  apply(OBFUSCATED_EMAIL_REGEX, "email", "[EMAIL]");
-  apply(URL_REGEX, "lien-ket", "[LIÊN-KẾT]");
-  apply(BARE_LINK_REGEX, "lien-ket", "[LIÊN-KẾT]");
-  apply(HANDLE_REGEX, "lien-ket", "[LIÊN-KẾT]");
-  apply(VN_PHONE_REGEX, "so-dien-thoai", "[SĐT]");
-  apply(DATE_REGEX, "ngay", "[NGÀY]");
-  apply(RECORD_CODE_REGEX, "ma-ho-so", "[MÃ-SỐ]");
-  apply(LONG_DIGITS_REGEX, "ma-so", "[MÃ-SỐ]");
-  if (heuristics) {
-    apply(ADDRESS_REGEX, "dia-chi", "địa chỉ [ĐỊA-CHỈ]");
-    apply(INTRO_NAME_REGEX, "ten", "[TÊN]");
-    apply(FULL_NAME_REGEX, "ten", "[TÊN]");
-  }
-  return {
-    text: res,
-    redactions: [...counts].map(([type, count]) => ({ type, count })),
-  };
-}
+export { detectAndRedactPii, type PiiRedaction, type PiiDetectionResult };
 
 export function redactPii(text: string): string {
   return detectAndRedactPii(text).text;
@@ -227,7 +145,11 @@ export function sanitizeFeedbackItem(item: {
 
   // Ẩn PII trước khi kiểm duyệt bằng luật: email viết lách "an[at]x[dot]y"
   // không được khớp nhầm luật công kích ("dot").
-  const { text: piiRedactedText, redactions } = detectAndRedactPii(nfcText);
+  const {
+    text: piiRedactedText,
+    redactions,
+    hasVideoPrivacyRisk,
+  } = detectAndRedactPii(nfcText);
   let ruleCheck = checkModerationRules(piiRedactedText);
   // Nếu có ký tự vô hình kết hợp chuỗi dài, tăng nghi ngờ cài lệnh
   if (invisibleCount > 0 && !ruleCheck.isQuarantined) {
@@ -248,6 +170,14 @@ export function sanitizeFeedbackItem(item: {
       isQuarantined: true,
       label: "thong-tin-ca-nhan",
       reason: "Có thông tin cá nhân, chờ người kiểm tra trước khi phân tích",
+    };
+  }
+
+  if (!ruleCheck.isQuarantined && hasVideoPrivacyRisk) {
+    ruleCheck = {
+      isQuarantined: true,
+      label: "thong-tin-ca-nhan",
+      reason: "Góp ý cảnh báo video làm lộ thông tin riêng tư",
     };
   }
 
