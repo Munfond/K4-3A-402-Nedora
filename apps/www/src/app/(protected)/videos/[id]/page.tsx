@@ -27,6 +27,7 @@ import {
   Network,
   Loader2,
   RefreshCw,
+  Zap,
 } from "lucide-react";
 
 import PageWrapper from "@/components/page-wrapper";
@@ -41,6 +42,7 @@ import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
 import BriefOverviewPanel from "@/components/studio/brief-overview-panel";
 import TimelineTracks from "@/components/studio/timeline-tracks";
+import TraceDebugViewer from "@/components/studio/trace-debug-viewer";
 import PipelineFlow from "@/components/studio/pipeline-flow";
 import RevisionGraphView from "@/components/studio/revision-graph-view";
 import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
@@ -138,7 +140,7 @@ export default function VideoDetailPage({
     }
   }, [queryRunId, runScope]);
 
-  // Lấy dữ liệu run qua revision-service (R2 & AR-06)
+  // Lấy dữ liệu run qua revision-service
   const {
     data: runData,
     error: runFetchError,
@@ -634,11 +636,23 @@ export default function VideoDetailPage({
             >
               Lịch sử phiên bản
             </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("go-loi")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "go-loi"
+                  ? "bg-background text-foreground shadow-xs font-semibold text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Zap className="size-3 text-primary" />
+              <span>Gỡ lỗi &amp; Trace</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* THÔNG BÁO MẤT KẾT NỐI REVISION SERVICE (AR-06) */}
+      {/* THÔNG BÁO MẤT KẾT NỐI REVISION SERVICE */}
       {(isServiceOffline || video?.feedbackError) && (
         <div className="max-w-7xl mx-auto w-full px-4 pt-2">
           <ServiceOfflineBanner
@@ -767,7 +781,7 @@ export default function VideoDetailPage({
         {/* TAB 4: ĐỀ XUẤT CHỈNH SỬA (REVISION PLANNER 3 CỘT TRONG NGỮ CẢNH VIDEO) */}
         {(activeTab === "de-xuat" || activeTab === "chinh-sua") && (
           <div className="flex-1 flex flex-col min-h-[620px] space-y-4">
-            {/* SƠ ĐỒ PIPELINE CỐ ĐỊNH KIỂU DIFY (R0.6 & AR-01) */}
+            {/* SƠ ĐỒ PIPELINE */}
             <PipelineFlow
               runId={activeRunId}
               runMeta={runMeta}
@@ -1207,6 +1221,19 @@ export default function VideoDetailPage({
           <VideoVersionsTab
             video={video}
             onGoToRevision={() => handleTabChange("de-xuat")}
+          />
+        )}
+
+        {/* TAB 7: GỠ LỖI & GIÁM SÁT TRACE (T12) */}
+        {activeTab === "go-loi" && (
+          <TraceDebugViewer
+            runId={activeRunId}
+            runMeta={runMeta}
+            result={result}
+            onSeek={(sec) => {
+              setVideoSeekTime(sec);
+              handleTabChange("xem-video");
+            }}
           />
         )}
       </div>

@@ -63,9 +63,10 @@ export default function LichSuPage() {
 
   const runs = data?.runs || [];
 
-  const handleOpenRun = (runId: string) => {
-    setLastRunId(runId);
-    router.push(`/van-de?run=${runId}`);
+  const handleOpenRun = (r: RunMetadata) => {
+    setLastRunId(r.runId);
+    const vId = r.videoId || "d1";
+    router.push(`/videos/${vId}?tab=go-loi&run=${r.runId}`);
   };
 
   const handleCopyId = (runId: string) => {
@@ -313,7 +314,7 @@ export default function LichSuPage() {
                               <Button
                                 size="sm"
                                 className="h-7 px-2.5 text-xs gap-1"
-                                onClick={() => handleOpenRun(r.runId)}
+                                onClick={() => handleOpenRun(r)}
                               >
                                 Mở kết quả
                                 <ExternalLink className="h-3 w-3" />

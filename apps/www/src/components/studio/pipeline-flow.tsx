@@ -544,7 +544,7 @@ export default function PipelineFlow({
     }
   };
 
-  // 7. TRẠNG THÁI THU GỌN KHI PHÂN TÍCH XONG (AR-01 & Spec 5.1)
+  // 7. TRẠNG THÁI THU GỌN KHI PHÂN TÍCH XONG
   if (isCompleted && !isExpanded) {
     const totalCasesCount =
       partialCases.length || runMeta?.caseCount || regionProgressMap.size || 0;

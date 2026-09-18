@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
-import V2PreparationColumn from "@/components/studio/v2-preparation-column";
+import BriefOverviewPanel from "@/components/studio/brief-overview-panel";
 import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
 import { getLastRunId, useQuyetDinh } from "@/hooks/use-quyet-dinh";
 import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
@@ -241,17 +241,17 @@ export default function VanDePage() {
           )}
         </div>
 
-        {/* CỘT 3 (PHẢI): ĐANG CHUẨN BỊ BẢN SỬA V2 THỜI GIAN THỰC */}
+        {/* CỘT 3 (PHẢI): TỔNG QUAN BRIEF V3 */}
         <div className="h-full overflow-hidden">
-          {snapshot ? (
-            <V2PreparationColumn
-              snapshot={snapshot}
+          {result && script ? (
+            <BriefOverviewPanel
+              result={result}
               script={script}
               runId={activeRunId}
             />
           ) : (
             <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
-              Đang tính toán khối lượng v2...
+              Đang tính toán brief v3...
             </div>
           )}
         </div>
