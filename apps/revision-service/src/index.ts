@@ -11,6 +11,7 @@ import {
   type DecisionRecord,
   type FeedbackItem,
   GRAPH_VERSION,
+  GRAPH_VERSION_V3,
   generateAllExports,
   getDefaultStore,
   getOrBuildVideoIndex,
@@ -19,9 +20,14 @@ import {
   type NewFeedbackInput,
   nextStoredFeedbackIndex,
   PIPELINE_GRAPH,
+  PIPELINE_GRAPH_V3,
   parseFeedbackCsv,
   type RunDecisionState,
   runPipeline,
+  runRevisionV3,
+  type RunV3Input,
+  exportRevisionV3Package,
+  simulatePlan,
   sanitizeFeedbackItem,
   subscribeRunEvents,
 } from "@feedback/revision-core";
@@ -105,21 +111,30 @@ app.get("/health", (c) => c.json({ ok: true, port: PORT, status: "healthy" }));
 
 // GET /pipeline?version=
 app.get("/pipeline", (c) => {
+  const version = c.req.query("version");
+  if (version === "revision@2" || version === "v2") {
+    return c.json({
+      graph: PIPELINE_GRAPH,
+      version: GRAPH_VERSION,
+    });
+  }
   return c.json({
-    graph: PIPELINE_GRAPH,
-    version: GRAPH_VERSION,
+    graph: PIPELINE_GRAPH_V3,
+    version: GRAPH_VERSION_V3,
   });
 });
 
 // POST /runs
 app.post("/runs", async (c) => {
   try {
-    const body = (await c.req.json()) as AnalyzeInput & {
+    const body = (await c.req.json()) as (AnalyzeInput | RunV3Input) & {
       retryOf?: string;
+      graphVersion?: string;
     };
 
     const videoId = body.videoId || "d1";
     const versionId = body.versionId || "v1";
+    const graphVersion = body.graphVersion || GRAPH_VERSION_V3;
 
     // Góp ý đã lưu trong studio chỉ vào run của studio. Run eval gửi
     // includeD1Feedback: false kèm bộ góp ý riêng, không được trộn thêm.
@@ -130,26 +145,46 @@ app.post("/runs", async (c) => {
 
     // Studio chỉ gửi videoId/versionId: video mẫu D1 mặc định gồm bộ góp ý gốc.
     // Eval gửi includeD1Feedback: false để chỉ dùng bộ góp ý của case.
-    const input: AnalyzeInput = {
+    const input = {
       ...body,
       videoId,
       versionId,
       includeD1Feedback: body.includeD1Feedback ?? videoId === "d1",
     };
 
-    const { runId, status } = await runPipeline(input, {
-      store,
-      storedFeedback,
-    });
+    if (
+      graphVersion === GRAPH_VERSION_V3 ||
+      graphVersion === "revision@3" ||
+      graphVersion === "v3"
+    ) {
+      const { runId, status } = await runRevisionV3(input as RunV3Input, {
+        store,
+        storedFeedback,
+      });
 
-    return c.json(
-      {
-        runId,
-        graphVersion: GRAPH_VERSION,
-        status,
-      },
-      202,
-    );
+      return c.json(
+        {
+          runId,
+          graphVersion: GRAPH_VERSION_V3,
+          status,
+        },
+        202,
+      );
+    } else {
+      const { runId, status } = await runPipeline(input as AnalyzeInput, {
+        store,
+        storedFeedback,
+      });
+
+      return c.json(
+        {
+          runId,
+          graphVersion: GRAPH_VERSION,
+          status,
+        },
+        202,
+      );
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return c.json({ error: { code: "START_RUN_FAILED", message: msg } }, 400);
@@ -181,7 +216,7 @@ app.get("/runs/:runId", (c) => {
   const cacheHits = store
     .readEvents(runId, 0)
     .filter((e) => e.type === "node.cache_hit").length;
-  return c.json({ ...data, cacheHits });
+  return c.json({ ...data, brief: data.result?.brief, cacheHits });
 });
 
 // GET /runs/:runId/trace
@@ -855,6 +890,118 @@ app.post("/runs/:runId/export", async (c) => {
       body = await c.req.json();
     } catch {}
 
+    if (runData.result.brief) {
+      const packDir = store.getPackDir();
+      let timecodeCsvText: string | undefined;
+      let transcriptText: string | undefined;
+      let slideJsonText: string | undefined;
+      let videoFilePath: string | undefined;
+
+      try {
+        timecodeCsvText = store.readPackFile("video-mau/cau-timecode-d1.csv");
+      } catch {}
+      try {
+        transcriptText = store.readPackFile("video-mau/transcript-d1.txt");
+      } catch {}
+      try {
+        slideJsonText = store.readPackFile("video-mau/slide-d1.json");
+      } catch {}
+
+      const candidateVideo = join(packDir, "video-mau", "d1.mp4");
+      if (existsSync(candidateVideo)) {
+        videoFilePath = candidateVideo;
+      }
+
+      const videoIndex = getOrBuildVideoIndex(
+        {
+          videoId: runData.run.videoId || "d1",
+          versionId: runData.run.versionId || "v1",
+          script: runData.result.script,
+          timecodeCsvText,
+          transcriptText,
+          slideJsonText,
+          videoFilePath,
+        },
+        store,
+      );
+
+      const pkg = exportRevisionV3Package({
+        script: runData.result.script,
+        brief: runData.result.brief,
+        videoIndex,
+        metadata: {
+          runId,
+          modelId: runData.run.modelId,
+        },
+      });
+
+      const requestedFile = body.file;
+      if (requestedFile) {
+        let content = "";
+        let contentType = "";
+        switch (requestedFile) {
+          case "kich-ban-v2.json":
+            content = pkg.kichBanJson;
+            contentType = "application/json; charset=utf-8";
+            break;
+          case "kich-ban-v2.md":
+            content = pkg.kichBanMd;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "bang-moc-v2.md":
+            content = pkg.bangMocV2Md;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "bao-cao-chi-phi.md":
+            content = pkg.baoCaoChiPhiMd;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "truy-vet.json":
+            content = pkg.truyVetBriefJson;
+            contentType = "application/json; charset=utf-8";
+            break;
+          case "lenh-bien-kich.md":
+            content = pkg.workOrders.bienKich;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "lenh-thu-am.md":
+            content = pkg.workOrders.thuAm;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "lenh-dung-hinh.md":
+            content = pkg.workOrders.dungHinh;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "lenh-am-thanh.md":
+            content = pkg.workOrders.amThanh;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          case "lenh-phu-de.md":
+            content = pkg.workOrders.phuDe;
+            contentType = "text/markdown; charset=utf-8";
+            break;
+          default:
+            return c.json(
+              {
+                error: {
+                  code: "FILE_TYPE_INVALID",
+                  message: `Loại file không hợp lệ: ${requestedFile}`,
+                },
+              },
+              400,
+            );
+        }
+        return new Response(content, {
+          headers: {
+            "Content-Type": contentType,
+            "Content-Disposition": `attachment; filename="${requestedFile}"`,
+          },
+        });
+      }
+
+      return c.json(pkg);
+    }
+
     const state = store.loadDecisions(runId);
     // Ưu tiên quyết định đã lưu ở server (nguồn có thẩm quyền)
     const decisions =
@@ -951,6 +1098,205 @@ app.post("/runs/:runId/export", async (c) => {
       isConflict ? 409 : 500,
     );
   }
+});
+
+// POST /runs/:runId/work-items/:workItemId/propose
+// "Đề xuất cách sửa cho việc này"
+app.post("/runs/:runId/work-items/:workItemId/propose", async (c) => {
+  const runId = c.req.param("runId");
+  const workItemId = c.req.param("workItemId");
+  const runData = store.getRunById(runId);
+  if (!runData || !runData.result || !runData.result.brief) {
+    return c.json(
+      {
+        error: {
+          code: "RUN_NOT_FOUND",
+          message: `Không tìm thấy run v3 ${runId}`,
+        },
+      },
+      404,
+    );
+  }
+
+  const brief = runData.result.brief;
+  const workItem = brief.viec.find((w) => w.id === workItemId);
+  if (!workItem) {
+    return c.json(
+      {
+        error: {
+          code: "WORK_ITEM_NOT_FOUND",
+          message: `Không tìm thấy việc ${workItemId}`,
+        },
+      },
+      404,
+    );
+  }
+
+  // Đổi giữa phương án chính và alternative nếu có
+  const currentDeXuat = workItem.deXuat as any;
+  if (currentDeXuat?.alternative) {
+    const currentPrimary = {
+      type: currentDeXuat.type,
+      moTa: currentDeXuat.moTa,
+      changes: currentDeXuat.changes,
+      cost: currentDeXuat.cost,
+    };
+    const currentAlt = currentDeXuat.alternative;
+    workItem.deXuat = {
+      ...currentAlt,
+      alternative: currentPrimary,
+    };
+  }
+
+  const videoIndex = getOrBuildVideoIndex(
+    {
+      videoId: runData.run.videoId || "d1",
+      versionId: runData.run.versionId || "v1",
+      script: runData.result.script,
+    },
+    store,
+  );
+
+  const allChanges: any[] = [];
+  for (const w of brief.viec) {
+    const dx = w.deXuat as any;
+    if (dx?.changes) {
+      allChanges.push(...dx.changes);
+    }
+  }
+
+  const sim = simulatePlan(videoIndex, allChanges);
+  brief.keHoach.thuLai = sim.thuLai;
+  brief.keHoach.canhDungLai = sim.canhDungLai;
+  brief.keHoach.kyTuThuLai = sim.kyTuThuLai;
+  brief.keHoach.deltaTong = sim.deltaTong;
+  brief.keHoach.mocV2 = sim.mocV2;
+
+  store.saveRunTrace({
+    runId,
+    metadata: runData.run,
+    sanitizedInput: runData.sanitizedInput,
+    attempts: runData.attempts || [],
+    result: runData.result,
+  });
+  return c.json({ ok: true, workItem, brief });
+});
+
+// POST /runs/:runId/work-items/:workItemId/rewrite
+// "Viết lại theo ý tôi" (trần 3 lần mỗi việc)
+app.post("/runs/:runId/work-items/:workItemId/rewrite", async (c) => {
+  const runId = c.req.param("runId");
+  const workItemId = c.req.param("workItemId");
+  const runData = store.getRunById(runId);
+  if (!runData || !runData.result || !runData.result.brief) {
+    return c.json(
+      {
+        error: {
+          code: "RUN_NOT_FOUND",
+          message: `Không tìm thấy run v3 ${runId}`,
+        },
+      },
+      404,
+    );
+  }
+
+  const brief = runData.result.brief;
+  const workItem = brief.viec.find((w) => w.id === workItemId);
+  if (!workItem) {
+    return c.json(
+      {
+        error: {
+          code: "WORK_ITEM_NOT_FOUND",
+          message: `Không tìm thấy việc ${workItemId}`,
+        },
+      },
+      404,
+    );
+  }
+
+  // Kiểm tra trần 3 lần viết lại
+  const currentCount = (workItem as any).rewriteCount || 0;
+  if (currentCount >= 3) {
+    return c.json(
+      {
+        error: {
+          code: "ITERATION_LIMIT_EXCEEDED",
+          message: `Đã vượt quá giới hạn 3 lần viết lại cho việc ${workItemId} (tối đa 3 lần).`,
+        },
+      },
+      400,
+    );
+  }
+
+  let body: { instruction?: string } = {};
+  try {
+    body = await c.req.json();
+  } catch {}
+
+  const instruction = body.instruction?.trim() || "";
+  if (!instruction) {
+    return c.json(
+      {
+        error: {
+          code: "INSTRUCTION_REQUIRED",
+          message: "Vui lòng nhập hướng dẫn viết lại (instruction)",
+        },
+      },
+      400,
+    );
+  }
+
+  // Áp dụng hướng dẫn viết lại vào lời thoại của các câu trong việc này
+  (workItem as any).rewriteCount = currentCount + 1;
+  (workItem as any).lastInstruction = instruction;
+
+  const dx = workItem.deXuat as any;
+  if (dx?.changes) {
+    for (const ch of dx.changes) {
+      if (ch.kind === "loi") {
+        ch.after = instruction;
+      }
+    }
+  }
+
+  const videoIndex = getOrBuildVideoIndex(
+    {
+      videoId: runData.run.videoId || "d1",
+      versionId: runData.run.versionId || "v1",
+      script: runData.result.script,
+    },
+    store,
+  );
+
+  const allChanges: any[] = [];
+  for (const w of brief.viec) {
+    const itemDx = w.deXuat as any;
+    if (itemDx?.changes) {
+      allChanges.push(...itemDx.changes);
+    }
+  }
+
+  const sim = simulatePlan(videoIndex, allChanges);
+  brief.keHoach.thuLai = sim.thuLai;
+  brief.keHoach.canhDungLai = sim.canhDungLai;
+  brief.keHoach.kyTuThuLai = sim.kyTuThuLai;
+  brief.keHoach.deltaTong = sim.deltaTong;
+  brief.keHoach.mocV2 = sim.mocV2;
+
+  store.saveRunTrace({
+    runId,
+    metadata: runData.run,
+    sanitizedInput: runData.sanitizedInput,
+    attempts: runData.attempts || [],
+    result: runData.result,
+  });
+  return c.json({
+    ok: true,
+    iteration: (workItem as any).rewriteCount,
+    remainingIterations: 3 - (workItem as any).rewriteCount,
+    workItem,
+    brief,
+  });
 });
 
 // --------------------------------------------------------------------------

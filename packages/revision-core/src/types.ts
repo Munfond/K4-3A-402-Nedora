@@ -258,6 +258,7 @@ export interface RevisionRunResult {
   };
   unassignedFeedback: FeedbackItem[];
   quarantinedFeedback: FeedbackItem[];
+  brief?: RevisionBrief;
 }
 
 import type { PlanSimulation } from "./timeline/types";

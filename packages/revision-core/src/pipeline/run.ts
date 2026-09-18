@@ -55,7 +55,15 @@ export function isRunActive(runId: string): boolean {
   return activeRuns.has(runId);
 }
 
-function updateRunStatus(
+export function registerActiveRun(runId: string, run: ActiveRun): void {
+  activeRuns.set(runId, run);
+}
+
+export function unregisterActiveRun(runId: string): void {
+  activeRuns.delete(runId);
+}
+
+export function updateRunStatus(
   runId: string,
   status: "dang-chay" | "xong" | "loi" | "da-huy",
   error?: { code: string; message: string },

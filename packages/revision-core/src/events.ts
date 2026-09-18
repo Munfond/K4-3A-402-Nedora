@@ -120,7 +120,11 @@ export type RunEvent =
         | "feedback.labeled"
         | "cases.ready"
         | "options.ready"
-        | "case.options.ready";
+        | "case.options.ready"
+        | "brief.ready"
+        | "claims.ready"
+        | "issues.ready";
+
       payload: unknown;
     }
   | {
@@ -213,7 +217,11 @@ export type RunEventInput =
         | "feedback.labeled"
         | "cases.ready"
         | "options.ready"
-        | "case.options.ready";
+        | "case.options.ready"
+        | "brief.ready"
+        | "claims.ready"
+        | "issues.ready";
+
       payload: unknown;
     }
   | {
