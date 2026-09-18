@@ -70,6 +70,20 @@ app.use(
       ) {
         return origin;
       }
+      // localhost và 127.0.0.1 là hai origin khác nhau với trình duyệt. Nếu trả
+      // về STUDIO_ORIGIN cho một origin localhost hợp lệ khác, trình duyệt sẽ
+      // chặn — SSE im lặng và sơ đồ đứng ở "Chưa chạy".
+      try {
+        const { hostname, protocol } = new URL(origin);
+        if (
+          protocol === "http:" &&
+          (hostname === "localhost" || hostname === "127.0.0.1")
+        ) {
+          return origin;
+        }
+      } catch {
+        // origin không parse được: rơi về mặc định bên dưới
+      }
       return STUDIO_ORIGIN;
     },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
