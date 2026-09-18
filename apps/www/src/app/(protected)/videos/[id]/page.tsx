@@ -39,7 +39,8 @@ import VideoFeedbackTab from "@/components/studio/video-feedback-tab";
 import VideoVersionsTab from "@/components/studio/video-versions-tab";
 import CaseListColumn from "@/components/studio/case-list-column";
 import DecisionDossier from "@/components/studio/decision-dossier";
-import V2PreparationColumn from "@/components/studio/v2-preparation-column";
+import BriefOverviewPanel from "@/components/studio/brief-overview-panel";
+import TimelineTracks from "@/components/studio/timeline-tracks";
 import PipelineFlow from "@/components/studio/pipeline-flow";
 import RevisionGraphView from "@/components/studio/revision-graph-view";
 import { ServiceOfflineBanner } from "@/components/studio/service-offline-banner";
@@ -676,22 +677,38 @@ export default function VideoDetailPage({
       <div className="max-w-7xl mx-auto w-full p-4 flex-1 flex flex-col">
         {/* TAB 1: XEM VIDEO (KỊCH BẢN & TRÌNH PHÁT) */}
         {(activeTab === "xem-video" || activeTab === "kich-ban") && (
-          <VideoPlayerSync
-            videoUrl={video.videoUrl}
-            title={video.title}
-            durationSeconds={video.durationSeconds}
-            script={script}
-            initialSeekTime={videoSeekTime}
-            onAddFeedbackAtTime={(sec, sentenceN) => {
-              // Vị trí đi vào trường có cấu trúc, không chèn vào nội dung góp ý.
-              setFeedbackPrefillSentenceN(sentenceN || null);
-              setFeedbackPrefillTime(sec);
-              setFeedbackPrefillText("");
-              setFeedbackAutoOpen(true);
-              handleTabChange("gop-y");
-            }}
-            onGoToRevision={() => handleTabChange("de-xuat")}
-          />
+          <>
+            <VideoPlayerSync
+              videoUrl={video.videoUrl}
+              title={video.title}
+              durationSeconds={video.durationSeconds}
+              script={script}
+              initialSeekTime={videoSeekTime}
+              onAddFeedbackAtTime={(sec, sentenceN) => {
+                // Vị trí đi vào trường có cấu trúc, không chèn vào nội dung góp ý.
+                setFeedbackPrefillSentenceN(sentenceN || null);
+                setFeedbackPrefillTime(sec);
+                setFeedbackPrefillText("");
+                setFeedbackAutoOpen(true);
+                handleTabChange("gop-y");
+              }}
+              onGoToRevision={() => handleTabChange("de-xuat")}
+            />
+            {/* Làn dòng thời gian: 6 track dưới trình phát (§9 TK) */}
+            {script && (
+              <TimelineTracks
+                script={script}
+                brief={result?.brief}
+                currentTime={videoSeekTime ?? undefined}
+                totalDuration={video.durationSeconds}
+                onSeek={(sec) => setVideoSeekTime(sec)}
+                onSelectCase={(caseId) => {
+                  setSelectedCaseId(caseId);
+                  handleTabChange("de-xuat");
+                }}
+              />
+            )}
+          </>
         )}
 
         {/* TAB 2: KỊCH BẢN CHI TIẾT (29 NHÓM SLIDE, ẢNH TỪNG CÂU, DỮ LIỆU NGUỒN THUẦN - P0a) */}
@@ -980,17 +997,21 @@ export default function VideoDetailPage({
                       )}
                     </div>
 
-                    {/* CỘT 3 (PHẢI): ĐANG CHUẨN BỊ BẢN SỬA V2 THỜI GIAN THỰC */}
+                    {/* CỘT 3 (PHẢI): TỔNG QUAN BRIEF V3 */}
                     <div className="h-full overflow-hidden">
-                      {snapshot && script ? (
-                        <V2PreparationColumn
-                          snapshot={snapshot}
-                          script={script}
+                      {result ? (
+                        <BriefOverviewPanel
+                          result={result}
+                          script={script!}
                           runId={activeRunId}
+                          onSeek={(sec) => {
+                            setVideoSeekTime(sec);
+                            handleTabChange("xem-video");
+                          }}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full border rounded-xl bg-card text-muted-foreground text-xs">
-                          Đang tính toán khối lượng v2...
+                          Đang tính toán brief v3...
                         </div>
                       )}
                     </div>

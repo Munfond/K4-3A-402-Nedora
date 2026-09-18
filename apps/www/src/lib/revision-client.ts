@@ -5,11 +5,13 @@ import type {
   FeedbackItem,
   NewFeedbackInput,
   ReleaseSnapshot,
+  RevisionBrief,
   RevisionRunResult,
   RunMetadata,
   ScriptData,
   ExportPackage,
 } from "@feedback/revision-core/types";
+import type { PlanSimulation } from "@feedback/revision-core/timeline";
 import type { GraphNodeDefinition } from "@feedback/revision-core/pipeline/graph";
 
 export class RevisionServiceError extends Error {
@@ -148,9 +150,7 @@ export const revisionClient = {
     return request<{ runs: RunMetadata[] }>("/runs");
   },
 
-  async getRun(
-    runId: string,
-  ): Promise<{
+  async getRun(runId: string): Promise<{
     run: RunMetadata;
     result?: RevisionRunResult;
     input?: unknown;
@@ -221,9 +221,7 @@ export const revisionClient = {
     });
   },
 
-  async getDecisionsAndRelease(
-    runId: string,
-  ): Promise<{
+  async getDecisionsAndRelease(runId: string): Promise<{
     version: number;
     decisions: Record<string, DecisionRecord>;
     snapshot: ReleaseSnapshot;
@@ -302,6 +300,80 @@ export const revisionClient = {
     return request<ExportPackage>(`/runs/${runId}/export`, {
       method: "POST",
       body: JSON.stringify({ decisions }),
+    });
+  },
+
+  // ===== V3 API Methods =====
+
+  /** Lấy brief từ run result (nằm trong response của getRun) */
+  async getRunBrief(runId: string): Promise<RevisionBrief | null> {
+    const data = await request<{
+      run: RunMetadata;
+      result?: RevisionRunResult;
+    }>(`/runs/${runId}`);
+    return data.result?.brief ?? null;
+  },
+
+  /** Đề xuất cách sửa cho một work item (v3) */
+  async proposeWorkItemFix(
+    runId: string,
+    workItemId: string,
+  ): Promise<{
+    proposal: unknown;
+    updatedBudget: PlanSimulation;
+  }> {
+    return request<{
+      proposal: unknown;
+      updatedBudget: PlanSimulation;
+    }>(`/runs/${runId}/work-items/${encodeURIComponent(workItemId)}/propose`, {
+      method: "POST",
+    });
+  },
+
+  /** Viết lại nội dung theo ý người dùng (trần 3 lần) */
+  async rewriteWorkItem(
+    runId: string,
+    workItemId: string,
+    instruction: string,
+  ): Promise<{
+    rewrite: unknown;
+    updatedBudget: PlanSimulation;
+    iterationsUsed: number;
+    iterationsRemaining: number;
+  }> {
+    return request<{
+      rewrite: unknown;
+      updatedBudget: PlanSimulation;
+      iterationsUsed: number;
+      iterationsRemaining: number;
+    }>(`/runs/${runId}/work-items/${encodeURIComponent(workItemId)}/rewrite`, {
+      method: "POST",
+      body: JSON.stringify({ instruction }),
+    });
+  },
+
+  /** Xuất toàn bộ gói v3 (work orders theo vai, bảng mốc v2, báo cáo chi phí) */
+  async exportV3Package(
+    runId: string,
+    decisions?: Record<string, DecisionRecord>,
+  ): Promise<{
+    kichBanJson: string;
+    kichBanMd: string;
+    workOrders: Record<string, string>;
+    bangMocV2Md: string;
+    baoCaoChiPhiMd: string;
+    truyVetBriefJson: string;
+  }> {
+    return request<{
+      kichBanJson: string;
+      kichBanMd: string;
+      workOrders: Record<string, string>;
+      bangMocV2Md: string;
+      baoCaoChiPhiMd: string;
+      truyVetBriefJson: string;
+    }>(`/runs/${runId}/export`, {
+      method: "POST",
+      body: JSON.stringify({ decisions, format: "v3" }),
     });
   },
 };
