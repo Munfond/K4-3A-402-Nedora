@@ -9,8 +9,7 @@ export type Intent =
   | "phu-de"
   | "de-nghi-chung"
   | "khen-giu"
-  | "chi-cham-diem"
-  | "nhieu";
+  | "chi-cham-diem";
 
 export interface Claim {
   id: string;
@@ -22,10 +21,12 @@ export interface Claim {
   trich: string; // ≤ 80 ký tự, từ bản đã ẩn PII
   goiYViTri?: string;
   mocNoi?: { tu: number; den: number; nguon: string };
+  chiDan?: "sua" | "giu" | "khen" | "hoi";
   chieu?: string;
   giaThuyet?: { text: string; nguon: "nguoi-gop-y" | "ai-doi-chieu" };
   baoGianTiep: boolean;
   lanHoiLai: number;
+  heuristicIntent?: Intent;
 }
 
 export interface Localization {

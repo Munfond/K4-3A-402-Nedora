@@ -15,21 +15,26 @@ export const ClaimExtractionSchema = z.object({
         "phu-de",
         "de-nghi-chung",
         "khen-giu",
-        "nhieu",
       ]),
       trich: z
         .string()
         .max(120)
         .describe("Đoạn trích ngắn gọn phản ánh đúng ý người góp ý"),
-      mocThoiGian: z
+      goiYViTri: z.string().optional().describe("Gợi ý vị trí nếu có"),
+      mocNoi: z
         .object({
-          tuGiay: z.number(),
-          denGiay: z.number(),
-          chuoiGoc: z.string(),
+          tu: z.number(),
+          den: z.number(),
+          nguon: z.string(),
         })
         .optional()
-        .describe("Mốc thời gian được người dùng nhắc đến (nếu có)"),
-      moTaChiTiet: z.string().describe("Mô tả tóm tắt ý kiến"),
+        .describe("Mốc thời gian (giây) nhắc đến trong góp ý"),
+      chiDan: z
+        .enum(["sua", "giu", "khen", "hoi"])
+        .describe(
+          "Chỉ dẫn xử lý: sua (sửa), giu (giữ nguyên), khen (khen ngợi), hoi (cần hỏi lại)",
+        ),
+      moTaChiTiet: z.string().optional().describe("Mô tả tóm tắt ý kiến"),
     }),
   ),
 });

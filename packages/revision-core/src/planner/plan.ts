@@ -168,6 +168,15 @@ export function planRevision(options: PlanOptions): GlobalPlanResult {
   for (const res of handlerResults) {
     const issue = issueMap.get(res.vanDeId);
 
+    // Khen hoặc dặn giữ chỉ tạo vungBaoVe hoặc ghiNhan, KHÔNG BAO GIỜ thành một mục trong brief.viec
+    if (
+      res.ketLuan === "thiet-lap-vung-bao-ve" ||
+      issue?.intent === "khen-giu" ||
+      issue?.intent === "chi-cham-diem"
+    ) {
+      continue;
+    }
+
     // Mô phỏng phương án chính
     const simPrimary =
       res.chiPhi ?? simulatePlan(videoIndex, res.changes, protectedZoneNs);

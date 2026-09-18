@@ -31,7 +31,6 @@ export const HANDLER_REGISTRY: Record<Intent, HandlerFn> = {
   "de-nghi-chung": handleDeNghiChung,
   "khen-giu": handleKhen,
   "chi-cham-diem": handleKhen,
-  nhieu: handleKhen,
 };
 
 /**

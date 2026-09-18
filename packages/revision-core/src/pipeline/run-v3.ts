@@ -17,7 +17,7 @@ import { appendRunEvent, saveNodeDebugData } from "../events";
 import { getDefaultStore, type RevisionStore } from "../store";
 import { getOrBuildVideoIndex } from "../video-index/cache";
 import { moderateFeedbackBatch } from "../moderation";
-import { splitFeedbackToClaims } from "../claims/split";
+import { splitFeedbackBatch, splitFeedbackToClaims } from "../claims/split";
 import { localizeClaim } from "../localize";
 import { formIssues } from "../issues/form";
 import { routeAllIssues } from "../handlers/router";
@@ -367,11 +367,11 @@ export async function runRevisionV3(
       store,
     );
 
-    const claims: Claim[] = [];
-    for (const item of safeFeedback) {
-      const itemClaims = splitFeedbackToClaims(item);
-      claims.push(...itemClaims);
-    }
+    const claims: Claim[] = await splitFeedbackBatch(safeFeedback, {
+      model: (deps as any)?.model,
+      modelMode: (deps as any)?.modelMode,
+      onWarning: (msg) => canhBao.push(msg),
+    });
 
     appendRunEvent(
       runId,
@@ -451,7 +451,7 @@ export async function runRevisionV3(
     );
 
     const issuesResult = formIssues(claims, localizations, videoIndex);
-    const { issues, vungBaoVe } = issuesResult;
+    const { issues, vungBaoVe, loaiBo } = issuesResult;
 
     appendRunEvent(
       runId,
@@ -601,6 +601,12 @@ export async function runRevisionV3(
 
     const allQuestions: HandlerQuestion[] = [];
     const allGhiNhan: Array<{ gopYIds: string[]; lyDo: string }> = [];
+
+    if (loaiBo && loaiBo.length > 0) {
+      allGhiNhan.push(
+        ...loaiBo.map((l) => ({ gopYIds: [l.claimId], lyDo: l.lyDo })),
+      );
+    }
 
     for (const hr of handlerResults) {
       if (hr.cauHoi) allQuestions.push(...hr.cauHoi);

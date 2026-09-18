@@ -185,6 +185,134 @@ async function runClaimsTests() {
     }
   });
 
+  // --------------------------------------------------------------------------
+  // 4. Kiểm thử Chấp nhận F2 (D1 feedbacks & chỉ dẫn)
+  // --------------------------------------------------------------------------
+  console.log("\n--- [4] Kiểm thử Tiêu chí Chấp nhận F2 (D1 & Chỉ dẫn) ---");
+
+  await suite.run(
+    "F2-01: gy-015 có intent kho-hieu (không nhầm am-thanh hay hinh-anh)",
+    () => {
+      const text =
+        "Giải thích mô hình ngôn ngữ lớn ở đoạn đầu nghe ba lần mới hiểu";
+      const intent = classifyIntent(text);
+      if (intent !== "kho-hieu") {
+        throw new Error(`Kỳ vọng kho-hieu, nhận: ${intent}`);
+      }
+    },
+  );
+
+  await suite.run("F2-02: gy-005 có intent nhip-khoang-dung", () => {
+    const text = "Năm giây suy nghĩ ngắn quá, chưa kịp nghĩ đã hiện đáp án rồi";
+    const intent = classifyIntent(text);
+    if (intent !== "nhip-khoang-dung") {
+      throw new Error(`Kỳ vọng nhip-khoang-dung, nhận: ${intent}`);
+    }
+  });
+
+  await suite.run(
+    "F2-03: gy-013 có intent de-nghi-chung hoặc noi-dung-sai (không phải am-thanh)",
+    () => {
+      const text = "Nên cho thêm ví dụ về tiếng Việt";
+      const intent = classifyIntent(text);
+      if (intent === "am-thanh") {
+        throw new Error(
+          `Không được là am-thanh khi nói về tiếng Việt! Nhận: ${intent}`,
+        );
+      }
+      if (intent !== "de-nghi-chung" && intent !== "noi-dung-sai") {
+        throw new Error(
+          `Kỳ vọng de-nghi-chung hoặc noi-dung-sai, nhận: ${intent}`,
+        );
+      }
+    },
+  );
+
+  await suite.run("F2-04: gy-004 tách được ít nhất một ý khen-giu", () => {
+    const item: FeedbackItem = {
+      id: "gy-004",
+      channel: "binh-luan",
+      sender: "hv-004",
+      sanitizedText: "Slide đẹp, ví dụ rõ ràng, đoạn sau giải thích hay",
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "luat",
+      isQuarantined: false,
+    };
+    const claims = splitFeedbackToClaims(item);
+    const hasKhenGiu = claims.some(
+      (c) =>
+        c.intent === "khen-giu" || c.chiDan === "khen" || c.chiDan === "giu",
+    );
+    if (!hasKhenGiu) {
+      throw new Error(
+        `Kỳ vọng ít nhất 1 ý khen-giu, nhận: ${JSON.stringify(claims.map((c) => ({ intent: c.intent, chiDan: c.chiDan })))}`,
+      );
+    }
+  });
+
+  await suite.run("F2-05: Kiểm tra trường chiDan (sua, giu, khen, hoi)", () => {
+    const itemKhen: FeedbackItem = {
+      id: "fb-khen",
+      channel: "binh-luan",
+      sender: "hv-001",
+      sanitizedText: "Đoạn giải thích rất hay và trực quan",
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "luat",
+      isQuarantined: false,
+    };
+    const claimsKhen = splitFeedbackToClaims(itemKhen);
+    if (claimsKhen[0].chiDan !== "khen") {
+      throw new Error(`Kỳ vọng chiDan 'khen', nhận: ${claimsKhen[0].chiDan}`);
+    }
+
+    const itemGiu: FeedbackItem = {
+      id: "fb-giu",
+      channel: "binh-luan",
+      sender: "gv-002",
+      sanitizedText: "Cần giữ nguyên slide tóm tắt ở câu 10",
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "luat",
+      isQuarantined: false,
+    };
+    const claimsGiu = splitFeedbackToClaims(itemGiu);
+    if (claimsGiu[0].chiDan !== "giu") {
+      throw new Error(`Kỳ vọng chiDan 'giu', nhận: ${claimsGiu[0].chiDan}`);
+    }
+
+    const itemHoi: FeedbackItem = {
+      id: "fb-hoi",
+      channel: "binh-luan",
+      sender: "hv-003",
+      sanitizedText: "Rốt cuộc khái niệm này có phải là học có giám sát không?",
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "luat",
+      isQuarantined: false,
+    };
+    const claimsHoi = splitFeedbackToClaims(itemHoi);
+    if (claimsHoi[0].chiDan !== "hoi") {
+      throw new Error(`Kỳ vọng chiDan 'hoi', nhận: ${claimsHoi[0].chiDan}`);
+    }
+
+    const itemSua: FeedbackItem = {
+      id: "fb-sua",
+      channel: "binh-luan",
+      sender: "hv-005",
+      sanitizedText: "Cần chỉnh lại âm lượng nhạc nền ở phút 1:20",
+      time: new Date().toISOString(),
+      label: "gop-y",
+      moderationBy: "luat",
+      isQuarantined: false,
+    };
+    const claimsSua = splitFeedbackToClaims(itemSua);
+    if (claimsSua[0].chiDan !== "sua") {
+      throw new Error(`Kỳ vọng chiDan 'sua', nhận: ${claimsSua[0].chiDan}`);
+    }
+  });
+
   const passed = suite.summary();
   if (!passed) {
     process.exit(1);

@@ -84,14 +84,20 @@ export function formIssues(
 
     const check = verifyClaimContent(c, loc, videoIndex);
 
+    // Bỏ qua claim nếu là 'nhieu' hoặc không rõ ý
+    if ((c.intent as string) === "nhieu") {
+      loaiBo.push({ claimId: c.id, lyDo: "chưa rõ ý" });
+      continue;
+    }
+
     // Bỏ qua nếu không hợp lệ để tạo vấn đề (như "không khớp video")
     if (!check.hopLeDeTaoVanDe) {
       loaiBo.push({ claimId: c.id, lyDo: check.thongBao });
       continue;
     }
 
-    // Nếu là khen-giữ nguyên hoặc lời dặn giảng viên: Đưa vào Vùng bảo vệ
-    if (c.intent === "khen-giu") {
+    // Nếu là khen-giữ nguyên hoặc lời dặn giảng viên: Đưa vào Vùng bảo vệ, không bao giờ tạo việc
+    if (c.intent === "khen-giu" || c.chiDan === "giu" || c.chiDan === "khen") {
       const text = c.trich.toLowerCase();
       let ns: number[] = [];
 

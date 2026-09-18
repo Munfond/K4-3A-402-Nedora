@@ -20,6 +20,7 @@ export * from "./v3/schema-v3";
 export * from "./v3/prompt-sua-loi";
 export * from "./v3/prompt-an-toan";
 export * from "./v3/prompt-tach-y";
+export * from "./v3/schema-claims";
 
 export interface RevisionAgentScriptSentence {
   n: number;
