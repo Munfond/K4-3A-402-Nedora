@@ -6,11 +6,85 @@ import {
   RefreshCw,
   Award,
   ExternalLink,
+  Key,
 } from "lucide-react";
-import { debugApi } from "../lib/debug-api";
+import { debugApi, getDebugToken, setDebugToken } from "../lib/debug-api";
 
 interface GoldenSetViewProps {
   onSelectRun: (runId: string) => void;
+}
+
+function formatCellContent(val: any): React.ReactNode {
+  if (val == null) return <span className="text-slate-500">—</span>;
+  if (
+    typeof val === "string" ||
+    typeof val === "number" ||
+    typeof val === "boolean"
+  ) {
+    return <span>{String(val)}</span>;
+  }
+  if (Array.isArray(val)) {
+    return (
+      <ul className="list-disc list-inside space-y-0.5 max-h-24 overflow-y-auto">
+        {val.map((item, idx) => (
+          <li key={idx} className="truncate">
+            {typeof item === "object" ? JSON.stringify(item) : String(item)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (typeof val === "object") {
+    if (val.issues || val.reject) {
+      const issues = Array.isArray(val.issues) ? val.issues : [];
+      const reject = Array.isArray(val.reject) ? val.reject : [];
+      return (
+        <div className="space-y-1 text-[11px]">
+          {issues.length > 0 && (
+            <div>
+              <span className="text-sky-400 font-semibold">
+                Vấn đề ({issues.length}):
+              </span>{" "}
+              {issues
+                .map(
+                  (it: any) =>
+                    `${it.issueId || it.id || it.type || "issue"}${it.sentenceIds?.length ? ` (câu ${it.sentenceIds.join(",")})` : ""}`,
+                )
+                .join("; ")}
+            </div>
+          )}
+          {reject.length > 0 && (
+            <div>
+              <span className="text-rose-400 font-semibold">
+                Loại ({reject.length}):
+              </span>{" "}
+              {reject
+                .map((r: any) => r.id || r.feedbackId || JSON.stringify(r))
+                .join(", ")}
+            </div>
+          )}
+          {issues.length === 0 && reject.length === 0 && (
+            <span className="text-slate-500 font-mono">
+              {"{ issues: [], reject: [] }"}
+            </span>
+          )}
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-0.5 text-[11px] max-h-24 overflow-y-auto">
+        {Object.entries(val).map(([k, v]) => (
+          <div key={k} className="truncate">
+            <span className="text-slate-400 font-mono">{k}:</span>{" "}
+            <span className="text-slate-200">
+              {typeof v === "object" ? JSON.stringify(v) : String(v)}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <span>{String(val)}</span>;
 }
 
 export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
@@ -21,10 +95,13 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
   const [evalDetail, setEvalDetail] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tokenInput, setTokenInput] = useState(getDebugToken());
+  const [isAuthError, setIsAuthError] = useState(false);
 
   const loadEvalRuns = async () => {
     setIsLoading(true);
     setError(null);
+    setIsAuthError(false);
     try {
       const data = await debugApi.getEvalRuns();
       setEvalRuns(data.evalRuns || []);
@@ -32,10 +109,24 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
         setSelectedEvalId(data.evalRuns[0].id);
       }
     } catch (err: any) {
-      setError(err.message || "Lỗi tải danh sách Golden set");
+      const msg = err.message || "Lỗi tải danh sách Golden set";
+      setError(msg);
+      if (
+        err.statusCode === 401 ||
+        msg.includes("401") ||
+        msg.includes("UNAUTHORIZED")
+      ) {
+        setIsAuthError(true);
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSaveToken = (e: React.FormEvent) => {
+    e.preventDefault();
+    setDebugToken(tokenInput.trim());
+    loadEvalRuns();
   };
 
   useEffect(() => {
@@ -50,6 +141,9 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
         setEvalDetail(detail);
       } catch (err: any) {
         console.error("Failed to load eval run detail", err);
+        if (err.statusCode === 401) {
+          setIsAuthError(true);
+        }
       }
     };
     loadDetail();
@@ -71,52 +165,89 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
           </p>
         </div>
 
+        {/* Run Selector & Reload */}
         <div className="flex items-center gap-3">
-          <select
-            value={selectedEvalId}
-            onChange={(e) => setSelectedEvalId(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-sky-500 font-mono"
-          >
-            {evalRuns.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.id} {r.manifest?.mode ? `(${r.manifest.mode})` : ""}
-              </option>
-            ))}
-          </select>
+          {evalRuns.length > 0 && (
+            <select
+              value={selectedEvalId}
+              onChange={(e) => setSelectedEvalId(e.target.value)}
+              className="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-sky-500 font-mono"
+            >
+              {evalRuns.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.id} ({r.manifest?.model || "mock"})
+                </option>
+              ))}
+            </select>
+          )}
 
           <button
             type="button"
             onClick={loadEvalRuns}
-            className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition"
+            disabled={isLoading}
+            className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition disabled:opacity-50"
+            title="Tải lại kết quả Golden set"
           >
-            <RefreshCw className="size-4" />
+            <RefreshCw
+              className={`size-4 ${isLoading ? "animate-spin text-sky-400" : ""}`}
+            />
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-950/20 text-rose-300 text-xs">
-          {error}
+      {/* Auth / Error banner */}
+      {isAuthError && (
+        <form
+          onSubmit={handleSaveToken}
+          className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3"
+        >
+          <Key className="size-5 text-amber-400 shrink-0" />
+          <div className="flex-1">
+            <span className="text-amber-200 text-xs font-semibold block">
+              Yêu cầu token debug (401 Unauthorized)
+            </span>
+            <span className="text-slate-400 text-[11px]">
+              Vui lòng nhập REVISION_DEBUG_TOKEN (≥ 24 ký tự) đã cấu hình trên
+              service:
+            </span>
+          </div>
+          <input
+            type="password"
+            value={tokenInput}
+            onChange={(e) => setTokenInput(e.target.value)}
+            placeholder="Dán token debug..."
+            className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 font-mono w-64 focus:outline-none focus:border-amber-500"
+          />
+          <button
+            type="submit"
+            className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition"
+          >
+            Lưu & Thử lại
+          </button>
+        </form>
+      )}
+
+      {error && !isAuthError && (
+        <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-2 text-rose-400 text-xs">
+          <AlertCircle className="size-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* Summary Cards */}
+      {/* Eval Summary Banner */}
       {evalDetail?.manifest && (
-        <div className="grid grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-4 gap-4">
           <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
             <span className="text-slate-500 text-[11px] block">
-              Lượt đánh giá
+              Bộ Golden Set
             </span>
-            <span className="font-mono font-bold text-slate-200">
-              {evalDetail.manifest.id}
+            <span className="font-mono text-slate-200 font-medium">
+              {evalDetail.manifest.dataset || "v1"}
             </span>
           </div>
           <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-            <span className="text-slate-500 text-[11px] block">
-              Chế độ / Model
-            </span>
+            <span className="text-slate-500 text-[11px] block">Mô hình</span>
             <span className="font-mono text-slate-200 font-medium">
-              {evalDetail.manifest.mode || "gia-lap"} ·{" "}
               {evalDetail.manifest.model || "mock"}
             </span>
           </div>
@@ -169,6 +300,15 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
             ) : (
               cases.map((c: any) => {
                 const passed = c.status === "pass" || c.passed === true;
+                const expectedTitle =
+                  typeof c.expected === "object"
+                    ? JSON.stringify(c.expected, null, 2)
+                    : String(c.expected || "");
+                const actualTitle =
+                  typeof c.actual === "object"
+                    ? JSON.stringify(c.actual, null, 2)
+                    : String(c.actual || "");
+
                 return (
                   <tr
                     key={c.caseId || c.id}
@@ -183,16 +323,16 @@ export const GoldenSetView: React.FC<GoldenSetViewProps> = ({
                       </span>
                     </td>
                     <td
-                      className="py-3 px-3 text-slate-300 max-w-xs truncate"
-                      title={c.expected}
+                      className="py-3 px-3 text-slate-300 max-w-xs"
+                      title={expectedTitle}
                     >
-                      {c.expected || "—"}
+                      {formatCellContent(c.expected)}
                     </td>
                     <td
-                      className="py-3 px-3 text-slate-300 max-w-xs truncate"
-                      title={c.actual}
+                      className="py-3 px-3 text-slate-300 max-w-xs"
+                      title={actualTitle}
                     >
-                      {c.actual || "—"}
+                      {formatCellContent(c.actual)}
                     </td>
                     <td className="py-3 px-3">
                       {passed ? (

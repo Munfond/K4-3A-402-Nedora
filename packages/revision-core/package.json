@@ -12,10 +12,12 @@
     "./engine": "./src/engine.ts",
     "./sanitize": "./src/sanitize.ts",
     "./events": "./src/events.ts",
-    "./pipeline/graph": "./src/pipeline/graph.ts"
+    "./pipeline/graph": "./src/pipeline/graph.ts",
+    "./timeline": "./src/timeline/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx scripts/run-all.ts"
   },
   "dependencies": {
     "@feedback/ai": "workspace:*",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }

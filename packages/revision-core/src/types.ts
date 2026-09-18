@@ -259,6 +259,45 @@ export interface RevisionRunResult {
   quarantinedFeedback: FeedbackItem[];
 }
 
+import type { PlanSimulation } from "./timeline/types";
+
+export interface RevisionBrief {
+  pheu: {
+    gopY: number;
+    cachLy: number;
+    choDuyet: number;
+    y: number;
+    vanDe: number;
+    theoNhom: Record<string, number>;
+    deXuat: number;
+    quaThamDinh: number;
+  };
+  viec: Array<{
+    id: string;
+    nhom: "bien-kich" | "thu-am" | "dung-hinh" | "am-thanh" | "phu-de";
+    uuTien: number;
+    lyDoUuTien: string;
+    vanDeId: string;
+    gopYIds: string[];
+    nguoiDocLap: number;
+    viTri: { ns: number[]; v1: [number, number]; v2?: [number, number] };
+    bangChungDo?: string;
+    deXuat?: unknown;
+    cachKhac?: unknown;
+    chiPhi: PlanSimulation;
+  }>;
+  cauHoi: Array<{
+    id: string;
+    noiDung: string;
+    luaChon: string[];
+    gopYIds: string[];
+  }>;
+  ghiNhan: Array<{ gopYIds: string[]; lyDo: string }>;
+  vungBaoVe: Array<{ ns: number[]; gopYIds: string[] }>;
+  keHoach: PlanSimulation;
+  nganSach: { cauThuLai: number; deltaTongGiay: number };
+}
+
 export interface RunAttemptMetadata {
   attemptNumber: number;
   status: "xong" | "loi";
@@ -272,7 +311,7 @@ export interface RunAttemptMetadata {
 
 export interface RunMetadata {
   runId: string;
-  status: "xong" | "loi" | "dang-chay";
+  status: "xong" | "loi" | "dang-chay" | "da-huy";
   createdAt: string;
   inputHash: string;
   modelId: string;

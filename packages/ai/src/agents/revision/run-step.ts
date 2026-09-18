@@ -33,6 +33,7 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
   config?: RevisionAgentConfig;
   stepLabel: string;
   callModel?: (params?: any) => Promise<any>;
+  abortSignal?: AbortSignal;
 }): Promise<RevisionStepResult<z.infer<T>>> {
   const {
     systemPrompt,
@@ -41,6 +42,7 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
     config = {},
     stepLabel,
     callModel,
+    abortSignal,
   } = params;
 
   const modelId =
@@ -167,13 +169,17 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
       2,
     );
 
+    const effectiveSignal = abortSignal
+      ? AbortSignal.any([AbortSignal.timeout(timeoutMs), abortSignal])
+      : AbortSignal.timeout(timeoutMs);
+
     try {
       const result = await generateText({
         model: languageModel,
         system: systemPrompt,
         prompt,
         output: Output.object({ schema }),
-        abortSignal: AbortSignal.timeout(timeoutMs),
+        abortSignal: effectiveSignal,
         maxOutputTokens,
         ...(isReasoningModelId(modelId) ? {} : { temperature }),
       });
@@ -201,6 +207,21 @@ export async function runRevisionStep<T extends z.ZodTypeAny>(params: {
         totalTokens,
       };
     } catch (err: unknown) {
+      if (abortSignal?.aborted) {
+        return {
+          ok: false,
+          error: {
+            code: "MODEL_CALL_FAILED",
+            message: "Đã dừng lời gọi model do người dùng hủy",
+          },
+          attempts,
+          durationMs: Date.now() - startAll,
+          promptHash,
+          modelId,
+          totalTokens,
+        };
+      }
+
       const classified = classifyRevisionError(err);
       lastError = { code: classified.code, message: classified.message };
 

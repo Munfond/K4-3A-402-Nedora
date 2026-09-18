@@ -292,9 +292,17 @@ export function appendRunEvent(
     }
   }
 
+  const existing = effectiveStore ? effectiveStore.readEvents(runId) : [];
+  const isTerminal = existing.some(
+    (e) => e.type === "run.finished" || e.type === "run.failed",
+  );
+  if (isTerminal) {
+    // Sau run.failed hoặc run.finished không ghi thêm sự kiện
+    return existing[existing.length - 1];
+  }
+
   let seq = forcedSeq;
   if (seq === undefined) {
-    const existing = effectiveStore ? effectiveStore.readEvents(runId) : [];
     seq = existing.length + 1;
   }
 

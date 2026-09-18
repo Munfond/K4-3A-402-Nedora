@@ -18,6 +18,7 @@ interface NodeInspectorProps {
   node: NodeDebugEntry | null;
   nodeId: string | null;
   iterationKey?: string;
+  runModelId?: string;
   onClose: () => void;
   onReplay: (nodeId: string, iterationKey?: string) => void;
   isReplaying?: boolean;
@@ -27,6 +28,7 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
   node,
   nodeId,
   iterationKey,
+  runModelId,
   onClose,
   onReplay,
   isReplaying,
@@ -37,6 +39,21 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
   const [copied, setCopied] = useState(false);
 
   if (!nodeId) return null;
+
+  const isAiNode =
+    node?.nodeType === "ai" ||
+    [
+      "hieu-gop-y",
+      "de-xuat",
+      "sua-loi",
+      "tach-y",
+      "dinh-vi",
+      "tham-dinh",
+      "cong-an-toan",
+    ].some((prefix) => nodeId.includes(prefix));
+
+  const displayModel =
+    node?.modelId || (isAiNode ? runModelId || "ai-model" : "code");
 
   const title = iterationKey ? `${nodeId} · ${iterationKey}` : nodeId;
 
@@ -119,9 +136,9 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
           <span className="text-slate-500 text-[11px] block">Model</span>
           <span
             className="font-mono text-slate-200 font-medium truncate block"
-            title={node?.modelId}
+            title={displayModel}
           >
-            {node?.modelId || "code"}
+            {displayModel}
           </span>
         </div>
         <div>

@@ -6,7 +6,7 @@ import {
   writeFileSync,
   appendFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import type {
   FeedbackItem,
   RevisionRunResult,
@@ -68,7 +68,20 @@ export interface RevisionStore {
 
 const SAFE_ID = /^[a-z0-9-]{1,64}$/;
 
-function resolvePackDir(customPath?: string, base: string = "."): string {
+export function findRepoRoot(startDir: string = process.cwd()): string {
+  let curr = resolve(startDir);
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(join(curr, "pnpm-workspace.yaml"))) {
+      return curr;
+    }
+    const parent = resolve(curr, "..");
+    if (parent === curr) break;
+    curr = parent;
+  }
+  return resolve(startDir);
+}
+
+function resolvePackDir(customPath?: string, base?: string): string {
   if (customPath && existsSync(customPath)) return customPath;
   if (
     process.env.REVISION_DATA_DIR &&
@@ -76,33 +89,35 @@ function resolvePackDir(customPath?: string, base: string = "."): string {
   ) {
     return process.env.REVISION_DATA_DIR;
   }
+  const root = base ? resolve(base) : findRepoRoot();
   const candidates = [
-    join(base, "apps/www/src/data"),
-    join(base, "src/data"),
-    join(base, "../www/src/data"),
-    join(base, "../../apps/www/src/data"),
-    join(base, "data/studio-pack/c5-feedbackradar"),
-    join(base, "../../data/studio-pack/c5-feedbackradar"),
+    join(root, "data/studio-pack/c5-feedbackradar"),
+    join(root, "apps/www/src/data"),
+    join(root, "src/data"),
   ];
   for (const c of candidates) {
-    if (existsSync(join(c, "kich-ban-d1.json"))) return c;
+    if (
+      existsSync(join(c, "kich-ban-d1.json")) ||
+      existsSync(join(c, "video-mau/kich-ban-d1.json"))
+    ) {
+      return c;
+    }
   }
-  return join(base, "apps/www/src/data");
+  return join(root, "apps/www/src/data");
 }
 
 function resolveDataDir(
   subdir: string,
   customPath?: string,
   envVar?: string,
-  base: string = ".",
+  base?: string,
 ): string {
   if (customPath) return customPath;
   if (envVar && process.env[envVar]) return process.env[envVar]!;
+  const root = base ? resolve(base) : findRepoRoot();
   const candidates = [
-    join(base, "apps/www/.data", subdir),
-    join(base, ".data", subdir),
-    join(base, "../../apps/www/.data", subdir),
-    join(base, "../www/.data", subdir),
+    join(root, "apps/www/.data", subdir),
+    join(root, ".data", subdir),
   ];
   for (const c of candidates) {
     if (existsSync(c)) return c;

@@ -823,6 +823,26 @@ export default function VideoDetailPage({
                   </p>
                 </div>
               </div>
+            ) : cases.length === 0 && runMeta?.status === "da-huy" ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-3 bg-amber-50/10">
+                <AlertCircle className="size-8 text-amber-500" />
+                <div className="space-y-1">
+                  <h3 className="font-bold text-sm text-foreground">
+                    Đợt phân tích đã bị hủy
+                  </h3>
+                  <p className="text-xs text-muted-foreground max-w-md">
+                    Tiến trình đã được dừng theo yêu cầu của bạn.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => void handleTriggerAnalyze()}
+                  disabled={isAnalyzing}
+                  className="gap-2 font-bold shadow-xs"
+                >
+                  <RefreshCw className="size-4" />
+                  Bắt đầu phân tích lại
+                </Button>
+              </div>
             ) : cases.length === 0 && runMeta?.status === "loi" ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-3 bg-rose-50/10">
                 <AlertCircle className="size-8 text-rose-500" />

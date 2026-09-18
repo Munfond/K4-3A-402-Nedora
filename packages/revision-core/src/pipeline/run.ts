@@ -57,7 +57,7 @@ export function isRunActive(runId: string): boolean {
 
 function updateRunStatus(
   runId: string,
-  status: "dang-chay" | "xong" | "loi",
+  status: "dang-chay" | "xong" | "loi" | "da-huy",
   error?: { code: string; message: string },
   store: RevisionStore = getDefaultStore(),
 ) {
@@ -88,7 +88,7 @@ export function cancelRevisionRun(
     if (current?.run.status === "dang-chay") {
       updateRunStatus(
         runId,
-        "loi",
+        "da-huy",
         {
           code: "RUN_CANCELLED",
           message: "Đợt phân tích đã bị hủy",
@@ -140,7 +140,7 @@ export function cancelRevisionRun(
 
   updateRunStatus(
     runId,
-    "loi",
+    "da-huy",
     {
       code: "RUN_CANCELLED",
       message: "Người dùng đã hủy đợt phân tích",
@@ -549,6 +549,7 @@ export async function runPipeline(
               config,
               stepLabel: "hiểu góp ý",
               callModel,
+              abortSignal: abortController.signal,
             });
       } finally {
         clearInterval(hieuHeartbeat);
@@ -888,6 +889,7 @@ export async function runPipeline(
                   config,
                   stepLabel: `lập phương án vùng ${iterationKey} (lần ${attempt})`,
                   callModel,
+                  abortSignal: abortController.signal,
                 });
           } catch (e: any) {
             optRes = {

@@ -157,8 +157,13 @@ export default function PipelineFlow({
       }
     } else if (runMeta?.status === "loi") {
       setRunError({
-        code: "RUN_FAILED",
-        message: "Đợt phân tích thất bại hoặc đã bị dừng",
+        code: runMeta.error?.code || "RUN_FAILED",
+        message: runMeta.error?.message || "Đợt phân tích gặp lỗi",
+      });
+    } else if (runMeta?.status === "da-huy") {
+      setRunError({
+        code: "RUN_CANCELLED",
+        message: "Đợt phân tích đã bị hủy",
       });
     }
   }, [runMeta?.status, runMeta?.runId, runMeta?.durationMs, runId]);

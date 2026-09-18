@@ -446,6 +446,9 @@ export function App() {
                     node={selectedNodeData}
                     nodeId={selectedNodeId}
                     iterationKey={selectedIterationKey}
+                    runModelId={
+                      runs.find((r) => r.runId === activeRunId)?.modelId
+                    }
                     onClose={() => setSelectedNodeId(null)}
                     onReplay={handleReplayNode}
                     isReplaying={isReplaying}
