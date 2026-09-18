@@ -21,3 +21,5 @@ export * from "./video-index";
 export * from "./claims";
 export * from "./localize";
 export * from "./tools/registry";
+export * from "./verify";
+export * from "./issues";

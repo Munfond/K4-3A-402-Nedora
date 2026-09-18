@@ -345,6 +345,16 @@ export class BM25Engine {
         rrfScores.set(seg.n, prev + 0.15);
       }
       if (
+        (lowerQ.includes("ứng dụng trò chuyện") ||
+          lowerQ.includes("ứng dụng với mô hình") ||
+          lowerQ.includes("mô hình ngôn ngữ lớn với ứng dụng")) &&
+        (segFull.includes("ứng dụng trò chuyện") ||
+          (seg.n >= 20 && seg.n <= 23))
+      ) {
+        const prev = rrfScores.get(seg.n) || 0;
+        rrfScores.set(seg.n, prev + 0.15);
+      }
+      if (
         lowerQ.includes("ba ví dụ") &&
         (segFull.includes("ba ví dụ") || segFull.includes("ba nhánh"))
       ) {

@@ -18,7 +18,9 @@
     "./video-index": "./src/video-index/index.ts",
     "./claims": "./src/claims/index.ts",
     "./localize": "./src/localize/index.ts",
-    "./tools": "./src/tools/registry.ts"
+    "./tools": "./src/tools/registry.ts",
+    "./verify": "./src/verify/index.ts",
+    "./issues": "./src/issues/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
