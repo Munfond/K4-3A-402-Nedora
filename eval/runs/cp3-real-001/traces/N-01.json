@@ -1,0 +1,934 @@
+{
+  "caseId": "N-01",
+  "status": "dat",
+  "durationMs": 93,
+  "tokens": 0,
+  "criteria": [
+    {
+      "type": "run-status",
+      "passed": true,
+      "message": "Trạng thái hợp lệ"
+    },
+    {
+      "type": "in-issue",
+      "passed": true,
+      "message": "Tìm thấy vấn đề chứa [v1-n01-a,v1-n01-b]",
+      "details": {
+        "issueId": "is-1",
+        "sentences": [20, 21, 22, 23]
+      }
+    },
+    {
+      "type": "sender-count",
+      "passed": true,
+      "message": "Số người gửi độc lập = 2"
+    }
+  ],
+  "executionContext": {
+    "status": "xong",
+    "result": {
+      "runId": "run-20260917-192314-37a2",
+      "inputHash": "e7bafbe3e2f1a16e7e3a8ddb81940cb833254e720d9f2063a448cf022d3d39d2",
+      "script": {
+        "id": "d1",
+        "tieuDe": "Phân biệt trí tuệ nhân tạo, học máy, tạo sinh và mô hình ngôn ngữ lớn",
+        "mucTieu": "Phân loại ba ứng dụng quen thuộc và giải thích quan hệ giữa bốn khái niệm.",
+        "thoiLuongDuKienGiay": 251,
+        "phan": [
+          {
+            "so": 1,
+            "ten": "Mở đầu — hai công cụ, hai nhiệm vụ"
+          },
+          {
+            "so": 2,
+            "ten": "Trí tuệ nhân tạo và học máy"
+          },
+          {
+            "so": 3,
+            "ten": "Tạo nội dung và xử lý ngôn ngữ"
+          },
+          {
+            "so": 4,
+            "ten": "Đặt ba ứng dụng lên bản đồ"
+          },
+          {
+            "so": 5,
+            "ten": "Tự kiểm tra và chốt bản đồ"
+          }
+        ],
+        "cau": [
+          {
+            "n": 1,
+            "phan": 1,
+            "loi": "Một công cụ đánh dấu thư nào có thể là thư rác, còn một trợ lý viết giúp bạn lời mời tham gia câu lạc bộ.",
+            "chuTrenManHinh": "Hai ví dụ minh họa · Hai nhiệm vụ",
+            "yDoHinh": "Hai thư điện tử chạy vào hai nhánh: một thư điện tử được gắn nhãn, nhánh còn lại xuất hiện bản nháp mới.",
+            "batDauGiay": 0,
+            "ketThucTiengGiay": 5.4,
+            "ketThucGiay": 6.8,
+            "soKyTu": 105
+          },
+          {
+            "n": 2,
+            "phan": 1,
+            "loi": "Cả hai có thể dùng trí tuệ nhân tạo, nhưng việc chúng làm và kết quả chúng trả về rất khác nhau.",
+            "chuTrenManHinh": "Cách xử lý và kết quả có thể khác nhau",
+            "yDoHinh": "Đặt hai đầu ra Nhãn phân loại và Bản nháp cạnh nhau; giữ nhãn MINH HỌA.",
+            "batDauGiay": 6.8,
+            "ketThucTiengGiay": 11.6,
+            "ketThucGiay": 13,
+            "soKyTu": 96
+          },
+          {
+            "n": 3,
+            "phan": 1,
+            "loi": "Mình sẽ dùng ba công cụ quen thuộc để phân biệt trí tuệ nhân tạo, học máy, tạo sinh và mô hình ngôn ngữ lớn.",
+            "chuTrenManHinh": "Bốn khái niệm, ba ví dụ",
+            "yDoHinh": "Bốn nhãn trí tuệ nhân tạo, học máy, trí tuệ nhân tạo tạo sinh, mô hình ngôn ngữ lớn đi vào các vị trí chờ.",
+            "batDauGiay": 13,
+            "ketThucTiengGiay": 19.3,
+            "ketThucGiay": 21.3,
+            "soKyTu": 108
+          },
+          {
+            "n": 4,
+            "phan": 2,
+            "loi": "Trí tuệ nhân tạo là lĩnh vực làm cho máy thực hiện những việc thường cần trí thông minh, như nhận ra đồ vật trong ảnh.",
+            "chuTrenManHinh": "Trí tuệ nhân tạo",
+            "yDoHinh": "Mở vùng trí tuệ nhân tạo, thả vào biểu tượng nhận diện ảnh, chơi cờ và xử lý ngôn ngữ.",
+            "batDauGiay": 21.3,
+            "ketThucTiengGiay": 26.6,
+            "ketThucGiay": 28,
+            "soKyTu": 118
+          },
+          {
+            "n": 5,
+            "phan": 2,
+            "loi": "Trong lĩnh vực này, có những hệ thống giải bài toán bằng kiến thức và quy tắc do con người viết sẵn.",
+            "chuTrenManHinh": "Một hướng: quy tắc viết sẵn",
+            "yDoHinh": "Thẻ điều kiện kéo đến thẻ hành động bằng một đường nối cố định.",
+            "batDauGiay": 28,
+            "ketThucTiengGiay": 32.8,
+            "ketThucGiay": 34.2,
+            "soKyTu": 100
+          },
+          {
+            "n": 6,
+            "phan": 2,
+            "loi": "Một cách khác là cho hệ thống học từ nhiều ví dụ, để nhận ra những đặc điểm giúp nó giải quyết công việc.",
+            "chuTrenManHinh": "Học mẫu từ ví dụ",
+            "yDoHinh": "Nhiều thẻ thư điện tử chảy vào mô hình, tạo một đường phân chia giữa hai nhóm.",
+            "batDauGiay": 34.2,
+            "ketThucTiengGiay": 39.2,
+            "ketThucGiay": 40.6,
+            "soKyTu": 105
+          },
+          {
+            "n": 7,
+            "phan": 2,
+            "loi": "Chẳng hạn, ta đưa vào nhiều thư điện tử đã được đánh dấu là thư rác hoặc thư bình thường.",
+            "chuTrenManHinh": "Thư điện tử đã gắn nhãn",
+            "yDoHinh": "Hai chồng thư điện tử có nhãn đi vào hộp huấn luyện; không hiện dữ liệu cá nhân.",
+            "batDauGiay": 40.6,
+            "ketThucTiengGiay": 45.2,
+            "ketThucGiay": 46.6,
+            "soKyTu": 89
+          },
+          {
+            "n": 8,
+            "phan": 2,
+            "loi": "Bộ lọc dựa vào những gì đã học để dự đoán thư mới là thư rác hay thư bình thường.",
+            "chuTrenManHinh": "Đầu ra: nhãn dự đoán",
+            "yDoHinh": "Giữ hai chồng thư đã gắn nhãn ở bên trái; một thư mới đi qua hộp mô hình rồi nhận nhãn dự đoán “Có thể là thư rác”.",
+            "batDauGiay": 46.6,
+            "ketThucTiengGiay": 51.2,
+            "ketThucGiay": 52.6,
+            "soKyTu": 81
+          },
+          {
+            "n": 9,
+            "phan": 2,
+            "loi": "Cách học từ dữ liệu ấy được gọi là học máy.",
+            "chuTrenManHinh": "Học máy",
+            "yDoHinh": "Vùng Học máy hiện bên trong vùng Trí tuệ nhân tạo; dùng nhãn tiếng Việt.",
+            "batDauGiay": 52.6,
+            "ketThucTiengGiay": 54.8,
+            "ketThucGiay": 56.2,
+            "soKyTu": 43
+          },
+          {
+            "n": 10,
+            "phan": 2,
+            "loi": "Bên trong bộ lọc, phần tính toán đã học từ các ví dụ ấy được gọi là mô hình học máy.",
+            "chuTrenManHinh": "Mô hình học máy: học từ ví dụ để dự đoán",
+            "yDoHinh": "Khoanh hộp đã học nằm giữa Thư mới và Nhãn dự đoán; gắn tên Mô hình học máy.",
+            "batDauGiay": 56.2,
+            "ketThucTiengGiay": 60.5,
+            "ketThucGiay": 61.9,
+            "soKyTu": 84
+          },
+          {
+            "n": 11,
+            "phan": 2,
+            "loi": "Như vậy, học máy là một cách làm trong lĩnh vực trí tuệ nhân tạo, chứ không phải tên khác của cả lĩnh vực.",
+            "chuTrenManHinh": "Học máy nằm trong trí tuệ nhân tạo",
+            "yDoHinh": "Viền vùng học máy nhấp sáng bên trong trí tuệ nhân tạo; hai nhãn giữ kích thước khác nhau.",
+            "batDauGiay": 61.9,
+            "ketThucTiengGiay": 67.3,
+            "ketThucGiay": 69.3,
+            "soKyTu": 106
+          },
+          {
+            "n": 12,
+            "phan": 3,
+            "loi": "Bây giờ, mình đổi nhiệm vụ từ phân loại thư sang viết một bức thư mời tham gia câu lạc bộ.",
+            "chuTrenManHinh": "Yêu cầu mới: viết thư mời",
+            "yDoHinh": "Thay thẻ yêu cầu phân loại bằng yêu cầu viết thư mời; giữ khung đầu vào và đầu ra.",
+            "batDauGiay": 69.3,
+            "ketThucTiengGiay": 73.6,
+            "ketThucGiay": 75,
+            "soKyTu": 90
+          },
+          {
+            "n": 13,
+            "phan": 3,
+            "loi": "Lúc này, bạn cần một bức thư mới, chứ không chỉ cần biết thư thuộc nhóm nào.",
+            "chuTrenManHinh": "Đầu ra: nội dung mới",
+            "yDoHinh": "Trang giấy trống có thêm lời chào, nội dung mời và câu kết từng dòng.",
+            "batDauGiay": 75,
+            "ketThucTiengGiay": 79.2,
+            "ketThucGiay": 80.6,
+            "soKyTu": 76
+          },
+          {
+            "n": 14,
+            "phan": 3,
+            "loi": "Trí tuệ nhân tạo tạo sinh là tên gọi cho những hệ thống tạo nội dung, chẳng hạn văn bản, hình ảnh hoặc âm thanh.",
+            "chuTrenManHinh": "Tạo sinh = tạo nội dung",
+            "yDoHinh": "Vùng trí tuệ nhân tạo tạo sinh mở ra ba nhánh văn bản, hình ảnh, âm thanh.",
+            "batDauGiay": 80.6,
+            "ketThucTiengGiay": 87.1,
+            "ketThucGiay": 88.5,
+            "soKyTu": 112
+          },
+          {
+            "n": 15,
+            "phan": 3,
+            "loi": "Trên bản đồ này, mình xét các mô hình tạo sinh học từ dữ liệu, nên đặt chúng trong vùng học máy.",
+            "chuTrenManHinh": "Bản đồ của các mô hình đang xét",
+            "yDoHinh": "Đặt vùng Các mô hình tạo sinh đang xét bên trong Học máy; ghi rõ phạm vi giản lược.",
+            "batDauGiay": 88.5,
+            "ketThucTiengGiay": 93.7,
+            "ketThucGiay": 95.1,
+            "soKyTu": 96
+          },
+          {
+            "n": 16,
+            "phan": 3,
+            "loi": "Nhưng không phải cứ học từ dữ liệu thì hệ thống sẽ tạo nội dung, vì bộ lọc thư rác vừa rồi chỉ phân loại.",
+            "chuTrenManHinh": "Học từ dữ liệu có thể chỉ để phân loại",
+            "yDoHinh": "Thư điện tử phân loại giữ ở vùng học máy ngoài vùng trí tuệ nhân tạo tạo sinh; đường sang trí tuệ nhân tạo tạo sinh hiện dấu hỏi.",
+            "batDauGiay": 95.1,
+            "ketThucTiengGiay": 100.5,
+            "ketThucGiay": 101.9,
+            "soKyTu": 105
+          },
+          {
+            "n": 17,
+            "phan": 3,
+            "loi": "Một công cụ vẽ áp phích từ mô tả cũng thuộc nhóm tạo sinh, vì nó tạo hình ảnh để người dùng sử dụng.",
+            "chuTrenManHinh": "Tạo ảnh cũng là trí tuệ nhân tạo tạo sinh",
+            "yDoHinh": "Tờ áp phích hư cấu nở ra từ yêu cầu “Ngày hội khoa học”; gắn MINH HỌA.",
+            "batDauGiay": 101.9,
+            "ketThucTiengGiay": 107.1,
+            "ketThucGiay": 108.5,
+            "soKyTu": 100
+          },
+          {
+            "n": 18,
+            "phan": 3,
+            "loi": "Mô hình ngôn ngữ lớn học cách dùng và kết hợp từ ngữ từ lượng lớn dữ liệu, để xử lý văn bản.",
+            "chuTrenManHinh": "Mô hình học từ dữ liệu ngôn ngữ",
+            "yDoHinh": "Hiện hộp Mô hình ngôn ngữ lớn; chỉ nhánh Có khả năng sinh văn bản nối vào vùng tạo sinh.",
+            "batDauGiay": 108.5,
+            "ketThucTiengGiay": 113.8,
+            "ketThucGiay": 115.2,
+            "soKyTu": 92
+          },
+          {
+            "n": 19,
+            "phan": 3,
+            "loi": "Các mô hình ngôn ngữ có khả năng tạo sinh có thể viết thư, giải thích bài học hoặc tóm tắt tài liệu.",
+            "chuTrenManHinh": "Xử lý và sinh văn bản",
+            "yDoHinh": "Ba thẻ viết thư, giải thích, tóm tắt nối vào cùng hộp mô hình ngôn ngữ lớn.",
+            "batDauGiay": 115.2,
+            "ketThucTiengGiay": 120.1,
+            "ketThucGiay": 121.5,
+            "soKyTu": 100
+          },
+          {
+            "n": 20,
+            "phan": 3,
+            "loi": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+            "chuTrenManHinh": "Ứng dụng trò chuyện → mô hình xử lý",
+            "yDoHinh": "Tách giao diện bong bóng trò chuyện khỏi hộp mô hình nằm phía sau bằng đường gọi.",
+            "batDauGiay": 121.5,
+            "ketThucTiengGiay": 127.2,
+            "ketThucGiay": 128.6,
+            "soKyTu": 99
+          },
+          {
+            "n": 21,
+            "phan": 3,
+            "loi": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+            "chuTrenManHinh": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+            "yDoHinh": "Giữ một ứng dụng đang dùng mô hình ngôn ngữ; tô khung bạn nhập rồi tô hộp mô hình phía sau, nối thông tin gửi và câu trả lời trở về.",
+            "batDauGiay": 128.6,
+            "ketThucTiengGiay": 133.2,
+            "ketThucGiay": 134.6,
+            "soKyTu": 96
+          },
+          {
+            "n": 22,
+            "phan": 3,
+            "loi": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+            "chuTrenManHinh": "Một ứng dụng, nhiều thành phần",
+            "yDoHinh": "Ba hộp mô hình/công cụ nối vào một cửa sổ ứng dụng; không gộp chúng thành mô hình ngôn ngữ lớn.",
+            "batDauGiay": 134.6,
+            "ketThucTiengGiay": 139.4,
+            "ketThucGiay": 140.8,
+            "soKyTu": 94
+          },
+          {
+            "n": 23,
+            "phan": 3,
+            "loi": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+            "chuTrenManHinh": "Ứng dụng có thể dùng nhiều mô hình",
+            "yDoHinh": "Phóng to từng thành phần, giữ tên riêng và mũi tên vào ứng dụng.",
+            "batDauGiay": 140.8,
+            "ketThucTiengGiay": 144.8,
+            "ketThucGiay": 146.8,
+            "soKyTu": 79
+          },
+          {
+            "n": 24,
+            "phan": 4,
+            "loi": "Hãy đặt thẻ đầu tiên lên bản đồ: bộ lọc học từ những thư đã được đánh dấu để phân loại thư mới.",
+            "chuTrenManHinh": "Ví dụ 1: lọc thư rác",
+            "yDoHinh": "Thẻ bộ lọc thư điện tử di chuyển từ bàn chờ vào vùng học máy.",
+            "batDauGiay": 146.8,
+            "ketThucTiengGiay": 151.8,
+            "ketThucGiay": 153.2,
+            "soKyTu": 95
+          },
+          {
+            "n": 25,
+            "phan": 4,
+            "loi": "Thẻ này nằm trong vùng học máy, và vùng học máy nằm bên trong lĩnh vực trí tuệ nhân tạo.",
+            "chuTrenManHinh": "Học máy, thuộc lĩnh vực trí tuệ nhân tạo",
+            "yDoHinh": "Viền học máy rồi viền trí tuệ nhân tạo sáng nối tiếp quanh thẻ bộ lọc.",
+            "batDauGiay": 153.2,
+            "ketThucTiengGiay": 157.4,
+            "ketThucGiay": 158.8,
+            "soKyTu": 88
+          },
+          {
+            "n": 26,
+            "phan": 4,
+            "loi": "Bộ lọc này chỉ đánh dấu loại thư, nên việc nó đang làm không phải tạo sinh.",
+            "chuTrenManHinh": "Không tạo nội dung mới",
+            "yDoHinh": "Nhãn “Thư rác” giữ nguyên; thẻ không đi vào vùng trí tuệ nhân tạo tạo sinh.",
+            "batDauGiay": 158.8,
+            "ketThucTiengGiay": 162.6,
+            "ketThucGiay": 164,
+            "soKyTu": 75
+          },
+          {
+            "n": 27,
+            "phan": 4,
+            "loi": "Thẻ thứ hai là công cụ tạo áp phích cho ngày hội khoa học từ một đoạn mô tả.",
+            "chuTrenManHinh": "Ví dụ 2: tạo áp phích",
+            "yDoHinh": "Áp phích từ mô tả được kéo vào vùng trí tuệ nhân tạo tạo sinh, nhánh hình ảnh.",
+            "batDauGiay": 164,
+            "ketThucTiengGiay": 168.1,
+            "ketThucGiay": 169.5,
+            "soKyTu": 76
+          },
+          {
+            "n": 28,
+            "phan": 4,
+            "loi": "Tạo áp phích là một việc tạo sinh, nhưng nhìn bức ảnh chưa cho biết công cụ đã dùng những mô hình nào.",
+            "chuTrenManHinh": "Chức năng tạo ảnh ≠ tên mô hình bên trong",
+            "yDoHinh": "Đặt thẻ Chức năng: tạo ảnh cạnh áp phích; phần Mô hình bên trong để dấu hỏi, không tự tô sáng nhánh mô hình ngôn ngữ lớn.",
+            "batDauGiay": 169.5,
+            "ketThucTiengGiay": 174.3,
+            "ketThucGiay": 175.7,
+            "soKyTu": 102
+          },
+          {
+            "n": 29,
+            "phan": 4,
+            "loi": "Thẻ thứ ba là trợ lý sử dụng mô hình ngôn ngữ lớn để viết thư mời tham gia ngày hội.",
+            "chuTrenManHinh": "Ví dụ 3: trợ lý hội thoại soạn thư điện tử",
+            "yDoHinh": "Trợ lý hội thoại và mô hình ngôn ngữ lớn giữ đường nối, thẻ chức năng soạn thư đặt vào nhánh ngôn ngữ.",
+            "batDauGiay": 175.7,
+            "ketThucTiengGiay": 180.1,
+            "ketThucGiay": 181.5,
+            "soKyTu": 84
+          },
+          {
+            "n": 30,
+            "phan": 4,
+            "loi": "Chức năng này tạo văn bản mới, nên ta đặt nó vào nhánh tạo sinh ngôn ngữ.",
+            "chuTrenManHinh": "Mô hình ngôn ngữ lớn tạo văn bản",
+            "yDoHinh": "Làm sáng riêng thẻ Mô hình ngôn ngữ lớn dùng để soạn thư trong nhánh tạo sinh, rồi tới các vùng học máy và trí tuệ nhân tạo; không đưa mọi mô hình ngôn ngữ vào vùng tạo sinh.",
+            "batDauGiay": 181.5,
+            "ketThucTiengGiay": 185.7,
+            "ketThucGiay": 187.1,
+            "soKyTu": 73
+          },
+          {
+            "n": 31,
+            "phan": 4,
+            "loi": "Nếu giao chính mô hình ấy nhiệm vụ phân loại thư, tên mô hình vẫn giữ nguyên nhưng công việc đang làm đã thay đổi.",
+            "chuTrenManHinh": "Cùng mô hình · Đổi công việc",
+            "yDoHinh": "Đổi yêu cầu từ soạn thư sang phân loại; giữ nguyên hộp mô hình ngôn ngữ lớn, thay kiểu đầu ra.",
+            "batDauGiay": 187.1,
+            "ketThucTiengGiay": 192.9,
+            "ketThucGiay": 194.3,
+            "soKyTu": 114
+          },
+          {
+            "n": 32,
+            "phan": 4,
+            "loi": "Muốn phân biệt cho rõ, hãy hỏi công cụ nhận gì, xử lý bằng cách nào và trả về loại kết quả gì.",
+            "chuTrenManHinh": "Nhận gì → làm gì → trả gì",
+            "yDoHinh": "Ba nhãn đầu vào, xử lý, đầu ra chạy dọc cùng một sơ đồ.",
+            "batDauGiay": 194.3,
+            "ketThucTiengGiay": 200.1,
+            "ketThucGiay": 202.1,
+            "soKyTu": 94
+          },
+          {
+            "n": 33,
+            "phan": 5,
+            "loi": "Một hệ thống chỉ phân loại thư rác, không tạo nội dung mới, có nhất thiết là trí tuệ nhân tạo tạo sinh không?",
+            "chuTrenManHinh": "Có nhất thiết là trí tuệ nhân tạo tạo sinh?",
+            "yDoHinh": "Giữ thẻ thư điện tử và hai lựa chọn “Có” / “Không nhất thiết”.",
+            "batDauGiay": 202.1,
+            "ketThucTiengGiay": 207.3,
+            "ketThucGiay": 208.7,
+            "soKyTu": 109
+          },
+          {
+            "n": 34,
+            "phan": 5,
+            "loi": "Hãy giải thích lựa chọn bằng kết quả mà hệ thống đang trả về.",
+            "chuTrenManHinh": "Giải thích bằng đầu ra",
+            "yDoHinh": "Khoanh ô đầu ra của bộ lọc; hiện biểu tượng suy nghĩ.",
+            "batDauGiay": 208.7,
+            "ketThucTiengGiay": 211.5,
+            "ketThucGiay": 212.1,
+            "soKyTu": 61
+          },
+          {
+            "n": 35,
+            "phan": 5,
+            "dungGiay": 5,
+            "chuTrenManHinh": "5 giây suy nghĩ",
+            "yDoHinh": "Giữ câu hỏi và chạy năm chấm đếm, không phát lời.",
+            "batDauGiay": 212.1,
+            "ketThucTiengGiay": 212.1,
+            "ketThucGiay": 217.1,
+            "soKyTu": 0
+          },
+          {
+            "n": 36,
+            "phan": 5,
+            "loi": "Không nhất thiết, vì học máy có thể dùng để phân loại mà không cần tạo nội dung mới.",
+            "chuTrenManHinh": "Phân loại không đồng nghĩa tạo sinh",
+            "yDoHinh": "Sáng lựa chọn “Không nhất thiết”; nối nhãn đầu ra với vùng học máy.",
+            "batDauGiay": 217.1,
+            "ketThucTiengGiay": 221.6,
+            "ketThucGiay": 223,
+            "soKyTu": 84
+          },
+          {
+            "n": 37,
+            "phan": 5,
+            "loi": "Nếu dùng mô hình ngôn ngữ cho việc đó, hãy nói rõ đây là mô hình ngôn ngữ đang làm nhiệm vụ phân loại.",
+            "chuTrenManHinh": "Mô hình ngôn ngữ đang phân loại thư",
+            "yDoHinh": "Hai dòng riêng “Mô hình: mô hình ngôn ngữ lớn” và “Công việc: phân loại thư” xuất hiện.",
+            "batDauGiay": 223,
+            "ketThucTiengGiay": 228.4,
+            "ketThucGiay": 229.8,
+            "soKyTu": 102
+          },
+          {
+            "n": 38,
+            "phan": 5,
+            "loi": "Trí tuệ nhân tạo là lĩnh vực rộng, học máy là một cách học từ dữ liệu, còn tạo sinh nói về việc tạo nội dung.",
+            "chuTrenManHinh": "Lĩnh vực rộng → cách học → khả năng tạo nội dung",
+            "yDoHinh": "Sáng ba vùng theo thứ tự lời đọc; nhãn mỗi vùng xuất hiện ngắn gọn.",
+            "batDauGiay": 229.8,
+            "ketThucTiengGiay": 235.8,
+            "ketThucGiay": 237.2,
+            "soKyTu": 109
+          },
+          {
+            "n": 39,
+            "phan": 5,
+            "loi": "Mô hình ngôn ngữ lớn xử lý văn bản, còn ứng dụng trò chuyện là nơi bạn gửi câu hỏi và nhận câu trả lời.",
+            "chuTrenManHinh": "Ứng dụng nhận câu hỏi · Mô hình xử lý",
+            "yDoHinh": "Đặt mô hình ngôn ngữ lớn trong bản đồ và trợ lý hội thoại bên ngoài nối vào như lớp ứng dụng.",
+            "batDauGiay": 237.2,
+            "ketThucTiengGiay": 242.8,
+            "ketThucGiay": 244.2,
+            "soKyTu": 103
+          },
+          {
+            "n": 40,
+            "phan": 5,
+            "loi": "Ở video tiếp theo, mình sẽ nhìn lại lịch sử để hiểu vì sao các công cụ này ngày càng phổ biến.",
+            "chuTrenManHinh": "Tiếp theo: lịch sử trí tuệ nhân tạo",
+            "yDoHinh": "Bản đồ thu nhỏ vào góc, một đường thời gian mở ra.",
+            "batDauGiay": 244.2,
+            "ketThucTiengGiay": 249.2,
+            "ketThucGiay": 251.2,
+            "soKyTu": 94
+          }
+        ]
+      },
+      "feedback": [
+        {
+          "id": "v1-n01-a",
+          "channel": "binh-luan",
+          "sender": "ng-78ed1a0e",
+          "sanitizedText": "Em vẫn lẫn ứng dụng trò chuyện với mô hình phía sau ở đoạn 20 đến 23.",
+          "time": "2026-09-17T12:23:14.479Z",
+          "label": "gop-y",
+          "moderationBy": "model",
+          "isQuarantined": false
+        },
+        {
+          "id": "v1-n01-b",
+          "channel": "khao-sat",
+          "sender": "ng-6222ed55",
+          "sanitizedText": "Phần app và mô hình chưa nói rõ khác nhau thế nào.",
+          "time": "2026-09-17T12:23:14.480Z",
+          "label": "gop-y",
+          "moderationBy": "model",
+          "isQuarantined": false
+        }
+      ],
+      "issues": [
+        {
+          "id": "is-1",
+          "key": "issue-01",
+          "summary": "Phân biệt giữa ứng dụng trò chuyện và mô hình phía sau chưa rõ, khiến người học còn nhầm lẫn hai thành phần này.",
+          "category": "kho-hieu",
+          "feedbackIds": ["v1-n01-a", "v1-n01-b"],
+          "location": {
+            "status": "da-dinh-vi",
+            "sentenceNs": [20, 21, 22, 23],
+            "basis": "Góp ý v1-n01-a nêu rõ đoạn 20–23; góp ý v1-n01-b cũng nói phần “app và mô hình” chưa rõ, trùng với nội dung các câu này."
+          },
+          "stances": [],
+          "uncertainties": [
+            "Chỉ có kịch bản văn bản, không thể kiểm tra trực tiếp hình minh họa, nhịp trình bày hoặc giọng đọc ở đoạn này.",
+            "Góp ý v1-n01-b không nêu mốc câu cụ thể; vị trí được gom theo chủ đề và đối chiếu với góp ý v1-n01-a."
+          ],
+          "causeHypothesis": null,
+          "impact": {
+            "level": "vua",
+            "reason": "Đây là phân biệt khái niệm trọng tâm của video; nhầm lẫn có thể ảnh hưởng đến việc hiểu vai trò của ứng dụng và mô hình ngôn ngữ lớn."
+          },
+          "options": [
+            {
+              "id": "is-1-A",
+              "label": "A",
+              "title": "Làm rõ vai trò khác nhau bằng luồng hỏi–đáp",
+              "rationale": "Nêu trực tiếp ứng dụng là nơi người dùng tương tác, còn mô hình là thành phần xử lý phía sau; sau đó dùng luồng thông tin để củng cố phân biệt này.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Câu hỏi đi từ ứng dụng đến mô hình để xử lý, rồi câu trả lời quay về ứng dụng hiển thị cho bạn."
+                },
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng có thể gửi yêu cầu đến mô hình viết văn bản, mô hình tạo ảnh hoặc những công cụ khác."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì thế, tên ứng dụng không cho biết chắc chắn mô hình hoặc công cụ nào đang xử lý yêu cầu của bạn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần kiểm tra hình minh họa có thể hiện rõ hai lớp riêng biệt: ứng dụng ở phía người dùng và mô hình ở phía xử lý, cùng chiều đi và về của thông tin.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": [],
+              "standaloneWork": {
+                "cauThuLai": [19, 20, 21, 22, 23, 24],
+                "soKyTuThuLai": 595,
+                "tongKyTuGoc": 3637,
+                "canhDungLai": [19, 20, 21, 22, 23, 24],
+                "tongCanh": 40,
+                "phuDeSua": [20, 21, 22, 23],
+                "xemLaiVideo": []
+              }
+            },
+            {
+              "id": "is-1-B",
+              "label": "B",
+              "title": "Giữ lời đọc ngắn, tăng nhãn phân biệt trên màn hình",
+              "rationale": "Phương án này giảm tải lời giải thích và dùng chữ trên màn hình để đóng đinh vai trò của từng thành phần, phù hợp khi sơ đồ minh họa đã có luồng kết nối rõ.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện giúp bạn gửi câu hỏi, còn mô hình ngôn ngữ lớn xử lý câu hỏi đó ở phía sau."
+                },
+                {
+                  "n": 20,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                  "after": "Ứng dụng: gửi · Mô hình: xử lý"
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn nhìn thấy ứng dụng trò chuyện, nhưng mô hình phía sau mới tạo nội dung cho câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "chuTrenManHinh",
+                  "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                  "after": "Bạn dùng ứng dụng · Mô hình xử lý"
+                },
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Ứng dụng không phải là mô hình, vì nó có thể kết nối với nhiều mô hình và công cụ khác nhau."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Do đó, chỉ nhìn tên ứng dụng thì chưa thể biết chính xác thành phần nào đang xử lý yêu cầu."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần kiểm tra các nhãn trên màn hình và đường nối có đủ rõ để người xem không hiểu ứng dụng là chính mô hình.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": [],
+              "standaloneWork": {
+                "cauThuLai": [19, 20, 21, 22, 23, 24],
+                "soKyTuThuLai": 564,
+                "tongKyTuGoc": 3637,
+                "canhDungLai": [19, 20, 21, 22, 23, 24],
+                "tongCanh": 40,
+                "phuDeSua": [20, 21, 22, 23],
+                "xemLaiVideo": [20, 21]
+              }
+            }
+          ],
+          "independentSenders": 2,
+          "mentions": 2,
+          "sendersVerified": true,
+          "hasDisagreement": false
+        }
+      ],
+      "cases": [
+        {
+          "id": "rg-20-23",
+          "type": "vung",
+          "title": "Phân biệt giữa ứng dụng trò chuyện và mô hình phía sau chưa rõ, khiến người học còn nhầm lẫn hai thành phần này.",
+          "issueIds": ["is-1"],
+          "sentenceNs": [20, 21, 22, 23],
+          "tuGiay": 121.5,
+          "denGiay": 146.8,
+          "issues": [
+            {
+              "id": "is-1",
+              "key": "issue-01",
+              "summary": "Phân biệt giữa ứng dụng trò chuyện và mô hình phía sau chưa rõ, khiến người học còn nhầm lẫn hai thành phần này.",
+              "category": "kho-hieu",
+              "feedbackIds": ["v1-n01-a", "v1-n01-b"],
+              "location": {
+                "status": "da-dinh-vi",
+                "sentenceNs": [20, 21, 22, 23],
+                "basis": "Góp ý v1-n01-a nêu rõ đoạn 20–23; góp ý v1-n01-b cũng nói phần “app và mô hình” chưa rõ, trùng với nội dung các câu này."
+              },
+              "stances": [],
+              "uncertainties": [
+                "Chỉ có kịch bản văn bản, không thể kiểm tra trực tiếp hình minh họa, nhịp trình bày hoặc giọng đọc ở đoạn này.",
+                "Góp ý v1-n01-b không nêu mốc câu cụ thể; vị trí được gom theo chủ đề và đối chiếu với góp ý v1-n01-a."
+              ],
+              "causeHypothesis": null,
+              "impact": {
+                "level": "vua",
+                "reason": "Đây là phân biệt khái niệm trọng tâm của video; nhầm lẫn có thể ảnh hưởng đến việc hiểu vai trò của ứng dụng và mô hình ngôn ngữ lớn."
+              },
+              "options": [
+                {
+                  "id": "rg-20-23-A",
+                  "label": "A",
+                  "title": "Làm rõ vai trò khác nhau bằng luồng hỏi–đáp",
+                  "rationale": "Nêu trực tiếp ứng dụng là nơi người dùng tương tác, còn mô hình là thành phần xử lý phía sau; sau đó dùng luồng thông tin để củng cố phân biệt này.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau tạo câu trả lời."
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Câu hỏi đi từ ứng dụng đến mô hình để xử lý, rồi câu trả lời quay về ứng dụng hiển thị cho bạn."
+                    },
+                    {
+                      "n": 22,
+                      "field": "loi",
+                      "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                      "after": "Một ứng dụng có thể gửi yêu cầu đến mô hình viết văn bản, mô hình tạo ảnh hoặc những công cụ khác."
+                    },
+                    {
+                      "n": 23,
+                      "field": "loi",
+                      "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                      "after": "Vì thế, tên ứng dụng không cho biết chắc chắn mô hình hoặc công cụ nào đang xử lý yêu cầu của bạn."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": "Cần kiểm tra hình minh họa có thể hiện rõ hai lớp riêng biệt: ứng dụng ở phía người dùng và mô hình ở phía xử lý, cùng chiều đi và về của thông tin.",
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": [],
+                  "standaloneWork": {
+                    "cauThuLai": [19, 20, 21, 22, 23, 24],
+                    "soKyTuThuLai": 595,
+                    "tongKyTuGoc": 3637,
+                    "canhDungLai": [19, 20, 21, 22, 23, 24],
+                    "tongCanh": 40,
+                    "phuDeSua": [20, 21, 22, 23],
+                    "xemLaiVideo": []
+                  }
+                },
+                {
+                  "id": "rg-20-23-B",
+                  "label": "B",
+                  "title": "Giữ lời đọc ngắn, tăng nhãn phân biệt trên màn hình",
+                  "rationale": "Phương án này giảm tải lời giải thích và dùng chữ trên màn hình để đóng đinh vai trò của từng thành phần, phù hợp khi sơ đồ minh họa đã có luồng kết nối rõ.",
+                  "patches": [
+                    {
+                      "n": 20,
+                      "field": "loi",
+                      "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                      "after": "Ứng dụng trò chuyện giúp bạn gửi câu hỏi, còn mô hình ngôn ngữ lớn xử lý câu hỏi đó ở phía sau."
+                    },
+                    {
+                      "n": 20,
+                      "field": "chuTrenManHinh",
+                      "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                      "after": "Ứng dụng: gửi · Mô hình: xử lý"
+                    },
+                    {
+                      "n": 21,
+                      "field": "loi",
+                      "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                      "after": "Bạn nhìn thấy ứng dụng trò chuyện, nhưng mô hình phía sau mới tạo nội dung cho câu trả lời."
+                    },
+                    {
+                      "n": 21,
+                      "field": "chuTrenManHinh",
+                      "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                      "after": "Bạn dùng ứng dụng · Mô hình xử lý"
+                    },
+                    {
+                      "n": 22,
+                      "field": "loi",
+                      "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                      "after": "Ứng dụng không phải là mô hình, vì nó có thể kết nối với nhiều mô hình và công cụ khác nhau."
+                    },
+                    {
+                      "n": 23,
+                      "field": "loi",
+                      "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                      "after": "Do đó, chỉ nhìn tên ứng dụng thì chưa thể biết chính xác thành phần nào đang xử lý yêu cầu."
+                    }
+                  ],
+                  "expectedEffect": "giai-quyet",
+                  "remaining": null,
+                  "needsHumanCheck": "Cần kiểm tra các nhãn trên màn hình và đường nối có đủ rõ để người xem không hiểu ứng dụng là chính mô hình.",
+                  "unsupportedOperation": null,
+                  "status": "hop-le",
+                  "statusReasons": [],
+                  "standaloneWork": {
+                    "cauThuLai": [19, 20, 21, 22, 23, 24],
+                    "soKyTuThuLai": 564,
+                    "tongKyTuGoc": 3637,
+                    "canhDungLai": [19, 20, 21, 22, 23, 24],
+                    "tongCanh": 40,
+                    "phuDeSua": [20, 21, 22, 23],
+                    "xemLaiVideo": [20, 21]
+                  }
+                }
+              ],
+              "independentSenders": 2,
+              "mentions": 2,
+              "sendersVerified": true,
+              "hasDisagreement": false
+            }
+          ],
+          "options": [
+            {
+              "id": "rg-20-23-A",
+              "label": "A",
+              "title": "Làm rõ vai trò khác nhau bằng luồng hỏi–đáp",
+              "rationale": "Nêu trực tiếp ứng dụng là nơi người dùng tương tác, còn mô hình là thành phần xử lý phía sau; sau đó dùng luồng thông tin để củng cố phân biệt này.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện là nơi bạn nhập câu hỏi, còn mô hình ngôn ngữ lớn là thành phần phía sau tạo câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Câu hỏi đi từ ứng dụng đến mô hình để xử lý, rồi câu trả lời quay về ứng dụng hiển thị cho bạn."
+                },
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Một ứng dụng có thể gửi yêu cầu đến mô hình viết văn bản, mô hình tạo ảnh hoặc những công cụ khác."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Vì thế, tên ứng dụng không cho biết chắc chắn mô hình hoặc công cụ nào đang xử lý yêu cầu của bạn."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần kiểm tra hình minh họa có thể hiện rõ hai lớp riêng biệt: ứng dụng ở phía người dùng và mô hình ở phía xử lý, cùng chiều đi và về của thông tin.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": [],
+              "standaloneWork": {
+                "cauThuLai": [19, 20, 21, 22, 23, 24],
+                "soKyTuThuLai": 595,
+                "tongKyTuGoc": 3637,
+                "canhDungLai": [19, 20, 21, 22, 23, 24],
+                "tongCanh": 40,
+                "phuDeSua": [20, 21, 22, 23],
+                "xemLaiVideo": []
+              }
+            },
+            {
+              "id": "rg-20-23-B",
+              "label": "B",
+              "title": "Giữ lời đọc ngắn, tăng nhãn phân biệt trên màn hình",
+              "rationale": "Phương án này giảm tải lời giải thích và dùng chữ trên màn hình để đóng đinh vai trò của từng thành phần, phù hợp khi sơ đồ minh họa đã có luồng kết nối rõ.",
+              "patches": [
+                {
+                  "n": 20,
+                  "field": "loi",
+                  "before": "Ứng dụng trò chuyện nhận câu hỏi của bạn và có thể sử dụng mô hình ngôn ngữ lớn để tạo câu trả lời.",
+                  "after": "Ứng dụng trò chuyện giúp bạn gửi câu hỏi, còn mô hình ngôn ngữ lớn xử lý câu hỏi đó ở phía sau."
+                },
+                {
+                  "n": 20,
+                  "field": "chuTrenManHinh",
+                  "before": "Ứng dụng trò chuyện → mô hình xử lý",
+                  "after": "Ứng dụng: gửi · Mô hình: xử lý"
+                },
+                {
+                  "n": 21,
+                  "field": "loi",
+                  "before": "Bạn gõ câu hỏi trong khung trò chuyện, còn mô hình phía sau xử lý thông tin để viết câu trả lời.",
+                  "after": "Bạn nhìn thấy ứng dụng trò chuyện, nhưng mô hình phía sau mới tạo nội dung cho câu trả lời."
+                },
+                {
+                  "n": 21,
+                  "field": "chuTrenManHinh",
+                  "before": "Khung trò chuyện: nơi nhập · Mô hình: nơi xử lý",
+                  "after": "Bạn dùng ứng dụng · Mô hình xử lý"
+                },
+                {
+                  "n": 22,
+                  "field": "loi",
+                  "before": "Cùng một ứng dụng có thể nối với cả mô hình viết văn bản, mô hình tạo ảnh và các công cụ khác.",
+                  "after": "Ứng dụng không phải là mô hình, vì nó có thể kết nối với nhiều mô hình và công cụ khác nhau."
+                },
+                {
+                  "n": 23,
+                  "field": "loi",
+                  "before": "Vì vậy, tên ứng dụng bạn đang mở chưa cho biết bên trong đang dùng mô hình nào.",
+                  "after": "Do đó, chỉ nhìn tên ứng dụng thì chưa thể biết chính xác thành phần nào đang xử lý yêu cầu."
+                }
+              ],
+              "expectedEffect": "giai-quyet",
+              "remaining": null,
+              "needsHumanCheck": "Cần kiểm tra các nhãn trên màn hình và đường nối có đủ rõ để người xem không hiểu ứng dụng là chính mô hình.",
+              "unsupportedOperation": null,
+              "status": "hop-le",
+              "statusReasons": [],
+              "standaloneWork": {
+                "cauThuLai": [19, 20, 21, 22, 23, 24],
+                "soKyTuThuLai": 564,
+                "tongKyTuGoc": 3637,
+                "canhDungLai": [19, 20, 21, 22, 23, 24],
+                "tongCanh": 40,
+                "phuDeSua": [20, 21, 22, 23],
+                "xemLaiVideo": [20, 21]
+              }
+            }
+          ],
+          "hasDisagreement": false,
+          "independentSenders": 2,
+          "mentions": 2,
+          "flags": [],
+          "status": "xong"
+        }
+      ],
+      "validation": {
+        "findings": [],
+        "checks": {
+          "schemaOk": true,
+          "feedbackCoverageOk": true,
+          "evidenceOk": true,
+          "locationsOk": true,
+          "patchesOk": true
+        }
+      },
+      "unassignedFeedback": [],
+      "quarantinedFeedback": []
+    }
+  }
+}

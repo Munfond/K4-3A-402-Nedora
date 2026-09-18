@@ -135,10 +135,40 @@ export default function VideoDetailPage({
   useEffect(() => {
     if (queryRunId) {
       setActiveRunId(queryRunId);
-    } else {
-      setActiveRunId(getLastRunId(runScope));
+      return;
     }
-  }, [queryRunId, runScope]);
+
+    const nhoTrongMay = getLastRunId(runScope);
+    if (nhoTrongMay) {
+      setActiveRunId(nhoTrongMay);
+      return;
+    }
+
+    // Máy chưa từng chạy run nào (hoặc đã xoá dữ liệu trình duyệt) thì lấy đợt
+    // gần nhất của video từ service, để mở trang là thấy kết quả luôn.
+    let active = true;
+    revisionClient
+      .listRuns()
+      .then((data) => {
+        if (!active) return;
+        const ganNhat = (data?.runs ?? []).find(
+          (r) =>
+            r.videoId === videoId &&
+            (r.versionId ?? "v1") === versionId &&
+            r.status === "xong",
+        );
+        if (ganNhat?.runId) {
+          setActiveRunId(ganNhat.runId);
+          setLastRunId(ganNhat.runId, runScope);
+        }
+      })
+      .catch(() => {
+        // Service không chạy: giữ trạng thái trống, trang đã có thông báo riêng
+      });
+    return () => {
+      active = false;
+    };
+  }, [queryRunId, runScope, videoId, versionId]);
 
   // Lấy dữ liệu run qua revision-service
   const {
@@ -215,6 +245,10 @@ export default function VideoDetailPage({
     if (streamingCases && streamingCases.length > 0) return streamingCases;
     return [];
   }, [result?.cases, streamingCases]);
+
+  // revision@3 trả việc trong brief.viec, không còn đổ vào result.cases như v2.
+  // Thiếu cờ này thì run v3 có việc vẫn rơi vào màn "không có đề xuất nào".
+  const coViecV3 = (result?.brief?.viec?.length ?? 0) > 0;
   const allFeedback = useMemo(() => result?.feedback || [], [result]);
 
   const {
@@ -895,7 +929,7 @@ export default function VideoDetailPage({
                   Chạy lại phân tích
                 </Button>
               </div>
-            ) : cases.length === 0 ? (
+            ) : cases.length === 0 && !coViecV3 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed space-y-4 bg-muted/10">
                 <Sparkles className="size-10 text-primary" />
                 <div className="space-y-1">

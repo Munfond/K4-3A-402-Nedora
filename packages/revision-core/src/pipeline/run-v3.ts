@@ -50,6 +50,11 @@ export interface RunV3Deps extends PipelineDeps {
   model?: any;
   modelMode?: "that" | "gia-lap";
   modelId?: string;
+  /**
+   * Cho phép người gọi cấp sẵn runId. Service dùng để trả runId về trình duyệt
+   * ngay lập tức rồi chạy pipeline ở nền, nhờ đó UI mở được luồng sự kiện.
+   */
+  runId?: string;
 }
 
 export interface RunV3Output {
@@ -67,7 +72,7 @@ export async function runRevisionV3(
   deps: RunV3Deps = {},
 ): Promise<RunV3Output> {
   const store = deps.store || getDefaultStore();
-  const runId = generateRunId();
+  const runId = deps.runId || generateRunId();
   const startTime = Date.now();
 
   const abortController = new AbortController();

@@ -17,6 +17,7 @@ import {
   getOrBuildVideoIndex,
   loadD1RawFeedback,
   loadScriptD1,
+  generateRunId,
   type NewFeedbackInput,
   nextStoredFeedbackIndex,
   PIPELINE_GRAPH,
@@ -198,7 +199,12 @@ app.post("/runs", async (c) => {
       const modelMode: "that" | "gia-lap" =
         model && !isGiaLap ? "that" : "gia-lap";
 
-      const { runId, status } = await runRevisionV3(
+      // Sinh runId trước và trả về ngay. Một lượt chạy thật mất vài phút; nếu
+      // chờ chạy xong mới trả thì trình duyệt chưa có runId nên không mở được
+      // luồng sự kiện, và sơ đồ đứng ở "Chưa chạy" suốt thời gian đó.
+      const runId = generateRunId();
+
+      void runRevisionV3(
         input as RunV3Input,
         {
           store,
@@ -206,14 +212,18 @@ app.post("/runs", async (c) => {
           model: modelMode === "that" ? model : undefined,
           modelMode,
           modelId: modelMode === "that" ? resolvedModelId : "mock",
+          runId,
         } as any,
-      );
+      ).catch((err: unknown) => {
+        // runRevisionV3 tự ghi sự kiện run.failed; log thêm cho người vận hành.
+        console.error(`[run ${runId}] thất bại:`, err);
+      });
 
       return c.json(
         {
           runId,
           graphVersion: GRAPH_VERSION_V3,
-          status,
+          status: "dang-chay",
         },
         202,
       );
