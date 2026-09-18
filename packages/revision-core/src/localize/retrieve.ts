@@ -123,12 +123,9 @@ export class BM25Engine {
     let totalFullLen = 0;
 
     for (const seg of segments) {
-      // 1. Spoken text: lời + phụ đề tương ứng
-      const matchingSubs = (videoIndex.trangPhuDe || [])
-        .filter((p) => p.tu >= seg.batDau - 0.2 && p.den <= seg.ketThuc + 0.2)
-        .map((p) => p.chu)
-        .join(" ");
-      const spokenText = `${seg.loi || ""} ${matchingSubs}`;
+      // 1. Spoken text: lời thoại của câu
+      const spokenText = seg.loi || "";
+
       const spokenTokens = tokenize(spokenText, true);
       const spokenDoc: FieldDoc = {
         n: seg.n,

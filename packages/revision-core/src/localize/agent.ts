@@ -1,7 +1,12 @@
 import { ToolLoopAgent, stepCountIs } from "ai";
 import type { Claim, Localization } from "../claims/types";
 import type { VideoIndex } from "../video-index/types";
-import { createRevisionTools, type ToolCallTelemetry } from "../tools/registry";
+import {
+  createRevisionTools,
+  type ToolCallTelemetry,
+  searchSegmentsFn,
+  findByTimeFn,
+} from "../tools/registry";
 import { retrieveCandidates } from "./retrieve";
 import { verifyCandidates } from "./verify";
 
@@ -76,23 +81,23 @@ Quy tắc:
   // Bước 1: Tra cứu BM25 bằng search_segments
   let step = 0;
   step++;
-  const searchRes = await tools.search_segments.execute({
+  const searchRes = (await (tools.search_segments.execute as any)({
     query: claim.trich,
     topK: 5,
-  });
+  })) as ReturnType<typeof searchSegmentsFn>;
 
   let candidates = searchRes.ungVien;
 
   // Bước 2: Nếu có mốc thời gian, kiểm tra find_by_time
   if (step < maxSteps && claim.mocNoi) {
     step++;
-    const timeRes = await tools.find_by_time.execute({
+    const timeRes = (await (tools.find_by_time.execute as any)({
       tu: claim.mocNoi.tu,
       den: claim.mocNoi.den,
-    });
+    })) as ReturnType<typeof findByTimeFn>;
     if (timeRes.ketQua.length > 0) {
       // Gộp điểm cho các câu khớp thời gian
-      const timeNs = new Set(timeRes.ketQua.map((r) => r.n));
+      const timeNs = new Set(timeRes.ketQua.map((r: any) => r.n));
       for (const cand of candidates) {
         if (timeNs.has(cand.n)) {
           cand.diem = Math.min(1.0, cand.diem + 0.3);
@@ -105,7 +110,7 @@ Quy tắc:
   if (step < maxSteps && candidates.length > 0) {
     step++;
     const topN = candidates[0].n;
-    await tools.get_segment.execute({ n: topN, lanCan: 1 });
+    await (tools.get_segment.execute as any)({ n: topN, lanCan: 1 });
   }
 
   // Bước 4: Kiểm tra glossary nếu có thuật ngữ
@@ -116,7 +121,7 @@ Quy tắc:
       text.includes(g.thuatNgu.toLowerCase()),
     );
     if (gTerm) {
-      await tools.glossary.execute({ term: gTerm.thuatNgu });
+      await (tools.glossary.execute as any)({ term: gTerm.thuatNgu });
     }
   }
 

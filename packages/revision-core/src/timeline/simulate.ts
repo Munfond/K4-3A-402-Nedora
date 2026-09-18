@@ -126,11 +126,19 @@ export function simulateTimeline(
       newDuration = Math.max(0.5, oldDuration + deltaDung);
     }
 
-    if (visualChange) {
-      if (segment.slideId) {
-        const slideNum =
-          parseInt(segment.slideId.replace(/\D/g, ""), 10) || segment.n;
-        canhDungLaiSet.add(slideNum);
+    if (visualChange || loiChange || dungChange) {
+      canhDungLaiSet.add(segment.n);
+      if (segment.slideDungDan || segment.slideId) {
+        const chain = videoIndex.slideChains?.find(
+          (sc) => sc.slideId === segment.slideId || sc.cau.includes(segment.n),
+        );
+        if (chain) {
+          for (const cNum of chain.cau) {
+            if (visualChange || cNum >= segment.n) {
+              canhDungLaiSet.add(cNum);
+            }
+          }
+        }
       }
     }
 

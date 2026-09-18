@@ -1,3 +1,7 @@
+import type { SubtitlePage } from "./subtitle";
+
+export type { SubtitlePage };
+
 export interface SegmentIndex {
   n: number;
   phan: number;

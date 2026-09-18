@@ -16,6 +16,8 @@ export * from "./prompt";
 export * from "./prompt-p1";
 export * from "./schema-p1";
 export * from "./run-step";
+export * from "./v3/schema-v3";
+export * from "./v3/prompt-sua-loi";
 
 export interface RevisionAgentScriptSentence {
   n: number;
