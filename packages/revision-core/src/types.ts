@@ -264,6 +264,7 @@ export interface RevisionRunResult {
 import type { PlanSimulation } from "./timeline/types";
 
 export interface RevisionBrief {
+  canhBao?: string[];
   pheu: {
     gopY: number;
     cachLy: number;

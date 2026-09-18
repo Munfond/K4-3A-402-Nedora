@@ -6,6 +6,7 @@ import type { GlobalPlanResult } from "./plan";
 import type { JudgeEvaluationResult } from "./judge";
 
 export interface BuildBriefOptions {
+  canhBao?: string[];
   feedback: FeedbackItem[];
   quarantinedFeedback: FeedbackItem[];
   pendingFeedback?: FeedbackItem[];
@@ -149,6 +150,10 @@ export function buildRevisionBrief(options: BuildBriefOptions): RevisionBrief {
   }));
 
   return {
+    canhBao:
+      options.canhBao && options.canhBao.length > 0
+        ? options.canhBao
+        : undefined,
     pheu,
     viec,
     cauHoi,

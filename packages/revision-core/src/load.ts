@@ -21,11 +21,13 @@ function readFileContent(
   filename: string,
 ): string {
   if (typeof packTarget === "string") {
-    const p = join(packTarget, filename);
-    if (!existsSync(p)) {
-      throw new Error(`File không tồn tại: ${p}`);
-    }
-    return readFileSync(p, "utf-8");
+    const p1 = join(packTarget, filename);
+    if (existsSync(p1)) return readFileSync(p1, "utf-8");
+    const p2 = join(packTarget, "video-mau", filename);
+    if (existsSync(p2)) return readFileSync(p2, "utf-8");
+    const p3 = join(packTarget, "vi-du", filename);
+    if (existsSync(p3)) return readFileSync(p3, "utf-8");
+    throw new Error(`File không tồn tại: ${p1}`);
   }
   return packTarget.readPackFile(filename);
 }
@@ -195,17 +197,28 @@ export function loadScriptD1(
 
 export function loadD1RawFeedback(
   packTarget: string | RevisionStore = getDefaultStore(),
+  options?: { onWarning?: (msg: string) => void },
 ): FeedbackItem[] {
   let gopYList: any[] = [];
   try {
     const raw = JSON.parse(readFileContent(packTarget, "gop-y-mau.json"));
     gopYList = raw.gopY || [];
-  } catch {}
+  } catch (err: any) {
+    throw new Error(
+      `INPUT_MISSING: Không thể đọc gop-y-mau.json: ${err.message}`,
+    );
+  }
 
   let khaoSatRows: any[] = [];
   try {
     khaoSatRows = parseCsv(readFileContent(packTarget, "khao-sat-mau.csv"));
-  } catch {}
+  } catch (err: any) {
+    if (options?.onWarning) {
+      options.onWarning(
+        `Thiếu file khao-sat-mau.csv (tùy chọn): ${err.message}`,
+      );
+    }
+  }
 
   const khaoSatMap = new Map<string, any>();
   for (const r of khaoSatRows) {
@@ -345,6 +358,7 @@ export function prepareAnalyzeInput(
   input: AnalyzeInput,
   packTarget: string | RevisionStore = getDefaultStore(),
   storedFeedback: FeedbackItem[] = [],
+  options?: { onWarning?: (msg: string) => void },
 ): {
   script: ScriptData;
   allFeedback: FeedbackItem[];
@@ -356,7 +370,7 @@ export function prepareAnalyzeInput(
 
   // 1. Nạp D1 nếu bật
   if (input.includeD1Feedback) {
-    const d1Items = loadD1RawFeedback(packTarget);
+    const d1Items = loadD1RawFeedback(packTarget, options);
     if (input.feedbackIds && input.feedbackIds.length > 0) {
       allFeedback.push(
         ...d1Items.filter((f) => input.feedbackIds!.includes(f.id)),

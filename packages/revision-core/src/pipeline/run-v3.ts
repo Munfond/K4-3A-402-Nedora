@@ -91,27 +91,91 @@ export async function runRevisionV3(
       store,
     );
 
+    const canhBao: string[] = [];
     const {
       script,
       allFeedback: rawFeedbackList,
       inputHash,
-    } = prepareAnalyzeInput(input, store, deps.storedFeedback);
+    } = prepareAnalyzeInput(input, store, deps.storedFeedback, {
+      onWarning: (msg) => canhBao.push(msg),
+    });
 
-    let timecodeCsvText: string | undefined;
+    if (rawFeedbackList.length === 0) {
+      const errMsg = "Không có góp ý nào để phân tích (tổng số góp ý = 0)";
+      canhBao.push(errMsg);
+      appendRunEvent(
+        runId,
+        {
+          type: "run.failed",
+          errorCode: "NO_FEEDBACK",
+          message: errMsg,
+        },
+        undefined,
+        store,
+      );
+      updateRunStatus(runId, "loi");
+      unregisterActiveRun(runId);
+      return {
+        runId,
+        status: "loi",
+        brief: {
+          canhBao,
+          pheu: {
+            gopY: 0,
+            cachLy: 0,
+            choDuyet: 0,
+            y: 0,
+            vanDe: 0,
+            theoNhom: {},
+            deXuat: 0,
+            quaThamDinh: 0,
+          },
+          viec: [],
+          cauHoi: [],
+          ghiNhan: [],
+          vungBaoVe: [],
+          keHoach: {
+            thuLai: [],
+            kyTuThuLai: 0,
+            canhDungLai: [],
+            trangPhuDe: 0,
+            deltaTong: 0,
+            mocV2: [],
+            chuong: [],
+            viPham: [],
+            chongLan: [],
+            soVoiLamLaiToanBo: { kyTu: 0, canh: 0 },
+          },
+          nganSach: input.nganSach || { cauThuLai: 8, deltaTongGiay: 10 },
+        },
+        videoIndex: null,
+      };
+    }
+
+    let timecodeCsvText: string;
+    try {
+      timecodeCsvText = store.readPackFile("cau-timecode-d1.csv");
+    } catch (err: any) {
+      throw new Error(
+        `TIMECODE_MISSING: Thiếu file timecode bắt buộc: ${err.message}`,
+      );
+    }
+
     let transcriptText: string | undefined;
+    try {
+      transcriptText = store.readPackFile("transcript-d1.txt");
+    } catch (err: any) {
+      canhBao.push(`Thiếu file transcript: ${err.message}`);
+    }
+
     let slideJsonText: string | undefined;
+    try {
+      slideJsonText = store.readPackFile("slide-d1.json");
+    } catch (err: any) {
+      canhBao.push(`Thiếu file slide: ${err.message}`);
+    }
+
     let videoFilePath: string | undefined;
-
-    try {
-      timecodeCsvText = store.readPackFile("video-mau/cau-timecode-d1.csv");
-    } catch {}
-    try {
-      transcriptText = store.readPackFile("video-mau/transcript-d1.txt");
-    } catch {}
-    try {
-      slideJsonText = store.readPackFile("video-mau/slide-d1.json");
-    } catch {}
-
     const candidateVideo = join(store.getPackDir(), "video-mau", "d1.mp4");
     if (existsSync(candidateVideo)) {
       videoFilePath = candidateVideo;
@@ -540,6 +604,7 @@ export async function runRevisionV3(
     }
 
     const brief = buildRevisionBrief({
+      canhBao: canhBao.length > 0 ? canhBao : undefined,
       feedback: rawFeedbackList,
       quarantinedFeedback,
       claims,

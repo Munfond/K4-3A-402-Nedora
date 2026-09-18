@@ -434,6 +434,10 @@ export class FsRevisionStore implements RevisionStore {
     if (existsSync(candidate2)) {
       return readFileSync(candidate2, "utf-8");
     }
+    const candidate3 = join(this.packDir, "vi-du", filename);
+    if (existsSync(candidate3)) {
+      return readFileSync(candidate3, "utf-8");
+    }
     throw new Error(`File pack không tồn tại: ${candidate1}`);
   }
 
