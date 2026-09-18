@@ -674,11 +674,16 @@ export default function PipelineFlow({
         </div>
       </div>
 
-      {/* SƠ ĐỒ 5 NODE CỐ ĐỊNH (RESPONSIVE: HÀNG NGANG TRÊN SM, DỌC DƯỚI 640PX) */}
-      <div className="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-1.5">
+      {/* SƠ ĐỒ CÁC NODE — LƯỚI 2 HÀNG (12 node: 6 cột × 2 hàng trên màn hình rộng).
+          Trước đây xếp 1 hàng ngang nên với 12 node thì chữ bị bóp sát vào nhau. */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-x-1.5 gap-y-2.5 items-stretch">
         {nodeStates.map((node, idx) => {
           const isIteration = node.id === "lap-phuong-an";
           const isLast = idx === nodeStates.length - 1;
+          // Ẩn mũi tên ở node cuối mỗi hàng: mũi tên chỉ sang ngang, mà node
+          // cuối hàng thì node kế tiếp nằm ở đầu hàng dưới.
+          const isRowEndLg = (idx + 1) % 6 === 0;
+          const isRowEndSm = (idx + 1) % 3 === 0;
 
           // Tiêu đề phụ cho node iteration
           const iterationSubtitle = isIteration
@@ -690,7 +695,7 @@ export default function PipelineFlow({
           return (
             <div
               key={node.id}
-              className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 min-w-0"
+              className="flex items-stretch sm:items-center gap-1.5 min-w-0"
             >
               {/* Thẻ Node */}
               <div
@@ -699,7 +704,7 @@ export default function PipelineFlow({
                     setShowRegionsList((v) => !v);
                   }
                 }}
-                className={`flex-1 rounded-xl p-3 border transition-all flex flex-col justify-between gap-2 select-none ${
+                className={`flex-1 min-w-0 rounded-xl p-2.5 border transition-all flex flex-col gap-2 select-none ${
                   isIteration ? "cursor-pointer hover:border-primary/60" : ""
                 } ${
                   node.status === "dang-chay"
@@ -714,12 +719,17 @@ export default function PipelineFlow({
                 }`}
               >
                 {/* Dòng trên: Nhãn node + Icon kind */}
-                <div className="flex items-center justify-between gap-1">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                <div className="flex items-start justify-between gap-1">
+                  <div className="flex items-start gap-1.5 min-w-0">
+                    <span className="font-mono text-[10px] text-muted-foreground shrink-0 leading-4">
                       {idx + 1}.
                     </span>
-                    <span className="font-semibold text-xs text-foreground truncate">
+                    {/* Cho nhãn xuống tối đa 2 dòng: ô lưới hẹp hơn hàng ngang
+                        nên cắt 1 dòng sẽ mất chữ. */}
+                    <span
+                      className="font-semibold text-xs text-foreground leading-4 line-clamp-2"
+                      title={node.label}
+                    >
                       {node.label}
                     </span>
                   </div>
@@ -734,8 +744,9 @@ export default function PipelineFlow({
                   )}
                 </div>
 
-                {/* Dòng dưới: Trạng thái Text + Icon */}
-                <div className="flex items-center justify-between gap-1 pt-1 border-t border-border/40">
+                {/* Dòng dưới: Trạng thái Text + Icon. `mt-auto` đẩy xuống đáy để
+                    các thẻ thẳng hàng dù nhãn dài ngắn khác nhau. */}
+                <div className="flex items-center justify-between gap-1 pt-1 mt-auto border-t border-border/40">
                   {renderStatusBadge(node.status, node.runningSeconds)}
 
                   {node.ms != null && (
@@ -753,9 +764,14 @@ export default function PipelineFlow({
                 </div>
               </div>
 
-              {/* Mũi tên kết nối giữa các node (ẩn ở node cuối và ẩn trên màn hình di động) */}
+              {/* Mũi tên nối sang node kế tiếp. Ẩn ở node cuối, ẩn trên di động
+                  (xếp dọc), và ẩn ở cuối mỗi hàng của lưới. */}
               {!isLast && (
-                <div className="hidden sm:flex items-center justify-center px-0.5 shrink-0 text-muted-foreground/30">
+                <div
+                  className={`hidden items-center justify-center px-0.5 shrink-0 text-muted-foreground/30 ${
+                    isRowEndSm ? "sm:hidden" : "sm:flex"
+                  } ${isRowEndLg ? "lg:hidden" : "lg:flex"}`}
+                >
                   <ArrowRight className="size-3.5" />
                 </div>
               )}
