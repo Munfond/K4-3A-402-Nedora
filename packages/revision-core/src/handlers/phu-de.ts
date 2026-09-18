@@ -60,8 +60,9 @@ export async function handlePhuDe(ctx: HandlerContext): Promise<HandlerResult> {
         },
       ];
 
+  const kpsCount = subProfile.trangViPham.filter((t) => t.vuotChuanKps).length;
   const bangChungDo = isRepro
-    ? `Phát hiện ${subProfile.soTrangVuotKps} trang phụ đề vượt quá 17 ký tự/giây`
+    ? `Phát hiện ${kpsCount} trang phụ đề vượt quá 17 ký tự/giây`
     : `Đã đối chiếu ${subProfile.soTrang || 72} trang phụ đề: 0 trang vượt 17 ký tự/giây, độ lệch mốc câu < 0.05s (chuẩn cho phép 0.3s)`;
 
   return {

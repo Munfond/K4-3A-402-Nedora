@@ -12,6 +12,9 @@ export function simulateTimeline(
   videoIndex: VideoIndex,
   changes: Change[],
   protectedZones: number[] = [1, 2, 3],
+  options?: {
+    expandRecordingWindow?: boolean;
+  },
 ): PlanSimulation {
   const changeBySentence = new Map<number, Change[]>();
   for (const ch of changes) {
@@ -212,6 +215,34 @@ export function simulateTimeline(
     };
   });
 
+  if (options?.expandRecordingWindow) {
+    const directVoiceNs = Array.from(thuLaiSet);
+    for (const n of directVoiceNs) {
+      for (const offset of [-1, 0, 1]) {
+        const targetN = n + offset;
+        const targetSeg = videoIndex.segments.find((s) => s.n === targetN);
+        if (targetSeg && targetSeg.loi && !targetSeg.dungGiay) {
+          thuLaiSet.add(targetN);
+        }
+      }
+    }
+
+    // Tính lại tổng ký tự thoại thu lại bao gồm cả các câu trong cửa sổ nối
+    kyTuThuLai = 0;
+    for (const n of thuLaiSet) {
+      const sChanges = changeBySentence.get(n) || [];
+      const loiChange = sChanges.find((c) => c.kind === "loi") as
+        | { kind: "loi"; n: number; after: string }
+        | undefined;
+      const seg = videoIndex.segments.find((s) => s.n === n);
+      if (loiChange && loiChange.after) {
+        kyTuThuLai += loiChange.after.length;
+      } else if (seg && seg.loi) {
+        kyTuThuLai += seg.loi.length;
+      }
+    }
+  }
+
   const thuLai = Array.from(thuLaiSet).sort((a, b) => a - b);
   const canhDungLai = Array.from(canhDungLaiSet).sort((a, b) => a - b);
 
@@ -238,3 +269,12 @@ export function simulateTimeline(
     },
   };
 }
+
+export const simulatePlan = (
+  videoIndex: VideoIndex,
+  changes: Change[],
+  protectedZones: number[] = [1, 2, 3],
+) =>
+  simulateTimeline(videoIndex, changes, protectedZones, {
+    expandRecordingWindow: true,
+  });
