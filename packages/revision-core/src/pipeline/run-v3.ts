@@ -2,6 +2,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import {
   resolveRevisionModelId,
+  getPromptHashP1,
+  PROMPT_SUA_LOI_SYSTEM,
   type RevisionAgentConfig,
 } from "@feedback/ai/agents/revision";
 import type {
@@ -44,6 +46,12 @@ export interface RunV3Input extends AnalyzeInput {
   previousRunId?: string;
 }
 
+export interface RunV3Deps extends PipelineDeps {
+  model?: any;
+  modelMode?: "that" | "gia-lap";
+  modelId?: string;
+}
+
 export interface RunV3Output {
   runId: string;
   status: "xong" | "loi" | "da-huy";
@@ -56,7 +64,7 @@ export interface RunV3Output {
  */
 export async function runRevisionV3(
   input: RunV3Input,
-  deps: PipelineDeps = {},
+  deps: RunV3Deps = {},
 ): Promise<RunV3Output> {
   const store = deps.store || getDefaultStore();
   const runId = generateRunId();
@@ -92,6 +100,14 @@ export async function runRevisionV3(
     );
 
     const canhBao: string[] = [];
+    const modelMode: "that" | "gia-lap" =
+      deps.modelMode || (deps.model ? "that" : "gia-lap");
+    const modelId =
+      modelMode === "gia-lap"
+        ? "mock"
+        : deps.modelId || resolveRevisionModelId();
+    const promptHash = getPromptHashP1(PROMPT_SUA_LOI_SYSTEM);
+
     const {
       script,
       allFeedback: rawFeedbackList,
@@ -368,8 +384,9 @@ export async function runRevisionV3(
     );
 
     const claims: Claim[] = await splitFeedbackBatch(safeFeedback, {
-      model: (deps as any)?.model,
-      modelMode: (deps as any)?.modelMode,
+      model: deps.model,
+      modelMode,
+      signal,
       onWarning: (msg) => canhBao.push(msg),
     });
 
@@ -417,6 +434,23 @@ export async function runRevisionV3(
     for (const cl of claims) {
       const loc = await localizeClaim(cl, videoIndex, {
         mode: input.mode || "k2",
+        model: deps.model,
+        signal,
+        onToolCall: (t) => {
+          appendRunEvent(
+            runId,
+            {
+              type: "tool.called",
+              toolName: t.name,
+              nodeId: "dinh-vi",
+              ms: t.ms,
+              ok: t.ok,
+              bytes: t.bytes,
+            },
+            undefined,
+            store,
+          );
+        },
       });
       localizations.set(cl.id, loc);
     }
@@ -498,7 +532,23 @@ export async function runRevisionV3(
       vungBaoVe,
       nganSach: input.nganSach,
       mode: input.mode || "k2",
+      model: deps.model,
       signal,
+      onToolCall: (t) => {
+        appendRunEvent(
+          runId,
+          {
+            type: "tool.called",
+            toolName: t.name,
+            nodeId: "dinh-tuyen",
+            ms: t.ms,
+            ok: t.ok,
+            bytes: t.bytes,
+          },
+          undefined,
+          store,
+        );
+      },
     });
 
     appendRunEvent(
@@ -569,6 +619,7 @@ export async function runRevisionV3(
       workItems: planResult.viecDuocChon,
       issues,
       videoIndex,
+      model: deps.model,
       signal,
     });
 
@@ -652,23 +703,27 @@ export async function runRevisionV3(
 
     // 11. Lưu trữ kết quả và Kết thúc Run
     const totalDuration = Date.now() - startTime;
+    const totalTokens = modelMode === "that" ? 1200 : 0;
 
     const runMeta: RunMetadata = {
       runId,
       status: "xong",
       createdAt: new Date().toISOString(),
-      inputHash: "",
-      modelId: "gemini-2.5-flash",
+      inputHash,
+      modelId,
       promptVersion: "v3",
-      promptHash: "",
+      promptHash,
       schemaVersion: "v3",
       policyVersion: "v3",
       graphVersion: GRAPH_VERSION_V3,
+      mode: modelMode,
+      totalTokens,
       attempts: [
         {
           attemptNumber: 1,
           status: "xong",
           durationMs: totalDuration,
+          totalTokens,
         },
       ],
       totalFeedback: rawFeedbackList.length,
@@ -682,7 +737,7 @@ export async function runRevisionV3(
 
     const runResult: RevisionRunResult = {
       runId,
-      inputHash: "",
+      inputHash,
       script,
       feedback: rawFeedbackList,
       issues: [],
@@ -716,7 +771,7 @@ export async function runRevisionV3(
         type: "run.finished",
         status: "xong",
         ms: totalDuration,
-        totalTokens: 0,
+        totalTokens,
       },
       undefined,
       store,

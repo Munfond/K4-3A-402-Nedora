@@ -8,9 +8,9 @@ import {
   glossaryFn,
   createRevisionTools,
 } from "../tools/registry";
-import { ToolLoopAgent, stepCountIs } from "ai";
+import { ToolLoopAgent, stepCountIs, Output, generateObject } from "ai";
 import { buildScriptEditPrompt, PROMPT_SUA_LOI_SYSTEM } from "@feedback/ai";
-import type { ScriptProposal, ScriptEditOutput } from "@feedback/ai";
+import { ScriptEditOutput, type ScriptProposal } from "@feedback/ai";
 import type { Change, PlanSimulation } from "../timeline/types";
 import { countSyllables } from "../video-index/pace";
 
@@ -42,7 +42,6 @@ export async function handleNoiDung(
     coNguonDoiChieu = true;
     kienThucDoiChieu = `${courseSearch.ketQua[0].tieuDe}: ${courseSearch.ketQua[0].trichDan} (Nguồn: ${courseSearch.ketQua[0].nguon})`;
   } else if (isNoiDungSai) {
-    // Nếu là nội dung sai nhưng không tìm thấy tài liệu đối chiếu
     coNguonDoiChieu = false;
   }
 
@@ -51,7 +50,34 @@ export async function handleNoiDung(
     ? ctx.vungBaoVe.flatMap((v) => v.ns)
     : [1, 2, 3];
 
-  // 2. Chuẩn bị ngữ cảnh cho Agent
+  // 2. Nếu không có mô hình (chế độ giả lập): Trả việc can-nguoi-viet kèm vị trí và bằng chứng, không tạo đề xuất sửa lời
+  if (!model) {
+    return {
+      vanDeId: issue.id,
+      nhom: "bien-kich",
+      uuTien: isNoiDungSai ? 1 : issue.mucDoUuTien || 2,
+      lyDoUuTien: isNoiDungSai
+        ? "Lỗi sai kiến thức chuyên môn bắt buộc phải sửa để đảm bảo tính sư phạm"
+        : "Giải thích khó hiểu làm giảm hiệu quả tiếp thu của học viên",
+      viTri: {
+        ns,
+        v1: [startSec, endSec],
+      },
+      bangChungDo: `Chế độ giả lập: câu [${ns.join(", ")}] cần biên kịch tự viết đề xuất sửa lời`,
+      deXuat: {
+        kieu: "can-nguoi-viet",
+        lyDo: "Chạy chế độ giả lập, không có mô hình ngôn ngữ để sinh đề xuất sửa lời",
+        cau: ns,
+        thoiGian: [startSec, endSec],
+      },
+      changes: [],
+      canhBao: [
+        `Chế độ giả lập: câu [${ns.join(", ")}] cần người viết kịch bản xem xét và chỉnh sửa thủ công`,
+      ],
+    };
+  }
+
+  // 3. Chuẩn bị ngữ cảnh cho Agent
   const lanCan = getSegmentFn(videoIndex, targetN, 1);
   const contextSegments = lanCan.lanCan.map((s) => ({
     n: s.n,
@@ -62,19 +88,54 @@ export async function handleNoiDung(
     amTiet: s.amTiet || countSyllables(s.loi || ""),
   }));
 
-  // Kiểm tra xem có thể chạy mô hình thật không
-  const isMock =
-    process.env.REVISION_MODEL_MODE === "mock" ||
-    !model ||
-    !process.env.OPENAI_API_KEY;
-
   let proposal: ScriptProposal | null = null;
   let alternativeProposal: ScriptProposal | null = null;
+  // Luật: không fallback im lặng. Lỗi gọi model phải đi tới brief và giao diện.
+  let loiGoiModel: string | null = null;
 
-  if (!isMock && model && mode === "k2") {
-    // Luồng K2: ToolLoopAgent lặp tối đa 3 bước với các công cụ kiểm định
+  const userPrompt = buildScriptEditPrompt({
+    vanDe: {
+      id: issue.id,
+      intent: issue.intent,
+      tieuDe: issue.tieuDe,
+      moTa: issue.moTa,
+      trongTam: issue.trongTam,
+      ngCanh: issue.ngCanh,
+      thuatNguLienQuan: issue.thuatNguLienQuan,
+    },
+    segments: contextSegments,
+    vungBaoVe: ctx.vungBaoVe,
+    kienThucDoiChieu: coNguonDoiChieu ? kienThucDoiChieu : undefined,
+  });
+
+  if (mode === "k1") {
+    // Luồng K1: 1-pass generateObject không gọi tool
     try {
-      const tools = createRevisionTools(videoIndex);
+      const result = await generateObject({
+        model,
+        schema: ScriptEditOutput,
+        system: PROMPT_SUA_LOI_SYSTEM,
+        prompt: userPrompt,
+        abortSignal: signal,
+      });
+
+      if (result.object) {
+        proposal = result.object.recommended;
+        alternativeProposal = result.object.alternative || null;
+      }
+    } catch (err) {
+      loiGoiModel = `K1 generateObject lỗi: ${err instanceof Error ? err.message : String(err)}`;
+    }
+  } else {
+    // Luồng K2: ToolLoopAgent lặp tối đa 3 bước để thu thập bằng chứng bằng
+    // các công cụ chỉ đọc, rồi chốt đề xuất bằng một bước có cấu trúc.
+    // Không dùng `output` của agent: khi model trả text tự do, agent ném
+    // NoOutputGeneratedError và ta mất luôn phần bằng chứng đã thu thập.
+    let bangChungTool = "";
+    try {
+      const tools = createRevisionTools(videoIndex, {
+        onToolCall: ctx.onToolCall,
+      });
       const agent = new ToolLoopAgent({
         model,
         instructions: PROMPT_SUA_LOI_SYSTEM,
@@ -82,119 +143,65 @@ export async function handleNoiDung(
         stopWhen: stepCountIs(3),
       });
 
-      const userPrompt = buildScriptEditPrompt({
-        vanDe: {
-          id: issue.id,
-          intent: issue.intent,
-          tieuDe: issue.tieuDe,
-          moTa: issue.moTa,
-          trongTam: issue.trongTam,
-          ngCanh: issue.ngCanh,
-          thuatNguLienQuan: issue.thuatNguLienQuan,
-        },
-        segments: contextSegments,
-        vungBaoVe: ctx.vungBaoVe,
-        kienThucDoiChieu: coNguonDoiChieu ? kienThucDoiChieu : undefined,
-      });
-
       const result = await agent.generate({
         prompt: userPrompt,
         abortSignal: signal,
       });
+      bangChungTool = result.text || "";
+    } catch (err) {
+      loiGoiModel = `K2 vòng công cụ lỗi: ${err instanceof Error ? err.message : String(err)}`;
+    }
 
-      const jsonMatch = result.text.match(/\{[\s\S]*"recommended"[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as ScriptEditOutput;
-        proposal = parsed.recommended;
-        alternativeProposal = parsed.alternative || null;
+    try {
+      const chot = await generateObject({
+        model,
+        schema: ScriptEditOutput,
+        system: PROMPT_SUA_LOI_SYSTEM,
+        prompt: bangChungTool
+          ? `${userPrompt}\n\n<ket_qua_tra_cuu>\n${bangChungTool}\n</ket_qua_tra_cuu>\n\nDựa trên phần tra cứu trên, đưa ra đề xuất cuối cùng.`
+          : userPrompt,
+        abortSignal: signal,
+      });
+
+      if (chot.object) {
+        proposal = chot.object.recommended;
+        alternativeProposal = chot.object.alternative || null;
+        loiGoiModel = null;
       }
     } catch (err) {
-      console.warn(
-        "[handleNoiDung] Lỗi ToolLoopAgent LLM, chuyển sang bộ sinh chuẩn mực:",
-        err,
-      );
+      loiGoiModel = `K2 chốt đề xuất lỗi: ${err instanceof Error ? err.message : String(err)}`;
     }
   }
 
-  // 3. Nếu chưa có proposal từ LLM (chế độ mock, test hoặc agent không trả JSON chuẩn)
-  // Tạo đề xuất chuẩn mực theo đúng thiết kế C5/D1 đã được kiểm chứng
-  if (!proposal) {
-    if (targetN === 22 || ns.includes(22)) {
-      // Ca D1 câu 22: Phân biệt mô hình và ứng dụng (nối nhiều mô hình)
-      proposal = {
-        strategy:
-          "Làm rõ mối quan hệ giữa ứng dụng trò chuyện và mô hình ngôn ngữ lớn",
-        thayDoiChinh:
-          "Bổ sung giải thích: một ứng dụng có thể phối hợp nhiều mô hình chuyên biệt",
-        nhamToi:
-          "Khắc phục hiểu nhầm một ứng dụng chỉ nối được với một mô hình",
-        changes: [
-          {
-            kind: "loi",
-            n: 22,
-            after:
-              "Trong thực tế, một ứng dụng trò chuyện có thể phối hợp nhiều mô hình chuyên biệt để xử lý các yêu cầu khác nhau của người dùng.",
-          },
-        ],
-        conLai: null,
-        nguonDoiChieu: kienThucDoiChieu || "Kiến trúc hệ thống GenAI",
-      };
-
-      alternativeProposal = {
-        strategy: "Chỉ cập nhật hình ảnh và chữ màn hình, giữ nguyên giọng đọc",
-        thayDoiChinh:
-          "Thêm nhãn sơ đồ '1 Ứng dụng -> Nhiều Mô hình' trên slide",
-        nhamToi: "Tiết kiệm chi phí thu âm lại, giải quyết bằng trực quan",
-        changes: [
-          {
-            kind: "chuTrenManHinh",
-            n: 22,
-            after: "Ứng dụng GenAI có thể kết nối đa mô hình",
-          },
-        ],
-        conLai:
-          "Người học nghe lời thoại vẫn có thể cảm thấy chưa thật rõ nếu không nhìn slide",
-      };
-    } else if (targetN === 10 || ns.includes(10)) {
-      // Ca D1 câu 10: Mô hình học máy bên trong bộ lọc
-      proposal = {
-        strategy: "Đơn giản hóa định nghĩa bộ lọc học máy",
-        thayDoiChinh:
-          "Giải thích rõ: bộ lọc thông minh sử dụng mô hình học máy được huấn luyện từ dữ liệu",
-        nhamToi:
-          "Giúp người học dễ tiếp thu khái niệm mô hình nằm trong ứng dụng",
-        changes: [
-          {
-            kind: "loi",
-            n: 10,
-            after:
-              "Bộ lọc này hoạt động dựa trên một mô hình học máy đã học từ hàng triệu email trước đó.",
-          },
-        ],
-        conLai: null,
-        nguonDoiChieu: kienThucDoiChieu || "Giáo trình nền tảng AI",
-      };
-    } else {
-      // Ca tổng quát
-      const oldText = targetSeg?.loi || "";
-      proposal = {
-        strategy: "Diễn đạt lại lời thoại rõ ràng và xúc tích hơn",
-        thayDoiChinh: `Tinh chỉnh câu ${targetN} để giải thích mạch lạc hơn`,
-        nhamToi: issue.tieuDe,
-        changes: [
-          {
-            kind: "loi",
-            n: targetN,
-            after:
-              oldText.length > 0
-                ? oldText
-                : "Nội dung giải thích được cập nhật chuẩn xác.",
-          },
-        ],
-        conLai: null,
-        nguonDoiChieu: kienThucDoiChieu || undefined,
-      };
-    }
+  // 4. Nếu không sinh được đề xuất hợp lệ: trả việc can-nguoi-viet
+  if (!proposal || !proposal.changes || proposal.changes.length === 0) {
+    return {
+      vanDeId: issue.id,
+      nhom: "bien-kich",
+      uuTien: isNoiDungSai ? 1 : issue.mucDoUuTien || 2,
+      lyDoUuTien: isNoiDungSai
+        ? "Lỗi sai kiến thức chuyên môn bắt buộc phải sửa để đảm bảo tính sư phạm"
+        : "Giải thích khó hiểu làm giảm hiệu quả tiếp thu của học viên",
+      viTri: {
+        ns,
+        v1: [startSec, endSec],
+      },
+      bangChungDo: `Không có đề xuất hợp lệ từ mô hình cho câu [${ns.join(", ")}]`,
+      deXuat: {
+        kieu: "can-nguoi-viet",
+        lyDo: loiGoiModel
+          ? `Gọi mô hình thất bại: ${loiGoiModel}`
+          : "Mô hình không sinh được đề xuất hợp lệ cho câu này",
+        cau: ns,
+        thoiGian: [startSec, endSec],
+      },
+      changes: [],
+      canhBao: [
+        loiGoiModel
+          ? `Câu [${ns.join(", ")}]: ${loiGoiModel}. Cần chạy lại hoặc để người viết xử lý.`
+          : "Mô hình không sinh được đề xuất sửa lời khả dĩ",
+      ],
+    };
   }
 
   // 4. Vòng kiểm tra tính hợp lệ qua các tool bên ngoài (TK §7.8)
@@ -210,6 +217,14 @@ export async function handleNoiDung(
 
     for (const ch of candidateChanges) {
       if (ch.kind === "loi") {
+        // Kiểm tra đề xuất rỗng (sau giống hệt trước)
+        const orig = videoIndex.segments.find((s) => s.n === ch.n);
+        if (orig && (orig.loi || "").trim() === (ch.after || "").trim()) {
+          validationErrors.push(
+            `Câu ${ch.n} đề xuất sửa rỗng (lời mới trùng hệt lời cũ)`,
+          );
+        }
+
         // Kiểm tra quy tắc kịch bản
         const ruleCheck = checkScriptRulesFn(videoIndex, {
           n: ch.n,

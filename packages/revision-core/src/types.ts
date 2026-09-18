@@ -338,6 +338,7 @@ export interface RunMetadata {
   mode?: "that" | "gia-lap";
   /** false khi run được yêu cầu bỏ qua cache node. */
   useCache?: boolean;
+  totalTokens?: number;
   error?: {
     code: string;
     message: string;

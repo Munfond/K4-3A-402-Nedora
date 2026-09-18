@@ -134,6 +134,8 @@ export async function routeIssue(ctx: HandlerContext): Promise<HandlerResult> {
   return finalResult;
 }
 
+import type { ToolCallTelemetry } from "../tools/registry";
+
 export interface RouteAllOptions {
   claims?: Claim[];
   vungBaoVe?: ProtectedZone[];
@@ -141,6 +143,7 @@ export interface RouteAllOptions {
   mode?: "k1" | "k2";
   model?: any;
   signal?: AbortSignal;
+  onToolCall?: (event: ToolCallTelemetry) => void;
 }
 
 /**
@@ -168,6 +171,7 @@ export async function routeAllIssues(
       mode: options?.mode || "k2",
       model: options?.model,
       signal: options?.signal,
+      onToolCall: options?.onToolCall,
     });
 
     results.push(res);

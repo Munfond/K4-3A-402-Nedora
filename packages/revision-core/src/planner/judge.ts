@@ -141,6 +141,7 @@ export async function judgeProposalItem(params: {
         },
         danhGiaChung: allPass ? "dat" : "can-can-nhac",
         lyDo: det.lyDo,
+        soSanhVoiCachKhac: null,
       },
     };
   }
@@ -257,6 +258,7 @@ Phương án B có tốt hơn hoặc tương đương Phương án A không?`;
         },
         danhGiaChung: "can-can-nhac",
         lyDo: `Chưa thẩm định bằng LLM (${err?.message || "lỗi không xác định"}). Đã dùng kết quả kiểm tra quy tắc bằng code.`,
+        soSanhVoiCachKhac: null,
       },
     };
   }

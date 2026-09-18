@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { getStudioPackDir } from "./lib/pack";
 import { TestSuite, skip } from "./lib/assert";
+import { createMockModel, scriptEditResponse } from "./lib/mock-model";
 import { getDefaultStore } from "../src/store";
 import { loadScriptD1 } from "../src/load";
 import { buildVideoIndex } from "../src/video-index/build";
@@ -667,10 +668,20 @@ async function runHandlerTests() {
         mucDoUuTien: 2,
       };
 
+      const seg22 = videoIndex.segments.find((s) => s.n === 22);
+      const model = createMockModel(() =>
+        scriptEditResponse(
+          22,
+          "Trong thực tế, một ứng dụng trò chuyện có thể phối hợp nhiều mô hình chuyên biệt cho từng loại yêu cầu.",
+          { n: 22, after: "Một ứng dụng có thể gọi nhiều mô hình" },
+        ),
+      );
+
       const res = await handleNoiDung({
         issue,
         videoIndex,
         mode: "k2",
+        model,
       });
 
       assert.equal(res.nhom, "bien-kich");
@@ -681,10 +692,85 @@ async function runHandlerTests() {
         res.cachKhac !== null,
         "Có đề xuất phương án phụ tiết kiệm chi phí",
       );
+      // Luật: không được có đề xuất rỗng (lời mới trùng lời cũ)
+      const change22 = res.changes[0] as { after?: string };
+      assert.notEqual(
+        (change22.after || "").trim(),
+        (seg22?.loi || "").trim(),
+        "Lời mới phải khác lời cũ",
+      );
       assert.equal(
         res.chiPhi?.viPham.length,
         0,
         "Đề xuất đạt chuẩn T1–T6, 0 vi phạm",
+      );
+    },
+  );
+
+  // HDL-09b: Không có model thì trả việc can-nguoi-viet, không bịa lời
+  await suite.run(
+    "HDL-09b: handleNoiDung chế độ giả lập trả can-nguoi-viet, không sinh lời",
+    async () => {
+      const issue: IssueV3 = {
+        id: "iss-script-22-mock",
+        intent: "kho-hieu",
+        tieuDe: "Phân biệt mô hình và ứng dụng",
+        moTa: "Hiểu nhầm một ứng dụng chỉ nối được với một mô hình",
+        trongTam: [22],
+        ngCanh: [21, 23],
+        claimIds: ["clm-22"],
+        gopYIds: ["gy-002"],
+        nguoiDocLap: 1,
+        soLuot: 1,
+        coHoiLai: false,
+        baoGianTiep: false,
+        traiChieu: false,
+        mucDoUuTien: 2,
+      };
+
+      const res = await handleNoiDung({ issue, videoIndex, mode: "k2" });
+
+      assert.equal(res.changes.length, 0, "Không được sinh thay đổi nào");
+      assert.equal(
+        (res.deXuat as { kieu?: string })?.kieu,
+        "can-nguoi-viet",
+        "Phải trả việc cần người viết",
+      );
+      assert.ok(
+        res.canhBao && res.canhBao.length > 0,
+        "Phải có cảnh báo, không hạ cấp im lặng",
+      );
+    },
+  );
+
+  // HDL-09c: Model lỗi thì lý do phải đi vào cảnh báo
+  await suite.run(
+    "HDL-09c: handleNoiDung đưa lỗi gọi model vào cảnh báo",
+    async () => {
+      const issue: IssueV3 = {
+        id: "iss-script-err",
+        intent: "kho-hieu",
+        tieuDe: "Phân biệt mô hình và ứng dụng",
+        moTa: "Hiểu nhầm",
+        trongTam: [22],
+        ngCanh: [21, 23],
+        claimIds: ["clm-22"],
+        gopYIds: ["gy-002"],
+        nguoiDocLap: 1,
+        soLuot: 1,
+        coHoiLai: false,
+        baoGianTiep: false,
+        traiChieu: false,
+        mucDoUuTien: 2,
+      };
+
+      const model = createMockModel(() => null); // luôn ném lỗi
+      const res = await handleNoiDung({ issue, videoIndex, mode: "k2", model });
+
+      assert.equal(res.changes.length, 0);
+      assert.ok(
+        res.canhBao?.some((c) => c.includes("lỗi")),
+        "Cảnh báo phải nêu lỗi gọi model",
       );
     },
   );
@@ -710,10 +796,18 @@ async function runHandlerTests() {
         mucDoUuTien: 2,
       };
 
+      const model = createMockModel(() =>
+        scriptEditResponse(
+          10,
+          "Bộ lọc này hoạt động dựa trên một mô hình học máy đã học từ rất nhiều thư trước đó.",
+        ),
+      );
+
       const res = await handleNoiDung({
         issue,
         videoIndex,
         mode: "k2",
+        model,
       });
 
       assert.equal(res.nhom, "bien-kich");
@@ -791,10 +885,18 @@ async function runHandlerTests() {
         mucDoUuTien: 2,
       };
 
+      const model = createMockModel(() =>
+        scriptEditResponse(
+          28,
+          "Ba thẻ ứng dụng này minh họa ba nhiệm vụ khác nhau của cùng một mô hình.",
+        ),
+      );
+
       const res = await routeIssue({
         issue,
         claims: [claimWithSecondary],
         videoIndex,
+        model,
       });
 
       assert.ok(

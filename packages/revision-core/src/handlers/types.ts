@@ -3,6 +3,7 @@ import type { IssueV3, ProtectedZone } from "../issues/form";
 import type { Change, PlanSimulation } from "../timeline/types";
 import type { VideoIndex } from "../video-index/types";
 import type { ScriptProposal } from "@feedback/ai";
+import type { ToolCallTelemetry } from "../tools/registry";
 
 export interface HandlerQuestion {
   id: string;
@@ -47,4 +48,5 @@ export interface HandlerContext {
   mode?: "k1" | "k2";
   model?: any;
   signal?: AbortSignal;
+  onToolCall?: (event: ToolCallTelemetry) => void;
 }

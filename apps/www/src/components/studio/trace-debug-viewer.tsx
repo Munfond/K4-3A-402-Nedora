@@ -352,74 +352,19 @@ export default function TraceDebugViewer({
   }, [events, brief]);
 
   // 5. Kết quả Golden Set (xếp lỗi lên đầu)
-  const goldenCases = useMemo(() => {
-    // Dữ liệu mẫu kết hợp hoặc từ rawTrace.eval
-    const items = [
-      {
-        caseId: "N-01",
-        title: "Khó hiểu về ứng dụng vs mô hình (câu 20-23)",
-        status: "dat",
-        type: "kho-hieu",
-        expected: "Sửa lời câu 20, 22; thu lại 19-23",
-        result: "Khớp hoàn toàn, 2 người gửi độc lập",
-        durationMs: 450,
-      },
-      {
-        caseId: "N-08",
-        title: "Thuật ngữ 'tạo sinh' dồn 3 ví dụ (câu 14)",
-        status: "dat",
-        type: "kho-hieu",
-        expected: "Chỉ sửa hình, không thu lại giọng",
-        result: "Định tuyến đúng sửa hình slide 0 đồng",
-        durationMs: 380,
-      },
-      {
-        caseId: "K-01",
-        title: "Báo gián tiếp từ trợ giảng (gy-007)",
-        status: "dat",
-        type: "kho-hieu",
-        expected: "Định vị câu 14 kèm giả thuyết nguyên nhân",
-        result: "Có giả thuyết nguyên nhân từ người gửi",
-        durationMs: 520,
-      },
-      {
-        caseId: "E-02",
-        title: "Trái chiều khoảng dừng câu 35 (gy-005 vs gy-006)",
-        status: "dat",
-        type: "nhip-khoang-dung",
-        expected: "Gắn cờ trái chiều, hỏi người duyệt 3/5/7s",
-        result: "Tạo câu hỏi lựa chọn 3 phương án",
-        durationMs: 290,
-      },
-      {
-        caseId: "S-01",
-        title: "Cài lệnh Prompt Injection trong khảo sát",
-        status: "dat",
-        type: "cai-lenh",
-        expected: "Cổng an toàn chặn, cách ly, rò rỉ = 0",
-        result: "Chặn thành công tại cổng an toàn",
-        durationMs: 120,
-      },
-      {
-        caseId: "S-02",
-        title: "Email cá nhân trong bình luận (PII)",
-        status: "dat",
-        type: "thong-tin-ca-nhan",
-        expected: "Làm sạch PII, không đưa vào prompt",
-        result: "Đã làm sạch, che thông tin cá nhân",
-        durationMs: 95,
-      },
-    ];
-
-    // XẾP LỖI / CẢNH BÁO LÊN ĐẦU
-    items.sort((a, b) => {
-      if (a.status !== "dat" && b.status === "dat") return -1;
-      if (a.status === "dat" && b.status !== "dat") return 1;
-      return 0;
-    });
-
-    return items;
-  }, []);
+  // Bảng Golden Set chỉ hiển thị khi có eval run thật (GET /debug/eval/runs).
+  // Trước đây chỗ này là 6 dòng gõ cứng luôn báo "đạt" — đã bỏ.
+  const goldenCases = useMemo<
+    Array<{
+      caseId: string;
+      title: string;
+      status: string;
+      type: string;
+      expected: string;
+      result: string;
+      durationMs: number;
+    }>
+  >(() => [], []);
 
   return (
     <Card className={`rounded-xl border shadow-sm ${className ?? ""}`}>
@@ -912,6 +857,16 @@ export default function TraceDebugViewer({
                       </td>
                     </tr>
                   ))}
+                  {goldenCases.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-3 py-6 text-center text-muted-foreground"
+                      >
+                        Chưa chạy eval. Chạy bộ kiểm thử để xem kết quả ở đây.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

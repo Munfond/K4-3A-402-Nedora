@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SafetyClassificationOutput = z.object({
+export const SafetyClassificationOutput = z.strictObject({
   nhan: z.enum([
     "an-toan",
     "tho-tuc-noi-dung",
@@ -16,7 +16,7 @@ export const SafetyClassificationOutput = z.object({
   lyDo: z.string().describe("Lý do phân loại"),
   yDungDuoc: z
     .string()
-    .optional()
+    .nullable()
     .describe(
       "Ý kiến về video đã diễn đạt lại trung tính, không chứa từ thô tục/công kích",
     ),
@@ -26,7 +26,7 @@ export type SafetyClassificationOutput = z.infer<
   typeof SafetyClassificationOutput
 >;
 
-export const ChangeSchema = z.object({
+export const ChangeSchema = z.strictObject({
   kind: z.enum([
     "loi",
     "chuTrenManHinh",
@@ -36,24 +36,24 @@ export const ChangeSchema = z.object({
     "ky-thuat",
   ]),
   n: z.number().describe("Số thứ tự câu (1-indexed)"),
-  after: z.string().optional().describe("Nội dung mới sau khi sửa"),
+  after: z.string().nullable().describe("Nội dung mới sau khi sửa"),
   kieu: z
     .enum(["ke", "giang", "nhe", "hoi", "nhan"])
-    .optional()
+    .nullable()
     .describe("Kiểu đọc mới"),
-  giay: z.number().optional().describe("Thời lượng dừng (giây) cho kind: dung"),
-  tu: z.number().optional().describe("Mốc bắt đầu kỹ thuật"),
-  den: z.number().optional().describe("Mốc kết thúc kỹ thuật"),
+  giay: z.number().nullable().describe("Thời lượng dừng (giây) cho kind: dung"),
+  tu: z.number().nullable().describe("Mốc bắt đầu kỹ thuật"),
+  den: z.number().nullable().describe("Mốc kết thúc kỹ thuật"),
   viec: z
     .enum(["mix", "phu-de", "khac"])
-    .optional()
+    .nullable()
     .describe("Loại việc kỹ thuật"),
-  moTa: z.string().optional().describe("Mô tả việc kỹ thuật"),
+  moTa: z.string().nullable().describe("Mô tả việc kỹ thuật"),
 });
 
 export type ChangeSchemaType = z.infer<typeof ChangeSchema>;
 
-export const ScriptProposalSchema = z.object({
+export const ScriptProposalSchema = z.strictObject({
   strategy: z
     .string()
     .describe(
@@ -70,27 +70,25 @@ export const ScriptProposalSchema = z.object({
     .describe("Vấn đề nào chưa giải quyết hết hoặc cần lưu ý"),
   nguonDoiChieu: z
     .string()
-    .optional()
+    .nullable()
     .describe("Nguồn kiến thức đối chiếu (bắt buộc với noi-dung-sai)"),
 });
 
 export type ScriptProposal = z.infer<typeof ScriptProposalSchema>;
 
-export const ScriptEditOutput = z.object({
+export const ScriptEditOutput = z.strictObject({
   recommended: ScriptProposalSchema.describe(
     "Đề xuất chính được khuyến nghị nhất",
   ),
-  alternative: ScriptProposalSchema.nullable()
-    .optional()
-    .describe(
-      "Phương án phụ (khác chiến lược hoặc tiết kiệm chi phí hơn, nếu có)",
-    ),
+  alternative: ScriptProposalSchema.nullable().describe(
+    "Phương án phụ (khác chiến lược hoặc tiết kiệm chi phí hơn, nếu có)",
+  ),
 });
 
 export type ScriptEditOutput = z.infer<typeof ScriptEditOutput>;
 
-export const JudgeOutput = z.object({
-  datTieuChi: z.object({
+export const JudgeOutput = z.strictObject({
+  datTieuChi: z.strictObject({
     nhamDungCauTrich: z.boolean().describe("Có nhắm trúng câu trích không"),
     thayDoiCoNghia: z
       .boolean()
@@ -105,11 +103,11 @@ export const JudgeOutput = z.object({
   danhGiaChung: z.enum(["dat", "khong-dat", "can-can-nhac"]),
   lyDo: z.string().describe("Nhận xét chi tiết của giám khảo"),
   soSanhVoiCachKhac: z
-    .object({
+    .strictObject({
       totHon: z.boolean(),
       lyDo: z.string(),
     })
-    .optional(),
+    .nullable(),
 });
 
 export type JudgeOutput = z.infer<typeof JudgeOutput>;

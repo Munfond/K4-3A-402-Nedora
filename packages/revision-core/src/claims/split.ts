@@ -1,5 +1,5 @@
 import { PROMPT_TACH_Y_SYSTEM, ClaimExtractionSchema } from "@feedback/ai";
-import { generateText, Output, type LanguageModel } from "ai";
+import { generateObject, type LanguageModel } from "ai";
 import type { FeedbackItem } from "../types";
 import type { Claim, Intent } from "./types";
 import { extractTimeMentions } from "./time-mentions";
@@ -352,6 +352,7 @@ export async function splitFeedbackBatch(
   options?: {
     model?: LanguageModel | null;
     modelMode?: "that" | "gia-lap";
+    signal?: AbortSignal;
     onWarning?: (msg: string) => void;
   },
 ): Promise<Claim[]> {
@@ -365,14 +366,15 @@ export async function splitFeedbackBatch(
       }));
       const prompt = `Danh sách phản hồi cần tách ý và phân loại:\n${JSON.stringify(payload, null, 2)}`;
 
-      const res = await generateText({
+      const res = await generateObject({
         model: options.model,
         system: PROMPT_TACH_Y_SYSTEM,
         prompt,
-        output: Output.object({ schema: ClaimExtractionSchema }),
+        schema: ClaimExtractionSchema,
+        abortSignal: options.signal,
       });
 
-      const extractedClaims = res.output.claims;
+      const extractedClaims = res.object.claims;
       const resultClaims: Claim[] = [];
 
       for (let i = 0; i < extractedClaims.length; i++) {
@@ -409,7 +411,7 @@ export async function splitFeedbackBatch(
           role,
           intent: ec.intent as Intent,
           trich: ec.trich.slice(0, 80).trim(),
-          goiYViTri: tm ? tm.raw : ec.goiYViTri,
+          goiYViTri: tm ? tm.raw : (ec.goiYViTri ?? undefined),
           mocNoi,
           chiDan: ec.chiDan,
           baoGianTiep: false,

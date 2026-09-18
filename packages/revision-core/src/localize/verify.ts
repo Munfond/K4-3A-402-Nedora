@@ -82,10 +82,7 @@ export function verifyCandidates(
       (text.includes("không phải") && segText.includes("chính là")) ||
       (text.includes("sai bản chất") && cand.diem > 0.5)
     ) {
-      const primaryN =
-        text.includes("học máy") && text.includes("trí tuệ nhân tạo")
-          ? 11
-          : cand.n;
+      const primaryN = cand.n;
       const ngCanh = [
         Math.max(1, primaryN - 1),
         primaryN,

@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-export const ClaimExtractionSchema = z.object({
+export const ClaimExtractionSchema = z.strictObject({
   claims: z.array(
-    z.object({
+    z.strictObject({
       feedbackId: z.string().describe("ID của góp ý gốc"),
       intent: z.enum([
         "noi-dung-sai",
@@ -20,21 +20,21 @@ export const ClaimExtractionSchema = z.object({
         .string()
         .max(120)
         .describe("Đoạn trích ngắn gọn phản ánh đúng ý người góp ý"),
-      goiYViTri: z.string().optional().describe("Gợi ý vị trí nếu có"),
+      goiYViTri: z.string().nullable().describe("Gợi ý vị trí nếu có"),
       mocNoi: z
-        .object({
+        .strictObject({
           tu: z.number(),
           den: z.number(),
           nguon: z.string(),
         })
-        .optional()
+        .nullable()
         .describe("Mốc thời gian (giây) nhắc đến trong góp ý"),
       chiDan: z
         .enum(["sua", "giu", "khen", "hoi"])
         .describe(
           "Chỉ dẫn xử lý: sua (sửa), giu (giữ nguyên), khen (khen ngợi), hoi (cần hỏi lại)",
         ),
-      moTaChiTiet: z.string().optional().describe("Mô tả tóm tắt ý kiến"),
+      moTaChiTiet: z.string().nullable().describe("Mô tả tóm tắt ý kiến"),
     }),
   ),
 });

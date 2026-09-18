@@ -2,7 +2,7 @@ import {
   PROMPT_AN_TOAN_SYSTEM,
   SafetyClassificationOutput,
 } from "@feedback/ai";
-import { generateText, Output, type LanguageModel } from "ai";
+import { generateObject, type LanguageModel } from "ai";
 import { toDetection, toDisplay } from "./normalize";
 import { detectAndRedactPii } from "./pii";
 import {
@@ -250,13 +250,13 @@ export async function moderateFeedbackBatch(
       } else if (options.model) {
         try {
           const prompt = `Góp ý cần phân loại:\n<gop_y>\n${p.displayContent}\n</gop_y>`;
-          const res = await generateText({
+          const res = await generateObject({
             model: options.model,
             system: PROMPT_AN_TOAN_SYSTEM,
             prompt,
-            output: Output.object({ schema: SafetyClassificationOutput }),
+            schema: SafetyClassificationOutput,
           });
-          const llmRes = res.output;
+          const llmRes = res.object;
           if (
             ruleRes.nhan === "cong-kich-ca-nhan" &&
             (llmRes.nhan === "an-toan" ||

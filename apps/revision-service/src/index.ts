@@ -31,6 +31,10 @@ import {
   sanitizeFeedbackItem,
   subscribeRunEvents,
 } from "@feedback/revision-core";
+import {
+  resolveLanguageModelForRevision,
+  resolveRevisionModelId,
+} from "@feedback/ai";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -157,10 +161,39 @@ app.post("/runs", async (c) => {
       graphVersion === "revision@3" ||
       graphVersion === "v3"
     ) {
-      const { runId, status } = await runRevisionV3(input as RunV3Input, {
-        store,
-        storedFeedback,
-      });
+      const isGiaLap =
+        (body as any).mode === "gia-lap" ||
+        (body as any).runMode === "gia-lap" ||
+        c.req.query("mode") === "gia-lap";
+      const resolvedModelId = resolveRevisionModelId();
+      const model = resolveLanguageModelForRevision(resolvedModelId);
+
+      if (!model && !isGiaLap) {
+        return c.json(
+          {
+            error: {
+              code: "MODEL_UNAVAILABLE",
+              message:
+                "Không có mô hình ngôn ngữ khả dụng. Vui lòng cấu hình API key hoặc chỉ định mode: 'gia-lap'.",
+            },
+          },
+          400,
+        );
+      }
+
+      const modelMode: "that" | "gia-lap" =
+        model && !isGiaLap ? "that" : "gia-lap";
+
+      const { runId, status } = await runRevisionV3(
+        input as RunV3Input,
+        {
+          store,
+          storedFeedback,
+          model: modelMode === "that" ? model : undefined,
+          modelMode,
+          modelId: modelMode === "that" ? resolvedModelId : "mock",
+        } as any,
+      );
 
       return c.json(
         {
