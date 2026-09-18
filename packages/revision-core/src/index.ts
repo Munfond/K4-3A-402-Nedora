@@ -18,3 +18,4 @@ export * from "./trace";
 export * from "./types";
 export * from "./validate";
 export * from "./video-index";
+export * from "./claims";
