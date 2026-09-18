@@ -16,7 +16,9 @@
     "./timeline": "./src/timeline/index.ts",
     "./moderation": "./src/moderation/index.ts",
     "./video-index": "./src/video-index/index.ts",
-    "./claims": "./src/claims/index.ts"
+    "./claims": "./src/claims/index.ts",
+    "./localize": "./src/localize/index.ts",
+    "./tools": "./src/tools/registry.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -24,6 +26,7 @@
   },
   "dependencies": {
     "@feedback/ai": "workspace:*",
+    "ai": "6.0.5",
     "zod": "^4.2.1"
   },
   "devDependencies": {

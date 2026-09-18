@@ -59,5 +59,18 @@ export interface VideoIndex {
     batDau: number;
   }>;
   tongThoiLuong: number;
+  slideChains?: Array<{
+    slideId: string;
+    cau: number[];
+    tuGiay?: number;
+    denGiay?: number;
+  }>;
+  glossary?: Array<{
+    thuatNgu: string;
+    xuatHienLanDau: number;
+    dinhNghiaO?: number;
+    dinhNghia?: string;
+  }>;
+  trangPhuDe?: SubtitlePage[];
   thieu: string[]; // phần không dựng được, kèm lý do (ví dụ "ffmpeg không có")
 }

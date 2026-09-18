@@ -51,4 +51,8 @@ export class TestSuite {
   }
 }
 
+export function skip(reason: string) {
+  console.log(`\n  ⊘ BỎ QUA: ${reason}`);
+}
+
 export { assert };

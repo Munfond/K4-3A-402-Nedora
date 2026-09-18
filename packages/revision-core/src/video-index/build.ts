@@ -2,8 +2,12 @@ import { createHash } from "node:crypto";
 
 import type { ScriptData } from "../types";
 import { analyzeAudioSentences } from "./audio";
-import { findSlideForSentence, parseSlideJson } from "./frames";
-import { extractNewTermsPerSentence } from "./glossary";
+import {
+  detectSlideChains,
+  findSlideForSentence,
+  parseSlideJson,
+} from "./frames";
+import { extractNewTermsPerSentence, TECHNICAL_GLOSSARY } from "./glossary";
 import { computePaceStats, computeSentencePace, countSyllables } from "./pace";
 import { mapSubtitlesToSentences, parseSubtitleFile } from "./subtitle";
 import { type ParsedTimecodeSentence, parseTimecodeCsv } from "./timecode";
@@ -197,7 +201,55 @@ export function buildVideoIndex(options: BuildVideoIndexOptions): VideoIndex {
   const tongThoiLuong =
     segments.length > 0 ? Math.max(...segments.map((s) => s.ketThuc)) : 0;
 
-  // 10. Hash xác định
+  // 10. Slide chains
+  const slideChains = detectSlideChains(slides);
+
+  // 11. Bảng thuật ngữ Glossary
+  const glossaryList: Array<{
+    thuatNgu: string;
+    xuatHienLanDau: number;
+    dinhNghiaO?: number;
+    dinhNghia?: string;
+  }> = [];
+
+  for (const term of TECHNICAL_GLOSSARY) {
+    const termLower = term.toLowerCase();
+    let xuatHienLanDau: number | undefined;
+    let dinhNghiaO: number | undefined;
+    let dinhNghiaText: string | undefined;
+
+    for (const s of segments) {
+      const segText = `${s.loi || ""} ${s.chuTrenManHinh || ""}`.toLowerCase();
+      if (segText.includes(termLower)) {
+        if (xuatHienLanDau === undefined) {
+          xuatHienLanDau = s.n;
+        }
+        if (
+          dinhNghiaO === undefined &&
+          (segText.includes("được gọi là") ||
+            segText.includes("là tên gọi") ||
+            segText.includes("là một cách") ||
+            segText.includes("là hệ thống") ||
+            segText.includes("học máy nằm trong") ||
+            segText.includes("nằm trong trí tuệ nhân tạo"))
+        ) {
+          dinhNghiaO = s.n;
+          dinhNghiaText = s.loi;
+        }
+      }
+    }
+
+    if (xuatHienLanDau !== undefined) {
+      glossaryList.push({
+        thuatNgu: term,
+        xuatHienLanDau,
+        dinhNghiaO: dinhNghiaO || xuatHienLanDau,
+        dinhNghia: dinhNghiaText,
+      });
+    }
+  }
+
+  // 12. Hash xác định
   const hashInput = JSON.stringify({
     videoId,
     versionId,
@@ -222,6 +274,9 @@ export function buildVideoIndex(options: BuildVideoIndexOptions): VideoIndex {
       truocCauDung: 0.0,
     },
     chuong,
+    slideChains,
+    glossary: glossaryList,
+    trangPhuDe: subtitlePages,
     tongThoiLuong: Math.round(tongThoiLuong * 10) / 10,
     thieu,
   };

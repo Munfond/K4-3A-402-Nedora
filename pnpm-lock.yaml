@@ -484,6 +484,9 @@ importers:
       '@feedback/ai':
         specifier: workspace:*
         version: link:../ai
+      ai:
+        specifier: 6.0.5
+        version: 6.0.5(zod@4.2.1)
       zod:
         specifier: ^4.2.1
         version: 4.2.1
@@ -10483,7 +10486,7 @@ snapshots:
 
   '@vercel/queue@0.0.0-alpha.33':
     dependencies:
-      '@vercel/oidc': 3.0.5
+      '@vercel/oidc': 3.8.8
       mixpart: 0.0.5-alpha.1
 
   '@vercel/slack-bolt@1.7.0(@aws-sdk/credential-provider-web-identity@3.956.0)(@slack/bolt@4.6.0(@types/express@5.0.6))(ws@8.18.3)':

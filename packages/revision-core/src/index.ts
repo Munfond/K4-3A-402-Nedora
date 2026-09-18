@@ -19,3 +19,5 @@ export * from "./types";
 export * from "./validate";
 export * from "./video-index";
 export * from "./claims";
+export * from "./localize";
+export * from "./tools/registry";

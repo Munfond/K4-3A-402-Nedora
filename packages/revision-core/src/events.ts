@@ -141,6 +141,16 @@ export type RunEvent =
   | {
       seq: number;
       at: string;
+      type: "tool.called";
+      toolName: string;
+      nodeId?: string;
+      ms: number;
+      ok: boolean;
+      bytes: number;
+    }
+  | {
+      seq: number;
+      at: string;
       type: "heartbeat";
     };
 
@@ -216,6 +226,14 @@ export type RunEventInput =
       type: "run.failed";
       errorCode: string;
       message: string;
+    }
+  | {
+      type: "tool.called";
+      toolName: string;
+      nodeId?: string;
+      ms: number;
+      ok: boolean;
+      bytes: number;
     }
   | {
       type: "heartbeat";
