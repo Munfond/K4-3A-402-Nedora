@@ -52,6 +52,7 @@ import {
   useQuyetDinh,
 } from "@/hooks/use-quyet-dinh";
 import { revisionClient, RevisionServiceError } from "@/lib/revision-client";
+import { briefToCases } from "@/lib/studio/brief-to-cases";
 import { computeReleaseSnapshot } from "@/lib/revision/engine";
 import { dinhDangPhut } from "@/lib/revision/format";
 import type { StudioFeedback, StudioVideo } from "@/lib/studio/types";
@@ -243,11 +244,11 @@ export default function VideoDetailPage({
   const cases = useMemo(() => {
     if (result?.cases && result.cases.length > 0) return result.cases;
     if (streamingCases && streamingCases.length > 0) return streamingCases;
-    return [];
-  }, [result?.cases, streamingCases]);
+    // revision@3 trả việc trong brief.viec, không còn đổ vào result.cases như
+    // v2. Chuyển sang định dạng cũ để các cột Studio dùng lại được.
+    return briefToCases(result?.brief, script);
+  }, [result?.cases, result?.brief, script, streamingCases]);
 
-  // revision@3 trả việc trong brief.viec, không còn đổ vào result.cases như v2.
-  // Thiếu cờ này thì run v3 có việc vẫn rơi vào màn "không có đề xuất nào".
   const coViecV3 = (result?.brief?.viec?.length ?? 0) > 0;
   const allFeedback = useMemo(() => result?.feedback || [], [result]);
 
